@@ -1,7 +1,4 @@
-import { Plus, Users, Bell, Settings } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/store/auth'
-import { logout } from '@/lib/auth'
+import { Plus, Users, Bell } from 'lucide-react'
 import type { Company } from '@/types'
 
 const COMPANY_COLORS = ['#4f46e5', '#0891b2', '#059669', '#d97706', '#dc2626', '#7c3aed', '#db2777', '#ea580c']
@@ -22,17 +19,6 @@ export default function AppSidebar({
   companies, sidebarView, selectedCompanyId,
   onSelectCompany, onViewAllClients, onViewReminders, onAddCompany,
 }: Props) {
-  const navigate   = useNavigate()
-  const { user, clearAuth } = useAuthStore()
-
-  async function handleLogout() {
-    await logout()
-    clearAuth()
-    navigate('/login')
-  }
-
-  const initial = (user?.name ?? user?.email ?? '?').charAt(0).toUpperCase()
-
   const iconBtn = (active: boolean, onClick: () => void, title: string, children: React.ReactNode) => (
     <button
       title={title}
@@ -64,9 +50,9 @@ export default function AppSidebar({
         fontSize: 13, fontWeight: 700, color: '#111',
         flexShrink: 0, marginBottom: 6, cursor: 'default',
       }}
-        title={user?.name ?? user?.email ?? ''}
+        title="Abelha"
       >
-        {initial}
+        A
       </div>
 
       <div style={{ width: 34, height: 1, backgroundColor: '#252525', margin: '2px 0 6px' }} />
@@ -114,8 +100,6 @@ export default function AppSidebar({
       {iconBtn(sidebarView === 'reminders',   onViewReminders,  'Lembretes',         <Bell size={17} />)}
 
       <div style={{ flex: 1 }} />
-
-      {iconBtn(false, handleLogout, 'Sair', <Settings size={17} />)}
     </aside>
   )
 }
