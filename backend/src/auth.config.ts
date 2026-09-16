@@ -5,6 +5,8 @@ import type { Session, User } from "@auth/core/types"
 import bcrypt from "bcryptjs"
 import { db } from "./db/index"
 
+const isProduction = process.env.NODE_ENV === "production"
+
 export const authConfig: ExpressAuthConfig = {
   providers: [
     Credentials({
@@ -68,6 +70,20 @@ export const authConfig: ExpressAuthConfig = {
     },
   },
   session: { strategy: "jwt" },
+  // Frontend e API ficam em domínios diferentes na Vercel/Render.
+  // Em produção, o cookie precisa ser Secure e SameSite=None para acompanhar
+  // as requisições autenticadas feitas pelo frontend.
+  cookies: {
+    sessionToken: {
+      name: isProduction ? "__Secure-authjs.session-token" : "authjs.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: isProduction ? "none" : "lax",
+        path: "/",
+        secure: isProduction,
+      },
+    },
+  },
   // Necessário para funcionar sem HTTPS em desenvolvimento
   trustHost: true,
 }
