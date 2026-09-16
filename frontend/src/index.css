@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
+
+/* ── Paleta melon e tipografia ── */
+@theme {
+  --color-melon-50:  #FEFEF0;
+  --color-melon-100: #FDFDC4;
+  --color-melon-200: #FBFB88;
+  --color-melon-300: #F5F560;
+  --color-melon-400: #F5E642;
+  --color-melon-500: #D4D418;
+  --color-melon-600: #AAAA12;
+  --color-melon-700: #7E7E0D;
+  --color-melon-800: #565608;
+  --color-melon-900: #3A3A05;
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+/* ── Variáveis do shadcn/ui (tema claro) ── */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
+
+  /* primary = melon-400 (#F5E642) em HSL */
+  --primary: 56 89% 61%;
+  --primary-foreground: 240 10% 3.9%;
+
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+  --accent: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --ring: 56 89% 61%;
+  --radius: 0.5rem;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border-color: hsl(var(--border));
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  -webkit-font-smoothing: antialiased;
+}

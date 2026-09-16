@@ -1,0 +1,26 @@
+app = "abelha-evolution-api"
+primary_region = "gru"
+
+[build]
+
+[env]
+  DATABASE_ENABLED = "true"
+  DATABASE_PROVIDER = "postgresql"
+  REDIS_ENABLED = "false"
+  CACHE_REDIS_ENABLED = "false"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+[mounts]
+  source = "evolution_data"
+  destination = "/evolution/store"
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1

@@ -1,0 +1,13 @@
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+backend/dist/
+frontend/dist/
+backend/.env
+frontend/.env.local
+.DS_Store
+backend/cookies.txt
+backend/test-auth.mjs
+backend/reset-password.mjs
+CLAUDE.md
+.claude/
