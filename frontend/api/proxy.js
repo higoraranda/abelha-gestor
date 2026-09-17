@@ -15,8 +15,22 @@ function serializeBody(request) {
   return JSON.stringify(request.body)
 }
 
+function createTargetUrl(request) {
+  const rawTarget = request.query?.target
+  const target = (Array.isArray(rawTarget) ? rawTarget.join('/') : String(rawTarget || '')).replace(/^\/+/, '')
+  const targetUrl = new URL(`/api/${target}`, BACKEND_URL)
+
+  for (const [name, value] of Object.entries(request.query || {})) {
+    if (name === 'target' || value == null) continue
+    if (Array.isArray(value)) value.forEach((entry) => targetUrl.searchParams.append(name, String(entry)))
+    else targetUrl.searchParams.set(name, String(value))
+  }
+
+  return targetUrl
+}
+
 export default async function handler(request, response) {
-  const targetUrl = new URL(request.url || '/', BACKEND_URL)
+  const targetUrl = createTargetUrl(request)
   const headers = new Headers()
 
   for (const [name, value] of Object.entries(request.headers)) {
