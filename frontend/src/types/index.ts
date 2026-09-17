@@ -109,6 +109,7 @@ export interface FinanceSummary {
   openAmount: number
   overdueAmount: number
   projectedTotal: number
+  activeMrr: number
   monthly: Array<{ month: string; received: number; projected: number }>
 }
 

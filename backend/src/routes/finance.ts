@@ -18,7 +18,16 @@ router.get("/summary", async (req, res) => {
         ), 0) AS received_month,
         COALESCE(SUM(amount) FILTER (WHERE status = 'open' AND due_date >= CURRENT_DATE), 0) AS open_amount,
         COALESCE(SUM(amount) FILTER (WHERE status = 'open' AND due_date < CURRENT_DATE), 0) AS overdue_amount,
-        COALESCE(SUM(amount) FILTER (WHERE status <> 'cancelled'), 0) AS projected_total
+        COALESCE(SUM(amount) FILTER (WHERE status <> 'cancelled'), 0) AS projected_total,
+        COALESCE((
+          SELECT SUM(cc.monthly_fee)
+          FROM client_contracts cc
+          WHERE cc.organization_id = ${orgId}
+            AND cc.status = 'active'
+            AND cc.monthly_fee > 0
+            AND cc.development_end_date <= CURRENT_DATE
+            AND cc.contract_end_date >= CURRENT_DATE
+        ), 0) AS active_mrr
       FROM receivables WHERE organization_id = ${orgId}
     `
     const monthly = await db`
@@ -42,6 +51,7 @@ router.get("/summary", async (req, res) => {
       openAmount: Number(totals.open_amount),
       overdueAmount: Number(totals.overdue_amount),
       projectedTotal: Number(totals.projected_total),
+      activeMrr: Number(totals.active_mrr),
       monthly: monthly.map((row) => ({ month: row.month, received: Number(row.received), projected: Number(row.projected) })),
     })
   } catch (error) {

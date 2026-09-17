@@ -3417,7 +3417,7 @@ textarea:focus-visible {
   border-top: 2px solid #c95c53;
 }
 
-.finance-live-metric.is-projected {
+.finance-live-metric.is-mrr {
   color: #f7f7f2;
   background: var(--sidebar);
 }
@@ -3532,47 +3532,131 @@ textarea:focus-visible {
 .finance-search input { border: 0; }
 .order-button { align-self: end; }
 
-.finance-table-head,
-.finance-table-row {
+.finance-client-groups {
   display: grid;
-  grid-template-columns: minmax(150px, 1.1fr) minmax(150px, 1.2fr) 92px 92px 78px 105px;
-  gap: 12px;
-  align-items: center;
-  padding: 0 20px;
+  gap: 10px;
+  padding: 0 20px 20px;
 }
 
-.finance-table-head {
+.finance-client-group {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.finance-client-group > header {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: center;
+  min-height: 68px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--line);
+  background: #fafaf7;
+}
+
+.finance-client-avatar {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  color: #4c451f;
+  background: #f5eaa5;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.finance-client-heading,
+.finance-client-total,
+.finance-charge-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.finance-client-heading h3,
+.finance-client-heading p {
+  margin: 0;
+}
+
+.finance-client-heading h3 {
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.finance-client-heading p,
+.finance-client-total small,
+.finance-charge-copy small {
+  color: var(--ink-faint);
+  font-size: 8px;
+}
+
+.finance-client-heading p {
+  margin-top: 3px;
+}
+
+.finance-client-total {
+  align-items: flex-end;
+  gap: 2px;
+  text-align: right;
+}
+
+.finance-client-total strong {
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.finance-client-charges {
+  overflow-x: auto;
+}
+
+.finance-client-charge-head,
+.finance-client-charge-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.4fr) 92px 92px 82px 105px;
+  gap: 12px;
+  align-items: center;
+  min-width: 690px;
+  padding: 0 14px;
+}
+
+.finance-client-charge-head {
   min-height: 38px;
-  border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
   color: var(--ink-faint);
-  background: #fafaf7;
+  background: #fff;
   font-size: 8px;
   font-weight: 600;
   text-transform: uppercase;
 }
 
-.finance-table-row {
-  min-height: 58px;
+.finance-client-charge-row {
+  min-height: 56px;
   border-bottom: 1px solid #ededE8;
   font-size: 9px;
 }
 
-.finance-table-row > span:first-child {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
+.finance-client-charge-row:last-child {
+  border-bottom: 0;
+}
+
+.finance-charge-copy {
   gap: 3px;
 }
 
-.finance-table-row > span:first-child strong {
+.finance-charge-copy strong {
   overflow: hidden;
   font-size: 10px;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.finance-table-row small { color: var(--ink-faint); }
-.finance-row-skeleton { height: 42px; margin: 8px 14px; }
+.finance-client-group-skeleton { height: 132px; border-radius: 12px; }
 .finance-list-empty { min-height: 260px; }
 
 .button-quiet {
@@ -3908,9 +3992,6 @@ textarea:focus-visible {
   .finance-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .finance-search { grid-column: 1 / -1; min-height: 38px; }
   .order-button { align-self: end; }
-  .finance-table { overflow-x: auto; }
-  .finance-table-head,
-  .finance-table-row { min-width: 820px; }
   .pricing-menu,
   .pricing-context-grid { grid-template-columns: minmax(0, 1fr); }
   .pricing-menu { gap: 30px; }
@@ -3950,6 +4031,10 @@ textarea:focus-visible {
   .bar-chart { gap: 8px; padding-right: 0; padding-left: 0; }
   .finance-toolbar { grid-template-columns: minmax(0, 1fr); }
   .finance-search { grid-column: 1; }
+  .finance-client-groups { padding-right: 14px; padding-left: 14px; }
+  .finance-client-group > header { grid-template-columns: 30px minmax(0, 1fr) auto; padding-right: 11px; padding-left: 11px; }
+  .finance-client-avatar { width: 30px; height: 30px; }
+  .finance-client-total strong { font-size: 13px; }
   .pricing-header { align-items: stretch; flex-direction: column; }
   .pricing-menu { min-height: 0; padding: 24px 18px; }
   .pricing-mode-list > button { min-height: 116px; grid-template-columns: 42px minmax(0, 1fr) 18px; padding: 14px 3px; }

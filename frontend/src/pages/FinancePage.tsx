@@ -60,6 +60,34 @@ export default function FinancePage() {
   }, [loadReceivables])
 
   const maxChart = useMemo(() => Math.max(1, ...(summary?.monthly.flatMap((item) => [item.projected, item.received]) ?? [1])), [summary])
+  const clientGroups = useMemo(() => {
+    const groups = new Map<string, {
+      clientId: string
+      clientName: string
+      items: Receivable[]
+      total: number
+      openCount: number
+      overdueCount: number
+    }>()
+
+    for (const item of receivables) {
+      const current = groups.get(item.clientId) ?? {
+        clientId: item.clientId,
+        clientName: item.clientName ?? 'Cliente sem nome',
+        items: [],
+        total: 0,
+        openCount: 0,
+        overdueCount: 0,
+      }
+      current.items.push(item)
+      current.total += item.amount
+      if (item.status === 'open') current.openCount += 1
+      if (item.status === 'overdue') current.overdueCount += 1
+      groups.set(item.clientId, current)
+    }
+
+    return Array.from(groups.values())
+  }, [receivables])
 
   async function markPaid() {
     if (!paying) return
@@ -89,7 +117,7 @@ export default function FinancePage() {
     { label: 'Recebido no mês', value: summary?.receivedMonth ?? 0, note: 'Baixas registradas', icon: CalendarCheck, className: 'received' },
     { label: 'Em aberto', value: summary?.openAmount ?? 0, note: 'Vencimentos atuais e futuros', icon: Clock3, className: 'open' },
     { label: 'Atrasado', value: summary?.overdueAmount ?? 0, note: 'Exige acompanhamento', icon: CircleAlert, className: 'overdue' },
-    { label: 'Total projetado', value: summary?.projectedTotal ?? 0, note: 'Contratos não cancelados', icon: WalletCards, className: 'projected' },
+    { label: 'MRR ativo', value: summary?.activeMrr ?? 0, note: 'Mensalidades recorrentes ativas', icon: WalletCards, className: 'mrr' },
   ]
 
   return (
@@ -117,7 +145,7 @@ export default function FinancePage() {
       </section>
 
       <section className="finance-receivables-section">
-        <div className="finance-table-title"><div><p className="panel-kicker">Cobranças</p><h2>Contas a receber</h2></div><span>{receivables.length} resultados</span></div>
+        <div className="finance-table-title"><div><p className="panel-kicker">Cobranças</p><h2>Contas por cliente</h2></div><span>{clientGroups.length} {clientGroups.length === 1 ? 'cliente' : 'clientes'} · {receivables.length} {receivables.length === 1 ? 'cobrança' : 'cobranças'}</span></div>
         <div className="finance-toolbar">
           <label className="finance-search"><Search size={16} aria-hidden="true" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar cliente ou serviço" /></label>
           <label><span>Situação</span><select value={status} onChange={(event) => setStatus(event.target.value)}><option value="all">Todas</option><option value="open">Em aberto</option><option value="overdue">Atrasadas</option><option value="paid">Pagas</option><option value="cancelled">Canceladas</option></select></label>
@@ -126,15 +154,29 @@ export default function FinancePage() {
           <button type="button" className="icon-button order-button" onClick={() => setOrder((current) => current === 'asc' ? 'desc' : 'asc')} aria-label="Inverter ordem de vencimento"><ArrowDownUp size={17} aria-hidden="true" /></button>
         </div>
 
-        <div className="finance-table">
-          <div className="finance-table-head"><span>Cliente</span><span>Serviço</span><span>Vencimento</span><span>Valor</span><span>Situação</span><span>Ação</span></div>
-          {loading ? Array.from({ length: 5 }, (_, index) => <div className="skeleton finance-row-skeleton" key={index} />) : null}
-          {!loading && receivables.map((item) => (
-            <div className="finance-table-row" key={item.id}>
-              <span><strong>{item.clientName ?? 'Cliente sem nome'}</strong><small>{item.kind === 'monthly_fee' ? 'Mensalidade' : `Parcela ${item.installmentNumber ?? ''}`}</small></span>
-              <span>{item.serviceName}</span><span>{formatDate(item.dueDate)}</span><strong>{currency.format(item.amount)}</strong><span className={`status-pill status-${item.status}`}>{LABELS[item.status]}</span>
-              <span>{item.status === 'paid' ? <button type="button" className="button button-quiet button-small" onClick={() => reopen(item)}><Undo2 size={14} aria-hidden="true" /> Reabrir</button> : item.status !== 'cancelled' ? <button type="button" className="button button-primary button-small" onClick={() => { setPaying(item); setPaidAt(new Date().toISOString().slice(0, 10)) }}><Check size={14} aria-hidden="true" /> Dar baixa</button> : '—'}</span>
-            </div>
+        <div className="finance-client-groups">
+          {loading ? Array.from({ length: 3 }, (_, index) => <div className="skeleton finance-client-group-skeleton" key={index} />) : null}
+          {!loading && clientGroups.map((group) => (
+            <article className="finance-client-group" key={group.clientId}>
+              <header>
+                <span className="finance-client-avatar">{group.clientName.charAt(0).toUpperCase()}</span>
+                <div className="finance-client-heading">
+                  <h3>{group.clientName}</h3>
+                  <p>{group.items.length} {group.items.length === 1 ? 'cobrança' : 'cobranças'}{group.openCount > 0 ? ` · ${group.openCount} em aberto` : ''}{group.overdueCount > 0 ? ` · ${group.overdueCount} em atraso` : ''}</p>
+                </div>
+                <div className="finance-client-total"><small>Total filtrado</small><strong>{currency.format(group.total)}</strong></div>
+              </header>
+              <div className="finance-client-charges">
+                <div className="finance-client-charge-head"><span>Serviço</span><span>Vencimento</span><span>Valor</span><span>Situação</span><span>Ação</span></div>
+                {group.items.map((item) => (
+                  <div className="finance-client-charge-row" key={item.id}>
+                    <span className="finance-charge-copy"><strong>{item.serviceName}</strong><small>{item.kind === 'monthly_fee' ? 'Mensalidade recorrente' : `Parcela ${item.installmentNumber ?? ''}`}</small></span>
+                    <span>{formatDate(item.dueDate)}</span><strong>{currency.format(item.amount)}</strong><span className={`status-pill status-${item.status}`}>{LABELS[item.status]}</span>
+                    <span>{item.status === 'paid' ? <button type="button" className="button button-quiet button-small" onClick={() => reopen(item)}><Undo2 size={14} aria-hidden="true" /> Reabrir</button> : item.status !== 'cancelled' ? <button type="button" className="button button-primary button-small" onClick={() => { setPaying(item); setPaidAt(new Date().toISOString().slice(0, 10)) }}><Check size={14} aria-hidden="true" /> Dar baixa</button> : '—'}</span>
+                  </div>
+                ))}
+              </div>
+            </article>
           ))}
           {!loading && receivables.length === 0 ? <div className="panel-empty finance-list-empty"><span className="empty-icon"><CircleDollarSign size={21} aria-hidden="true" /></span><strong>Nenhuma cobrança encontrada</strong><p>As cobranças são criadas automaticamente com os contratos dos clientes.</p></div> : null}
         </div>
