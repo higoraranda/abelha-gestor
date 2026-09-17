@@ -50,13 +50,26 @@ export default async function handler(request, response) {
       redirect: 'manual',
     })
 
-    response.statusCode = upstream.status
+    const isAuthRedirect = targetUrl.pathname.startsWith('/api/auth/')
+      && upstream.status >= 300
+      && upstream.status < 400
+      && upstream.headers.has('location')
+
+    response.statusCode = isAuthRedirect ? 200 : upstream.status
     upstream.headers.forEach((value, name) => {
-      if (!RESPONSE_HEADERS_TO_SKIP.has(name.toLowerCase())) response.setHeader(name, value)
+      if (!RESPONSE_HEADERS_TO_SKIP.has(name.toLowerCase()) && !(isAuthRedirect && name.toLowerCase() === 'location')) {
+        response.setHeader(name, value)
+      }
     })
 
     const cookies = upstream.headers.getSetCookie?.() || []
     if (cookies.length > 0) response.setHeader('set-cookie', cookies)
+
+    if (isAuthRedirect) {
+      response.setHeader('content-type', 'application/json; charset=utf-8')
+      response.end(JSON.stringify({ url: '/' }))
+      return
+    }
 
     response.end(Buffer.from(await upstream.arrayBuffer()))
   } catch (error) {
