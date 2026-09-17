@@ -24,12 +24,9 @@ router.get("/", async (req, res) => {
         c.created_at,
         cl.id         AS client_id_val,
         cl.name       AS client_name,
-        cl.whatsapp   AS client_whatsapp,
-        co.id         AS company_id_val,
-        co.name       AS company_name
+        cl.whatsapp   AS client_whatsapp
       FROM conversations c
       LEFT JOIN clients cl  ON cl.id = c.client_id
-      LEFT JOIN companies co ON co.id = cl.company_id
       WHERE c.organization_id = ${orgId}
       ORDER BY c.last_message_at DESC NULLS LAST
       LIMIT ${limit} OFFSET ${offset}
@@ -48,7 +45,6 @@ router.get("/", async (req, res) => {
               id:      r.client_id_val,
               name:    r.client_name,
               whatsapp: r.client_whatsapp,
-              company: r.company_id_val ? { id: r.company_id_val, name: r.company_name } : null,
             }
           : null,
       }))
@@ -75,12 +71,9 @@ router.get("/:id", async (req, res) => {
         c.created_at,
         cl.id         AS client_id_val,
         cl.name       AS client_name,
-        cl.whatsapp   AS client_whatsapp,
-        co.id         AS company_id_val,
-        co.name       AS company_name
+        cl.whatsapp   AS client_whatsapp
       FROM conversations c
       LEFT JOIN clients cl  ON cl.id = c.client_id
-      LEFT JOIN companies co ON co.id = cl.company_id
       WHERE c.id = ${id} AND c.organization_id = ${orgId}
     `
 
@@ -110,7 +103,6 @@ router.get("/:id", async (req, res) => {
             id:       conv.client_id_val,
             name:     conv.client_name,
             whatsapp: conv.client_whatsapp,
-            company:  conv.company_id_val ? { id: conv.company_id_val, name: conv.company_name } : null,
           }
         : null,
       messages: messages.map((m) => ({

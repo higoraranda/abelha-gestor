@@ -95,19 +95,9 @@ export default function ConversationList({ conversations, selectedId, loading, o
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    {conv.client?.company ? (
-                      <span style={{ fontSize: '12px', color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {conv.client.company.name}
-                      </span>
-                    ) : (
-                      <span style={{
-                        fontSize: '11px', color: '#9ca3af',
-                        border: '1px solid #e5e7eb', borderRadius: '4px',
-                        padding: '1px 5px', flexShrink: 0,
-                      }}>
-                        Sem empresa
-                      </span>
-                    )}
+                    <span style={{ fontSize: '12px', color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {conv.client?.whatsapp ?? 'Contato não identificado'}
+                    </span>
                     {conv.unreadCount > 0 && (
                       <span style={{
                         backgroundColor: '#F2E600',

@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL as string
+import { API_BASE_URL } from '@/lib/apiBase'
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const headers: HeadersInit = {
@@ -6,15 +6,16 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     ...options.headers,
   }
 
-  const response = await fetch(`${BASE_URL}${path}`, {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     headers,
     credentials: 'include',
   })
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Erro desconhecido' }))
-    throw new Error((error as { message?: string }).message ?? `HTTP ${response.status}`)
+    const error = await response.json().catch(() => ({ error: 'Erro desconhecido' }))
+    const body = error as { error?: string; message?: string }
+    throw new Error(body.error ?? body.message ?? `HTTP ${response.status}`)
   }
 
   if (response.status === 204) return undefined as T

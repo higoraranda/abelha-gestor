@@ -1,23 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { X } from 'lucide-react'
 import { api } from '@/lib/api'
-import type { Client, Company } from '@/types'
+import type { Client } from '@/types'
 
 interface Props {
   onClose:          () => void
   onCreate:         (client: Client) => void
-  defaultCompanyId?: string
 }
 
-export default function NewClientModal({ onClose, onCreate, defaultCompanyId }: Props) {
-  const [companies, setCompanies] = useState<Company[]>([])
-  const [form, setForm] = useState({ name: '', whatsapp: '', email: '', notes: '', company_id: defaultCompanyId ?? '' })
+export default function NewClientModal({ onClose, onCreate }: Props) {
+  const [form, setForm] = useState({ name: '', whatsapp: '', email: '', notes: '' })
   const [saving, setSaving]   = useState(false)
   const [error, setError]     = useState<string | null>(null)
-
-  useEffect(() => {
-    api.get<Company[]>('/api/v1/companies').then(setCompanies).catch(console.error)
-  }, [])
 
   function set(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -26,7 +20,7 @@ export default function NewClientModal({ onClose, onCreate, defaultCompanyId }: 
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!form.company_id) { setError('Empresa é obrigatória'); return }
+    if (!form.name.trim()) { setError('Nome é obrigatório'); return }
     setSaving(true)
     try {
       const client = await api.post<Client>('/api/v1/clients', {
@@ -34,7 +28,6 @@ export default function NewClientModal({ onClose, onCreate, defaultCompanyId }: 
         whatsapp:   form.whatsapp.trim() || null,
         email:      form.email.trim() || null,
         notes:      form.notes.trim() || null,
-        company_id: form.company_id,
       })
       onCreate(client)
       onClose()
@@ -80,8 +73,8 @@ export default function NewClientModal({ onClose, onCreate, defaultCompanyId }: 
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           <div>
-            <label style={labelStyle}>Nome</label>
-            <input style={inputStyle} type="text" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Nome do cliente" />
+            <label style={labelStyle}>Nome <span style={{ color: '#ef4444' }}>*</span></label>
+            <input style={inputStyle} type="text" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Nome do cliente" required autoFocus />
           </div>
 
           <div>
@@ -92,28 +85,6 @@ export default function NewClientModal({ onClose, onCreate, defaultCompanyId }: 
           <div>
             <label style={labelStyle}>Email</label>
             <input style={inputStyle} type="email" value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="email@exemplo.com" />
-          </div>
-
-          <div>
-            <label style={{ ...labelStyle }}>
-              Empresa <span style={{ color: '#ef4444' }}>*</span>
-            </label>
-            <select
-              value={form.company_id}
-              onChange={(e) => set('company_id', e.target.value)}
-              style={{ ...inputStyle, appearance: 'auto' }}
-              required
-            >
-              <option value="">Selecione uma empresa</option>
-              {companies.map((co) => (
-                <option key={co.id} value={co.id}>{co.name}</option>
-              ))}
-            </select>
-            {companies.length === 0 && (
-              <p style={{ fontSize: '12px', color: '#9ca3af', margin: '4px 0 0' }}>
-                Nenhuma empresa cadastrada ainda. Cadastre uma empresa primeiro.
-              </p>
-            )}
           </div>
 
           <div>

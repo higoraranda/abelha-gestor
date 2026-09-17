@@ -1,11 +1,10 @@
 import { Search, UserPlus } from 'lucide-react'
-import type { Client, Company, Reminder } from '@/types'
+import type { Client, Reminder } from '@/types'
 
-export type ClientListView = 'company' | 'all-clients' | 'reminders'
+export type ClientListView = 'all-clients' | 'reminders'
 
 interface Props {
   sidebarView:       ClientListView
-  selectedCompany:   Company | null
   clients:           Client[]
   reminders:         Reminder[]
   loading:           boolean
@@ -25,12 +24,11 @@ function formatDue(dueAt: string) {
 }
 
 export default function ClientColumn({
-  sidebarView, selectedCompany, clients, reminders, loading,
+  sidebarView, clients, reminders, loading,
   search, onSearch, onSelectClient, onSelectReminder, onNewClient, selectedClientId,
 }: Props) {
   const title =
     sidebarView === 'reminders'                    ? 'Lembretes' :
-    sidebarView === 'company' && selectedCompany   ? selectedCompany.name :
     'Todos os clientes'
 
   const isReminders = sidebarView === 'reminders'
@@ -131,15 +129,9 @@ export default function ClientColumn({
                 <p style={{ fontSize: 13, fontWeight: 500, color: '#111', margin: '0 0 2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {label}
                 </p>
-                {client.company ? (
-                  <p style={{ fontSize: 11, color: '#888', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {client.company.name}
-                  </p>
-                ) : (
-                  <span style={{ fontSize: 10, color: '#bbb', border: '1px solid #e5e7eb', borderRadius: 3, padding: '0 4px' }}>
-                    Sem empresa
-                  </span>
-                )}
+                <p style={{ fontSize: 11, color: '#888', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {client.whatsapp ?? client.email ?? 'Sem contato informado'}
+                </p>
               </div>
             </button>
           )

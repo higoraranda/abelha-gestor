@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Phone, Mail, Building2, StickyNote, Clock } from 'lucide-react'
+import { Phone, Mail, StickyNote, Clock } from 'lucide-react'
 import { api } from '@/lib/api'
 import type { ClientDetail, Reminder } from '@/types'
 
@@ -76,13 +76,7 @@ export default function ClientDetailPanel({ detail }: Props) {
         </div>
         <div style={{ textAlign: 'center' }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: '#111', margin: '0 0 4px' }}>{label}</p>
-          {detail.company ? (
-            <p style={{ fontSize: 11, color: '#888', margin: 0 }}>{detail.company.name}</p>
-          ) : (
-            <span style={{ fontSize: 10, color: '#bbb', border: '1px solid #e5e7eb', borderRadius: 3, padding: '1px 5px' }}>
-              Sem empresa
-            </span>
-          )}
+          <p style={{ fontSize: 11, color: '#888', margin: 0 }}>{detail.whatsapp ?? detail.email ?? 'Sem contato informado'}</p>
         </div>
       </div>
 
@@ -90,7 +84,6 @@ export default function ClientDetailPanel({ detail }: Props) {
       <div style={{ padding: '14px 16px', borderBottom: '1px solid rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {detail.whatsapp  && row(<Phone    size={12} color="#bbb" />, detail.whatsapp)}
         {detail.email     && row(<Mail     size={12} color="#bbb" />, detail.email)}
-        {detail.company   && row(<Building2 size={12} color="#bbb" />, detail.company.name)}
         {detail.notes     && row(<StickyNote size={12} color="#bbb" />, detail.notes)}
       </div>
 

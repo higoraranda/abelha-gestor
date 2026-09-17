@@ -66,12 +66,6 @@ export default function ChatMessages({ detail, loading, message, sending, onMess
           {label.charAt(0).toUpperCase()}
         </div>
         <span style={{ fontSize: 13, fontWeight: 600, color: '#111' }}>{label}</span>
-        {detail.company && (
-          <>
-            <span style={{ color: '#ccc', fontSize: 12 }}>·</span>
-            <span style={{ fontSize: 12, color: '#888' }}>{detail.company.name}</span>
-          </>
-        )}
         {detail.whatsapp && (
           <>
             <span style={{ color: '#ccc', fontSize: 12 }}>·</span>

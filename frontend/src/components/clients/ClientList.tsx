@@ -102,19 +102,9 @@ export default function ClientList({ clients, selectedId, loading, search, onSea
                   <p style={{ fontSize: '14px', fontWeight: 600, color: '#111827', margin: '0 0 2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {label}
                   </p>
-                  {client.company ? (
-                    <p style={{ fontSize: '12px', color: '#6b7280', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {client.company.name}
-                    </p>
-                  ) : (
-                    <span style={{
-                      fontSize: '11px', color: '#9ca3af',
-                      border: '1px solid #e5e7eb', borderRadius: '4px',
-                      padding: '1px 5px',
-                    }}>
-                      Sem empresa
-                    </span>
-                  )}
+                  <p style={{ fontSize: '12px', color: '#6b7280', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {client.whatsapp ?? client.email ?? 'Sem contato informado'}
+                  </p>
                 </div>
               </button>
             )

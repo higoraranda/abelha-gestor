@@ -2,25 +2,23 @@ import {
   ArrowRight,
   Bell,
   BriefcaseBusiness,
-  Building2,
   CalendarCheck,
   CircleAlert,
   ContactRound,
   Plus,
   TrendingUp,
+  UserPlus,
   WalletCards,
 } from 'lucide-react'
-import type { Client, Company, Reminder } from '@/types'
+import type { Client, Reminder } from '@/types'
 
 interface Props {
   clients: Client[]
-  companies: Company[]
   reminders: Reminder[]
   loading: boolean
   syncError: string | null
   onNewClient: () => void
   onOpenClients: () => void
-  onOpenCompanies: () => void
   onOpenFinance: () => void
   onOpenPipeline: () => void
   onOpenReminders: () => void
@@ -75,13 +73,11 @@ function buildMonthlyClients(clients: Client[]) {
 
 export default function DashboardPage({
   clients,
-  companies,
   reminders,
   loading,
   syncError,
   onNewClient,
   onOpenClients,
-  onOpenCompanies,
   onOpenFinance,
   onOpenPipeline,
   onOpenReminders,
@@ -90,6 +86,7 @@ export default function DashboardPage({
   const overdueReminders = pendingReminders.filter((reminder) => new Date(reminder.dueAt) < new Date())
   const recentClients = clients.slice(0, 4)
   const monthlyClients = buildMonthlyClients(clients)
+  const newThisMonth = monthlyClients.at(-1)?.count ?? 0
   const maxMonthlyClients = Math.max(...monthlyClients.map((month) => month.count), 1)
   const hasActivity = monthlyClients.some((month) => month.count > 0)
 
@@ -138,10 +135,10 @@ export default function DashboardPage({
           tone="accent"
         />
         <MetricCard
-          label="Empresas"
-          value={companies.length.toLocaleString('pt-BR')}
-          detail={companies.length === 1 ? 'empresa ativa' : 'empresas ativas'}
-          icon={Building2}
+          label="Novos no mês"
+          value={newThisMonth.toLocaleString('pt-BR')}
+          detail={newThisMonth === 1 ? 'novo cliente' : 'novos clientes'}
+          icon={UserPlus}
         />
         <MetricCard
           label="Pendências"
@@ -245,7 +242,7 @@ export default function DashboardPage({
                     <span className="client-avatar">{label.charAt(0).toUpperCase()}</span>
                     <span className="recent-client-copy">
                       <strong>{label}</strong>
-                      <small>{client.company?.name ?? 'Sem empresa vinculada'}</small>
+                      <small>{client.whatsapp ?? client.email ?? 'Sem contato informado'}</small>
                     </span>
                     <span className="client-date">{formatShortDate(client.createdAt)}</span>
                   </button>
@@ -270,9 +267,9 @@ export default function DashboardPage({
             </div>
           </div>
           <div className="quick-actions">
-            <button type="button" onClick={onOpenCompanies}>
-              <span><Building2 size={18} aria-hidden="true" /></span>
-              <div><strong>Empresas</strong><small>Organize contas e contatos</small></div>
+            <button type="button" onClick={onOpenClients}>
+              <span><UserPlus size={18} aria-hidden="true" /></span>
+              <div><strong>Clientes</strong><small>Cadastre e acompanhe contatos</small></div>
               <ArrowRight size={15} aria-hidden="true" />
             </button>
             <button type="button" onClick={onOpenFinance}>

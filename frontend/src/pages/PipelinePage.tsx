@@ -50,8 +50,8 @@ export default function PipelinePage({ clients, onNewClient }: Props) {
                   return (
                     <div className="pipeline-card" key={client.id}>
                       <div className="pipeline-card-head"><span>{label.charAt(0).toUpperCase()}</span><strong>{label}</strong></div>
-                      <p>{client.company?.name ?? 'Sem empresa vinculada'}</p>
-                      <small>{client.email ?? client.whatsapp ?? 'Contato não informado'}</small>
+                      <p>{client.whatsapp ?? 'Telefone não informado'}</p>
+                      <small>{client.email ?? 'Email não informado'}</small>
                     </div>
                   )
                 }) : (

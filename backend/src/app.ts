@@ -7,8 +7,8 @@ import conversationsRouter from "./routes/conversations"
 import messagesRouter from "./routes/messages"
 import eventsRouter from "./routes/events"
 import clientsRouter from "./routes/clients"
-import companiesRouter from "./routes/companies"
 import remindersRouter from "./routes/reminders"
+import catalogRouter from "./routes/catalog"
 import webhooksRouter from "./routes/webhooks"
 
 const app = express()
@@ -30,8 +30,8 @@ app.use("/api/auth/*", ExpressAuth(authConfig))
 app.use("/api/v1/conversations", conversationsRouter)
 app.use("/api/v1/messages", messagesRouter)
 app.use("/api/v1/clients", clientsRouter)
-app.use("/api/v1/companies", companiesRouter)
 app.use("/api/v1/reminders", remindersRouter)
+app.use("/api/v1/catalog", catalogRouter)
 app.use("/api/events", eventsRouter)
 app.use("/webhooks", webhooksRouter)
 

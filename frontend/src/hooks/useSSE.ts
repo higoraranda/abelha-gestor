@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
-
-const BASE_URL = import.meta.env.VITE_API_URL as string
+import { API_BASE_URL } from '@/lib/apiBase'
 
 export function useSSE(onEvent: (event: string, data: unknown) => void) {
   const callbackRef = useRef(onEvent)
@@ -10,7 +9,7 @@ export function useSSE(onEvent: (event: string, data: unknown) => void) {
   }, [onEvent])
 
   useEffect(() => {
-    const es = new EventSource(`${BASE_URL}/api/events`, { withCredentials: true })
+    const es = new EventSource(`${API_BASE_URL}/api/events`, { withCredentials: true })
 
     const handle = (eventName: string) => (e: MessageEvent) => {
       try {

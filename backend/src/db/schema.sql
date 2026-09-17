@@ -3,6 +3,7 @@
 -- =============================================
 
 DROP TABLE IF EXISTS reminders CASCADE;
+DROP TABLE IF EXISTS catalog_items CASCADE;
 DROP TABLE IF EXISTS messages CASCADE;
 DROP TABLE IF EXISTS conversations CASCADE;
 DROP TABLE IF EXISTS pipeline_cards CASCADE;
@@ -160,3 +161,36 @@ CREATE TABLE reminders (
 
 CREATE INDEX idx_reminders_organization ON reminders(organization_id);
 CREATE INDEX idx_reminders_due_at       ON reminders(organization_id, due_at);
+
+-- =============================================
+-- CATALOG ITEMS (produtos, serviços e preços)
+-- =============================================
+CREATE TABLE catalog_items (
+  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  organization_id       UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  code                  VARCHAR(120),
+  name                  VARCHAR(255) NOT NULL,
+  description           TEXT,
+  item_type             VARCHAR(30) NOT NULL DEFAULT 'service'
+                          CHECK (item_type IN ('service', 'package', 'plan', 'addon', 'option')),
+  category              VARCHAR(60) NOT NULL DEFAULT 'outros',
+  base_price            NUMERIC(12, 2) NOT NULL DEFAULT 0 CHECK (base_price >= 0),
+  setup_price           NUMERIC(12, 2) CHECK (setup_price IS NULL OR setup_price >= 0),
+  monthly_price         NUMERIC(12, 2) CHECK (monthly_price IS NULL OR monthly_price >= 0),
+  premium_monthly_price NUMERIC(12, 2) CHECK (premium_monthly_price IS NULL OR premium_monthly_price >= 0),
+  weight                INTEGER CHECK (weight IS NULL OR weight >= 0),
+  pages_included        INTEGER CHECK (pages_included IS NULL OR pages_included >= 0),
+  extra_page_price      NUMERIC(12, 2) CHECK (extra_page_price IS NULL OR extra_page_price >= 0),
+  multiplier            NUMERIC(8, 4) CHECK (multiplier IS NULL OR multiplier > 0),
+  per_page              BOOLEAN NOT NULL DEFAULT FALSE,
+  featured              BOOLEAN NOT NULL DEFAULT FALSE,
+  active                BOOLEAN NOT NULL DEFAULT TRUE,
+  included_item_codes   TEXT[] NOT NULL DEFAULT '{}',
+  attributes            JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (organization_id, code)
+);
+
+CREATE INDEX idx_catalog_items_organization
+  ON catalog_items(organization_id, active, category, name);

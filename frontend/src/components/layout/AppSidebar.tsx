@@ -1,13 +1,12 @@
 import {
-  Bell,
-  Building2,
+  CalendarDays,
   ChartNoAxesCombined,
-  ChevronDown,
   CircleDollarSign,
   ContactRound,
   LayoutDashboard,
   MessageSquareText,
-  PanelLeftClose,
+  PackageOpen,
+  LogOut,
   Settings,
   Sparkles,
   X,
@@ -16,34 +15,35 @@ import {
 export type AppView =
   | 'overview'
   | 'clients'
-  | 'companies'
   | 'inbox'
   | 'pipeline'
   | 'finance'
-  | 'reminders'
+  | 'agenda'
+  | 'catalog'
 
 interface Props {
   activeView: AppView
   isOpen: boolean
   onClose: () => void
   onChange: (view: AppView) => void
+  onLogout: () => void
   pendingReminders: number
 }
 
 const PRIMARY_NAV = [
   { id: 'overview', label: 'Visão geral', icon: LayoutDashboard },
   { id: 'clients', label: 'Clientes', icon: ContactRound },
-  { id: 'companies', label: 'Empresas', icon: Building2 },
   { id: 'inbox', label: 'Conversas', icon: MessageSquareText },
 ] as const
 
 const OPERATIONS_NAV = [
   { id: 'pipeline', label: 'Pipeline', icon: ChartNoAxesCombined },
   { id: 'finance', label: 'Financeiro', icon: CircleDollarSign },
-  { id: 'reminders', label: 'Lembretes', icon: Bell },
+  { id: 'agenda', label: 'Agenda', icon: CalendarDays },
+  { id: 'catalog', label: 'Serviços e preços', icon: PackageOpen },
 ] as const
 
-export default function AppSidebar({ activeView, isOpen, onClose, onChange, pendingReminders }: Props) {
+export default function AppSidebar({ activeView, isOpen, onClose, onChange, onLogout, pendingReminders }: Props) {
   function select(view: AppView) {
     onChange(view)
     onClose()
@@ -62,7 +62,7 @@ export default function AppSidebar({ activeView, isOpen, onClose, onChange, pend
       >
         <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
         <span>{label}</span>
-        {id === 'reminders' && pendingReminders > 0 ? (
+        {id === 'agenda' && pendingReminders > 0 ? (
           <span className="sidebar-badge" aria-label={`${pendingReminders} lembretes pendentes`}>
             {pendingReminders > 99 ? '99+' : pendingReminders}
           </span>
@@ -83,14 +83,13 @@ export default function AppSidebar({ activeView, isOpen, onClose, onChange, pend
         </button>
       </div>
 
-      <button type="button" className="workspace-switcher" title="Trocar espaço de trabalho">
+      <div className="workspace-switcher">
         <span className="workspace-avatar">HG</span>
         <span className="workspace-copy">
-          <strong>Meu negócio</strong>
-          <small>Espaço principal</small>
+          <strong>Carteira pessoal</strong>
+          <small>Uso individual</small>
         </span>
-        <ChevronDown size={15} aria-hidden="true" />
-      </button>
+      </div>
 
       <nav className="sidebar-navigation">
         <div className="sidebar-nav-group">
@@ -116,14 +115,14 @@ export default function AppSidebar({ activeView, isOpen, onClose, onChange, pend
           <Settings size={18} strokeWidth={1.8} aria-hidden="true" />
           <span>Configurações</span>
         </button>
-        <div className="sidebar-user">
+        <button type="button" className="sidebar-user" onClick={onLogout} title="Sair da conta">
           <span className="sidebar-user-avatar">HA</span>
           <span>
             <strong>Higor Aranda</strong>
             <small>Administrador</small>
           </span>
-          <PanelLeftClose size={17} aria-hidden="true" />
-        </div>
+          <LogOut size={17} aria-hidden="true" />
+        </button>
       </div>
     </aside>
   )

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { Phone, Mail, Building2, StickyNote } from 'lucide-react'
+import { Phone, Mail, StickyNote } from 'lucide-react'
 import { api } from '@/lib/api'
 import type { Client, Message } from '@/types'
 
@@ -91,16 +91,7 @@ export default function ClientPanel({ clientId }: Props) {
             <p style={{ fontSize: '16px', fontWeight: 600, color: '#111827', margin: 0, lineHeight: 1.3 }}>
               {label}
             </p>
-            {detail.company ? (
-              <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>{detail.company.name}</p>
-            ) : (
-              <span style={{
-                fontSize: '11px', color: '#9ca3af',
-                border: '1px solid #e5e7eb', borderRadius: '4px', padding: '1px 6px',
-              }}>
-                Sem empresa
-              </span>
-            )}
+            <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>{detail.whatsapp ?? detail.email ?? 'Sem contato informado'}</p>
           </div>
         </div>
 
@@ -115,12 +106,6 @@ export default function ClientPanel({ clientId }: Props) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Mail size={13} color="#9ca3af" />
               <span style={{ fontSize: '13px', color: '#374151' }}>{detail.email}</span>
-            </div>
-          )}
-          {detail.company && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Building2 size={13} color="#9ca3af" />
-              <span style={{ fontSize: '13px', color: '#374151' }}>{detail.company.name}</span>
             </div>
           )}
           {detail.notes && (

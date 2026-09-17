@@ -1,18 +1,21 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { api } from '@/lib/api'
-import type { Client, ClientDetail, Company, Reminder } from '@/types'
+import { logout } from '@/lib/auth'
+import { useAuthStore } from '@/store/auth'
+import type { Client, ClientDetail, Reminder } from '@/types'
 import AppSidebar, { type AppView } from '@/components/layout/AppSidebar'
 import ClientColumn, { type ClientListView } from '@/components/layout/ClientColumn'
 import ChatMessages from '@/components/layout/ChatMessages'
 import ClientDetailPanel from '@/components/layout/ClientDetailPanel'
 import NewClientModal from '@/components/clients/NewClientModal'
-import NewCompanyModal from '@/components/clients/NewCompanyModal'
-import CompaniesPage from '@/pages/CompaniesPage'
 import DashboardPage from '@/pages/DashboardPage'
 import FinancePage from '@/pages/FinancePage'
 import InboxPage from '@/pages/InboxPage'
 import PipelinePage from '@/pages/PipelinePage'
+import AgendaPage from '@/pages/AgendaPage'
+import CatalogPage from '@/pages/CatalogPage'
 
 interface Tab {
   id: string
@@ -20,11 +23,11 @@ interface Tab {
 }
 
 export default function AppPage() {
+  const navigate = useNavigate()
+  const clearAuth = useAuthStore((state) => state.clearAuth)
   const [activeView, setActiveView] = useState<AppView>('overview')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [companies, setCompanies] = useState<Company[]>([])
   const [clientListView, setClientListView] = useState<ClientListView>('all-clients')
-  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null)
   const [clients, setClients] = useState<Client[]>([])
   const [clientsLoading, setClientsLoading] = useState(true)
   const [overviewLoading, setOverviewLoading] = useState(true)
@@ -38,23 +41,20 @@ export default function AppPage() {
   const [chatInput, setChatInput] = useState('')
   const [sending, setSending] = useState(false)
   const [showClientModal, setShowClientModal] = useState(false)
-  const [showCompanyModal, setShowCompanyModal] = useState(false)
 
   useEffect(() => {
     let active = true
 
     Promise.allSettled([
-      api.get<Company[]>('/api/v1/companies'),
       api.get<Client[]>('/api/v1/clients'),
       api.get<Reminder[]>('/api/v1/reminders'),
-    ]).then(([companyResult, clientResult, reminderResult]) => {
+    ]).then(([clientResult, reminderResult]) => {
       if (!active) return
 
-      if (companyResult.status === 'fulfilled') setCompanies(companyResult.value)
       if (clientResult.status === 'fulfilled') setClients(clientResult.value)
       if (reminderResult.status === 'fulfilled') setReminders(reminderResult.value)
 
-      const failed = [companyResult, clientResult, reminderResult].some((result) => result.status === 'rejected')
+      const failed = [clientResult, reminderResult].some((result) => result.status === 'rejected')
       setSyncError(failed ? 'A API não respondeu com uma sessão válida.' : null)
       setClientsLoading(false)
       setOverviewLoading(false)
@@ -63,12 +63,11 @@ export default function AppPage() {
     return () => { active = false }
   }, [])
 
-  const fetchClients = useCallback((query: string, companyId: string | null, view: ClientListView) => {
+  const fetchClients = useCallback((query: string, view: ClientListView) => {
     if (view === 'reminders') return
     setClientsLoading(true)
     const params = new URLSearchParams()
     if (query) params.set('search', query)
-    if (companyId) params.set('company_id', companyId)
     const searchParams = params.toString()
 
     api.get<Client[]>(`/api/v1/clients${searchParams ? `?${searchParams}` : ''}`)
@@ -82,12 +81,12 @@ export default function AppPage() {
 
   useEffect(() => {
     if (activeView !== 'clients') return
-    const timer = window.setTimeout(() => fetchClients(search, selectedCompanyId, clientListView), 250)
+    const timer = window.setTimeout(() => fetchClients(search, clientListView), 250)
     return () => window.clearTimeout(timer)
-  }, [activeView, clientListView, fetchClients, search, selectedCompanyId])
+  }, [activeView, clientListView, fetchClients, search])
 
   useEffect(() => {
-    if (activeView !== 'reminders') return
+    if (activeView !== 'agenda') return
     api.get<Reminder[]>('/api/v1/reminders')
       .then((data) => {
         setReminders(data)
@@ -136,21 +135,11 @@ export default function AppPage() {
   function openClients() {
     setActiveView('clients')
     setClientListView('all-clients')
-    setSelectedCompanyId(null)
-    setSearch('')
-  }
-
-  function openCompany(companyId: string) {
-    setActiveView('clients')
-    setClientListView('company')
-    setSelectedCompanyId(companyId)
     setSearch('')
   }
 
   function openReminders() {
-    setActiveView('reminders')
-    setClientListView('reminders')
-    setSelectedCompanyId(null)
+    setActiveView('agenda')
   }
 
   function handleViewChange(view: AppView) {
@@ -158,7 +147,7 @@ export default function AppPage() {
       openClients()
       return
     }
-    if (view === 'reminders') {
+    if (view === 'agenda') {
       openReminders()
       return
     }
@@ -170,11 +159,6 @@ export default function AppPage() {
     setActiveView('clients')
     setClientListView('all-clients')
     openTab(client)
-  }
-
-  function handleCreatedCompany(company: Company) {
-    setCompanies((currentCompanies) => [...currentCompanies, company])
-    openCompany(company.id)
   }
 
   function handleSelectReminder(reminder: Reminder) {
@@ -219,15 +203,21 @@ export default function AppPage() {
     }
   }
 
-  const selectedCompany = companies.find((company) => company.id === selectedCompanyId) ?? null
+  async function handleLogout() {
+    try {
+      await logout()
+    } finally {
+      clearAuth()
+      navigate('/login', { replace: true })
+    }
+  }
+
   const pendingReminderCount = reminders.filter((reminder) => !reminder.completed).length
-  const defaultCompanyId = clientListView === 'company' && selectedCompanyId ? selectedCompanyId : undefined
 
   const clientWorkspace = (
     <div className="client-workspace">
       <ClientColumn
         sidebarView={clientListView}
-        selectedCompany={selectedCompany}
         clients={clients}
         reminders={reminders}
         loading={clientsLoading}
@@ -288,13 +278,11 @@ export default function AppPage() {
       content = (
         <DashboardPage
           clients={clients}
-          companies={companies}
           reminders={reminders}
           loading={overviewLoading}
           syncError={syncError}
           onNewClient={() => setShowClientModal(true)}
           onOpenClients={openClients}
-          onOpenCompanies={() => setActiveView('companies')}
           onOpenFinance={() => setActiveView('finance')}
           onOpenPipeline={() => setActiveView('pipeline')}
           onOpenReminders={openReminders}
@@ -302,11 +290,7 @@ export default function AppPage() {
       )
       break
     case 'clients':
-    case 'reminders':
       content = clientWorkspace
-      break
-    case 'companies':
-      content = <CompaniesPage companies={companies} clients={clients} loading={overviewLoading} onNewCompany={() => setShowCompanyModal(true)} onOpenCompany={openCompany} />
       break
     case 'inbox':
       content = <InboxPage />
@@ -317,6 +301,12 @@ export default function AppPage() {
     case 'finance':
       content = <FinancePage />
       break
+    case 'agenda':
+      content = <AgendaPage clients={clients} reminders={reminders} onRemindersChange={setReminders} />
+      break
+    case 'catalog':
+      content = <CatalogPage />
+      break
   }
 
   return (
@@ -326,6 +316,7 @@ export default function AppPage() {
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
         onChange={handleViewChange}
+        onLogout={handleLogout}
         pendingReminders={pendingReminderCount}
       />
       {mobileMenuOpen ? <button type="button" className="sidebar-overlay" onClick={() => setMobileMenuOpen(false)} aria-label="Fechar menu" /> : null}
@@ -342,10 +333,7 @@ export default function AppPage() {
       </main>
 
       {showClientModal ? (
-        <NewClientModal onClose={() => setShowClientModal(false)} onCreate={handleCreatedClient} defaultCompanyId={defaultCompanyId} />
-      ) : null}
-      {showCompanyModal ? (
-        <NewCompanyModal onClose={() => setShowCompanyModal(false)} onCreate={handleCreatedCompany} />
+        <NewClientModal onClose={() => setShowClientModal(false)} onCreate={handleCreatedClient} />
       ) : null}
     </div>
   )
