@@ -110,7 +110,44 @@ export interface FinanceSummary {
   overdueAmount: number
   projectedTotal: number
   activeMrr: number
+  expensesMonth: number
+  balanceMonth: number
   monthly: Array<{ month: string; received: number; projected: number }>
+}
+
+export interface FinanceClientSummary {
+  clientId: string
+  clientName: string | null
+  email: string | null
+  whatsapp: string | null
+  serviceNames: string
+  totalAmount: number
+  paidAmount: number
+  remainingAmount: number
+  overdueAmount: number
+  activeMrr: number
+  nextDueDate: string | null
+}
+
+export interface FinanceClientDetail extends FinanceClientSummary {
+  receivables: Receivable[]
+}
+
+export type ExpenseCategory = 'subscriptions' | 'ads' | 'tools' | 'taxes' | 'services' | 'infrastructure' | 'other'
+export type ExpenseStatus = 'planned' | 'paid'
+
+export interface Expense {
+  id: string
+  organizationId: string
+  description: string
+  category: ExpenseCategory
+  amount: number
+  expenseDate: string
+  status: ExpenseStatus
+  paidAt: string | null
+  notes: string | null
+  createdAt: string
+  updatedAt: string
 }
 
 export interface Reminder {
