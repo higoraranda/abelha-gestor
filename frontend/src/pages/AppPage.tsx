@@ -11,9 +11,7 @@ import DashboardPage from '@/pages/DashboardPage'
 import ClientsPage from '@/pages/ClientsPage'
 import FinancePage from '@/pages/FinancePage'
 import InboxPage from '@/pages/InboxPage'
-import PipelinePage from '@/pages/PipelinePage'
 import AgendaPage from '@/pages/AgendaPage'
-import CatalogPage from '@/pages/CatalogPage'
 
 export default function AppPage() {
   const navigate = useNavigate()
@@ -78,7 +76,6 @@ export default function AppPage() {
           onNewClient={() => setShowClientModal(true)}
           onOpenClients={() => setActiveView('clients')}
           onOpenFinance={() => setActiveView('finance')}
-          onOpenPipeline={() => setActiveView('pipeline')}
           onOpenReminders={() => setActiveView('agenda')}
         />
       )
@@ -89,17 +86,11 @@ export default function AppPage() {
     case 'inbox':
       content = <InboxPage />
       break
-    case 'pipeline':
-      content = <PipelinePage clients={clients} onNewClient={() => setShowClientModal(true)} />
-      break
     case 'finance':
       content = <FinancePage />
       break
     case 'agenda':
       content = <AgendaPage clients={clients} reminders={reminders} onRemindersChange={setReminders} />
-      break
-    case 'catalog':
-      content = <CatalogPage />
       break
   }
 
@@ -120,7 +111,7 @@ export default function AppPage() {
           <button type="button" className="icon-button" onClick={() => setMobileMenuOpen(true)} aria-label="Abrir menu">
             <Menu size={19} aria-hidden="true" />
           </button>
-          <span className="mobile-brand"><img src="/bee-logo.png" alt="" /> abelha</span>
+          <span className="mobile-brand"><img src="/bee-mark.png" alt="" /> abelha</span>
           <span className="mobile-avatar">HA</span>
         </div>
         <div className="app-view">{content}</div>

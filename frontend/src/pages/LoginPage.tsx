@@ -31,7 +31,7 @@ export default function LoginPage() {
   return (
     <main className="login-page">
       <section className="login-intro" aria-label="Apresentação do Abelha">
-        <div className="login-brand"><img className="brand-mark" src="/bee-logo.png" alt="" /><strong>abelha</strong></div>
+        <div className="login-brand"><img className="brand-mark" src="/bee-mark.png" alt="" /><strong>abelha</strong></div>
         <div className="login-intro-copy">
           <p className="eyebrow">Seu CRM pessoal</p>
           <h1>Clientes, conversas e financeiro sob o seu controle.</h1>

@@ -27,7 +27,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   if (checking) {
     return (
       <div className="auth-loading" aria-busy="true" aria-label="Verificando acesso">
-        <img className="brand-mark auth-bee" src="/bee-logo.png" alt="" />
+        <img className="brand-mark auth-bee" src="/bee-mark.png" alt="" />
         <div className="skeleton auth-loading-bar" />
       </div>
     )

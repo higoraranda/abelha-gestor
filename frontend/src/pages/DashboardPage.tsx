@@ -1,7 +1,6 @@
 import {
   ArrowRight,
   Bell,
-  BriefcaseBusiness,
   CalendarCheck,
   CircleAlert,
   ContactRound,
@@ -20,7 +19,6 @@ interface Props {
   onNewClient: () => void
   onOpenClients: () => void
   onOpenFinance: () => void
-  onOpenPipeline: () => void
   onOpenReminders: () => void
 }
 
@@ -79,7 +77,6 @@ export default function DashboardPage({
   onNewClient,
   onOpenClients,
   onOpenFinance,
-  onOpenPipeline,
   onOpenReminders,
 }: Props) {
   const pendingReminders = reminders.filter((reminder) => !reminder.completed)
@@ -275,11 +272,6 @@ export default function DashboardPage({
             <button type="button" onClick={onOpenFinance}>
               <span><WalletCards size={18} aria-hidden="true" /></span>
               <div><strong>Financeiro</strong><small>Receitas, despesas e cobranças</small></div>
-              <ArrowRight size={15} aria-hidden="true" />
-            </button>
-            <button type="button" onClick={onOpenPipeline}>
-              <span><BriefcaseBusiness size={18} aria-hidden="true" /></span>
-              <div><strong>Pipeline</strong><small>Acompanhe novas oportunidades</small></div>
               <ArrowRight size={15} aria-hidden="true" />
             </button>
           </div>

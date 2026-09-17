@@ -1,14 +1,13 @@
 import {
   CalendarDays,
   Calculator,
-  ChartNoAxesCombined,
   CircleDollarSign,
   ContactRound,
+  ExternalLink,
   LayoutDashboard,
   MessageSquareText,
   LogOut,
   Settings,
-  Sparkles,
   X,
 } from 'lucide-react'
 
@@ -16,10 +15,8 @@ export type AppView =
   | 'overview'
   | 'clients'
   | 'inbox'
-  | 'pipeline'
   | 'finance'
   | 'agenda'
-  | 'catalog'
 
 interface Props {
   activeView: AppView
@@ -37,10 +34,8 @@ const PRIMARY_NAV = [
 ] as const
 
 const OPERATIONS_NAV = [
-  { id: 'pipeline', label: 'Pipeline', icon: ChartNoAxesCombined },
   { id: 'finance', label: 'Financeiro', icon: CircleDollarSign },
   { id: 'agenda', label: 'Agenda', icon: CalendarDays },
-  { id: 'catalog', label: 'Calculadora de preços', icon: Calculator },
 ] as const
 
 export default function AppSidebar({ activeView, isOpen, onClose, onChange, onLogout, pendingReminders }: Props) {
@@ -75,7 +70,7 @@ export default function AppSidebar({ activeView, isOpen, onClose, onChange, onLo
     <aside className={`app-sidebar${isOpen ? ' is-open' : ''}`} aria-label="Navegação principal">
       <div className="sidebar-brand-row">
         <button type="button" className="sidebar-brand" onClick={() => select('overview')} aria-label="Ir para a visão geral">
-          <img className="brand-mark" src="/bee-logo.png" alt="" />
+          <img className="brand-mark" src="/bee-mark.png" alt="" />
           <span className="brand-name">abelha</span>
         </button>
         <button type="button" className="sidebar-close" onClick={onClose} aria-label="Fechar menu">
@@ -104,13 +99,20 @@ export default function AppSidebar({ activeView, isOpen, onClose, onChange, onLo
       </nav>
 
       <div className="sidebar-footer">
-        <div className="sidebar-insight">
-          <span className="insight-icon"><Sparkles size={15} aria-hidden="true" /></span>
-          <div>
-            <strong>Central de melhorias</strong>
-            <p>Seu CRM crescerá por módulos.</p>
-          </div>
-        </div>
+        <a
+          className="sidebar-calculator-link"
+          href="https://project-k3a8s.vercel.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Abrir calculadora de preços em uma nova aba"
+        >
+          <span className="calculator-link-icon"><Calculator size={16} strokeWidth={1.8} aria-hidden="true" /></span>
+          <span className="calculator-link-copy">
+            <strong>Calculadora de preços</strong>
+            <small>Abrir ferramenta de propostas</small>
+          </span>
+          <ExternalLink size={15} strokeWidth={1.8} aria-hidden="true" />
+        </a>
         <button type="button" className="sidebar-nav-item">
           <Settings size={18} strokeWidth={1.8} aria-hidden="true" />
           <span>Configurações</span>
