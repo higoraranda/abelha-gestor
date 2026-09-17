@@ -23,10 +23,6 @@ export default function MessageThread({ conversation, messages, loading, sending
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  useEffect(() => {
-    setInput('')
-  }, [conversation?.id])
-
   function submit() {
     const trimmed = input.trim()
     if (!trimmed || sending) return

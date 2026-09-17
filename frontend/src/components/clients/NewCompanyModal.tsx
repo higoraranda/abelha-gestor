@@ -32,8 +32,8 @@ export default function NewCompanyModal({ onClose, onCreate }: Props) {
       })
       onCreate(company)
       onClose()
-    } catch (err: any) {
-      setError(err.message ?? 'Erro ao criar empresa')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erro ao criar empresa')
     } finally {
       setSaving(false)
     }

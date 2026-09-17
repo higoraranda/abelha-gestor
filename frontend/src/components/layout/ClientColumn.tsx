@@ -1,9 +1,10 @@
 import { Search, UserPlus } from 'lucide-react'
 import type { Client, Company, Reminder } from '@/types'
-import type { SidebarView } from './AppSidebar'
+
+export type ClientListView = 'company' | 'all-clients' | 'reminders'
 
 interface Props {
-  sidebarView:       SidebarView
+  sidebarView:       ClientListView
   selectedCompany:   Company | null
   clients:           Client[]
   reminders:         Reminder[]

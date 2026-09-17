@@ -28,11 +28,23 @@ export default function ClientPanel({ clientId }: Props) {
   const bottomRef             = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    setLoading(true)
-    api.get<ClientDetail>(`/api/v1/clients/${clientId}`)
-      .then(setDetail)
-      .catch(console.error)
-      .finally(() => setLoading(false))
+    let cancelled = false
+
+    async function loadClient() {
+      setLoading(true)
+      try {
+        const data = await api.get<ClientDetail>(`/api/v1/clients/${clientId}`)
+        if (!cancelled) setDetail(data)
+      } catch (error) {
+        console.error(error)
+        if (!cancelled) setDetail(null)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    void loadClient()
+    return () => { cancelled = true }
   }, [clientId])
 
   useEffect(() => {

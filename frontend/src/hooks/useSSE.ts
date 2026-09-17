@@ -4,7 +4,10 @@ const BASE_URL = import.meta.env.VITE_API_URL as string
 
 export function useSSE(onEvent: (event: string, data: unknown) => void) {
   const callbackRef = useRef(onEvent)
-  callbackRef.current = onEvent
+
+  useEffect(() => {
+    callbackRef.current = onEvent
+  }, [onEvent])
 
   useEffect(() => {
     const es = new EventSource(`${BASE_URL}/api/events`, { withCredentials: true })

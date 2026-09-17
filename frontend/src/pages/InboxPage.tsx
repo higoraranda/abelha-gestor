@@ -23,19 +23,36 @@ export default function InboxPage() {
   }, [])
 
   useEffect(() => {
-    if (!selectedId) { setMessages([]); return }
+    if (!selectedId) return
+    let cancelled = false
 
-    setLoadingMsgs(true)
-    api.get<ConversationDetail>(`/api/v1/conversations/${selectedId}`)
-      .then((data) => setMessages(data.messages))
-      .catch(console.error)
-      .finally(() => setLoadingMsgs(false))
+    async function loadConversation() {
+      setLoadingMsgs(true)
+      try {
+        const [data] = await Promise.all([
+          api.get<ConversationDetail>(`/api/v1/conversations/${selectedId}`),
+          api.post(`/api/v1/conversations/${selectedId}/read`, {}),
+        ])
+        if (cancelled) return
+        setMessages(data.messages)
+        setConversations((prev) => prev.map((conversation) =>
+          conversation.id === selectedId ? { ...conversation, unreadCount: 0 } : conversation
+        ))
+      } catch (error) {
+        console.error(error)
+      } finally {
+        if (!cancelled) setLoadingMsgs(false)
+      }
+    }
 
-    api.post(`/api/v1/conversations/${selectedId}/read`, {}).catch(console.error)
-    setConversations((prev) =>
-      prev.map((c) => (c.id === selectedId ? { ...c, unreadCount: 0 } : c))
-    )
+    void loadConversation()
+    return () => { cancelled = true }
   }, [selectedId])
+
+  function selectConversation(id: string) {
+    setMessages([])
+    setSelectedId(id)
+  }
 
   useSSE((event, data) => {
     if (event !== 'new_message') return
@@ -84,9 +101,10 @@ export default function InboxPage() {
         conversations={conversations}
         selectedId={selectedId}
         loading={loadingConvs}
-        onSelect={setSelectedId}
+        onSelect={selectConversation}
       />
       <MessageThread
+        key={selectedId ?? 'no-conversation'}
         conversation={conversations.find((c) => c.id === selectedId) ?? null}
         messages={messages}
         loading={loadingMsgs}

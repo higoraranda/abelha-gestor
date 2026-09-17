@@ -1,184 +1,232 @@
-import { useState, useEffect, useCallback } from 'react'
-import { X } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { Menu, X } from 'lucide-react'
 import { api } from '@/lib/api'
-import type { Client, Company, ClientDetail, Reminder } from '@/types'
-import AppSidebar, { type SidebarView } from '@/components/layout/AppSidebar'
-import ClientColumn from '@/components/layout/ClientColumn'
+import type { Client, ClientDetail, Company, Reminder } from '@/types'
+import AppSidebar, { type AppView } from '@/components/layout/AppSidebar'
+import ClientColumn, { type ClientListView } from '@/components/layout/ClientColumn'
 import ChatMessages from '@/components/layout/ChatMessages'
 import ClientDetailPanel from '@/components/layout/ClientDetailPanel'
 import NewClientModal from '@/components/clients/NewClientModal'
 import NewCompanyModal from '@/components/clients/NewCompanyModal'
+import CompaniesPage from '@/pages/CompaniesPage'
+import DashboardPage from '@/pages/DashboardPage'
+import FinancePage from '@/pages/FinancePage'
+import InboxPage from '@/pages/InboxPage'
+import PipelinePage from '@/pages/PipelinePage'
 
 interface Tab {
-  id:    string
+  id: string
   label: string
 }
 
 export default function AppPage() {
-  const [companies,         setCompanies]         = useState<Company[]>([])
-  const [sidebarView,       setSidebarView]       = useState<SidebarView>('all-clients')
+  const [activeView, setActiveView] = useState<AppView>('overview')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [companies, setCompanies] = useState<Company[]>([])
+  const [clientListView, setClientListView] = useState<ClientListView>('all-clients')
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null)
-  const [clients,           setClients]           = useState<Client[]>([])
-  const [clientsLoading,    setClientsLoading]    = useState(true)
-  const [search,            setSearch]            = useState('')
-  const [reminders,         setReminders]         = useState<Reminder[]>([])
-  const [openTabs,          setOpenTabs]          = useState<Tab[]>([])
-  const [activeTabId,       setActiveTabId]       = useState<string | null>(null)
-  const [activeDetail,      setActiveDetail]      = useState<ClientDetail | null>(null)
-  const [detailLoading,     setDetailLoading]     = useState(false)
-  const [chatInput,         setChatInput]         = useState('')
-  const [sending,           setSending]           = useState(false)
-  const [showClientModal,   setShowClientModal]   = useState(false)
-  const [showCompanyModal,  setShowCompanyModal]  = useState(false)
+  const [clients, setClients] = useState<Client[]>([])
+  const [clientsLoading, setClientsLoading] = useState(true)
+  const [overviewLoading, setOverviewLoading] = useState(true)
+  const [syncError, setSyncError] = useState<string | null>(null)
+  const [search, setSearch] = useState('')
+  const [reminders, setReminders] = useState<Reminder[]>([])
+  const [openTabs, setOpenTabs] = useState<Tab[]>([])
+  const [activeTabId, setActiveTabId] = useState<string | null>(null)
+  const [activeDetail, setActiveDetail] = useState<ClientDetail | null>(null)
+  const [detailLoading, setDetailLoading] = useState(false)
+  const [chatInput, setChatInput] = useState('')
+  const [sending, setSending] = useState(false)
+  const [showClientModal, setShowClientModal] = useState(false)
+  const [showCompanyModal, setShowCompanyModal] = useState(false)
 
-  // Fetch companies on mount
   useEffect(() => {
-    api.get<Company[]>('/api/v1/companies')
-      .then(setCompanies)
-      .catch(console.error)
+    let active = true
+
+    Promise.allSettled([
+      api.get<Company[]>('/api/v1/companies'),
+      api.get<Client[]>('/api/v1/clients'),
+      api.get<Reminder[]>('/api/v1/reminders'),
+    ]).then(([companyResult, clientResult, reminderResult]) => {
+      if (!active) return
+
+      if (companyResult.status === 'fulfilled') setCompanies(companyResult.value)
+      if (clientResult.status === 'fulfilled') setClients(clientResult.value)
+      if (reminderResult.status === 'fulfilled') setReminders(reminderResult.value)
+
+      const failed = [companyResult, clientResult, reminderResult].some((result) => result.status === 'rejected')
+      setSyncError(failed ? 'A API não respondeu com uma sessão válida.' : null)
+      setClientsLoading(false)
+      setOverviewLoading(false)
+    })
+
+    return () => { active = false }
   }, [])
 
-  // Fetch clients when view/company/search changes (debounce search)
-  const fetchClients = useCallback((q: string, compId: string | null, view: SidebarView) => {
+  const fetchClients = useCallback((query: string, companyId: string | null, view: ClientListView) => {
     if (view === 'reminders') return
     setClientsLoading(true)
     const params = new URLSearchParams()
-    if (q)     params.set('search',     q)
-    if (compId) params.set('company_id', compId)
-    const qs = params.toString()
-    api.get<Client[]>(`/api/v1/clients${qs ? `?${qs}` : ''}`)
-      .then(setClients)
-      .catch(console.error)
+    if (query) params.set('search', query)
+    if (companyId) params.set('company_id', companyId)
+    const searchParams = params.toString()
+
+    api.get<Client[]>(`/api/v1/clients${searchParams ? `?${searchParams}` : ''}`)
+      .then((data) => {
+        setClients(data)
+        setSyncError(null)
+      })
+      .catch(() => setSyncError('A API não respondeu com uma sessão válida.'))
       .finally(() => setClientsLoading(false))
   }, [])
 
   useEffect(() => {
-    const timer = setTimeout(() => fetchClients(search, selectedCompanyId, sidebarView), 250)
-    return () => clearTimeout(timer)
-  }, [search, selectedCompanyId, sidebarView, fetchClients])
+    if (activeView !== 'clients') return
+    const timer = window.setTimeout(() => fetchClients(search, selectedCompanyId, clientListView), 250)
+    return () => window.clearTimeout(timer)
+  }, [activeView, clientListView, fetchClients, search, selectedCompanyId])
 
-  // Fetch reminders when switching to reminders view
   useEffect(() => {
-    if (sidebarView !== 'reminders') return
+    if (activeView !== 'reminders') return
     api.get<Reminder[]>('/api/v1/reminders')
-      .then(setReminders)
-      .catch(console.error)
-  }, [sidebarView])
+      .then((data) => {
+        setReminders(data)
+        setSyncError(null)
+      })
+      .catch(() => setSyncError('A API não respondeu com uma sessão válida.'))
+  }, [activeView])
 
-  // Fetch client detail when active tab changes
   useEffect(() => {
-    if (!activeTabId) { setActiveDetail(null); return }
-    setDetailLoading(true)
-    api.get<ClientDetail>(`/api/v1/clients/${activeTabId}`)
-      .then(setActiveDetail)
-      .catch(console.error)
-      .finally(() => setDetailLoading(false))
+    if (!activeTabId) return
+    let cancelled = false
+
+    async function loadClientDetail() {
+      setDetailLoading(true)
+      try {
+        const detail = await api.get<ClientDetail>(`/api/v1/clients/${activeTabId}`)
+        if (!cancelled) setActiveDetail(detail)
+      } catch {
+        if (!cancelled) setActiveDetail(null)
+      } finally {
+        if (!cancelled) setDetailLoading(false)
+      }
+    }
+
+    void loadClientDetail()
+    return () => { cancelled = true }
   }, [activeTabId])
 
   function openTab(client: Client) {
     const label = client.name ?? client.whatsapp ?? 'Sem nome'
-    if (!openTabs.find((t) => t.id === client.id)) {
-      setOpenTabs((prev) => [...prev, { id: client.id, label }])
-    }
+    setOpenTabs((currentTabs) => currentTabs.some((tab) => tab.id === client.id)
+      ? currentTabs
+      : [...currentTabs, { id: client.id, label }])
     setActiveTabId(client.id)
+    setActiveDetail(null)
     setChatInput('')
   }
 
   function closeTab(id: string) {
-    const remaining = openTabs.filter((t) => t.id !== id)
+    const remaining = openTabs.filter((tab) => tab.id !== id)
     setOpenTabs(remaining)
-    setActiveTabId((prev) => {
-      if (prev !== id) return prev
-      return remaining.length > 0 ? remaining[remaining.length - 1].id : null
-    })
+    if (activeTabId === id && remaining.length === 0) setActiveDetail(null)
+    setActiveTabId((currentId) => currentId === id ? (remaining.at(-1)?.id ?? null) : currentId)
   }
 
-  function selectCompany(id: string) {
-    setSidebarView('company')
-    setSelectedCompanyId(id)
-    setSearch('')
-  }
-
-  function viewAllClients() {
-    setSidebarView('all-clients')
+  function openClients() {
+    setActiveView('clients')
+    setClientListView('all-clients')
     setSelectedCompanyId(null)
     setSearch('')
   }
 
-  function viewReminders() {
-    setSidebarView('reminders')
+  function openCompany(companyId: string) {
+    setActiveView('clients')
+    setClientListView('company')
+    setSelectedCompanyId(companyId)
+    setSearch('')
+  }
+
+  function openReminders() {
+    setActiveView('reminders')
+    setClientListView('reminders')
     setSelectedCompanyId(null)
+  }
+
+  function handleViewChange(view: AppView) {
+    if (view === 'clients') {
+      openClients()
+      return
+    }
+    if (view === 'reminders') {
+      openReminders()
+      return
+    }
+    setActiveView(view)
   }
 
   function handleCreatedClient(client: Client) {
-    setClients((prev) => [client, ...prev])
+    setClients((currentClients) => [client, ...currentClients])
+    setActiveView('clients')
+    setClientListView('all-clients')
     openTab(client)
   }
 
   function handleCreatedCompany(company: Company) {
-    setCompanies((prev) => [...prev, company])
-    selectCompany(company.id)
+    setCompanies((currentCompanies) => [...currentCompanies, company])
+    openCompany(company.id)
   }
 
   function handleSelectReminder(reminder: Reminder) {
-    if (reminder.linkedType === 'client' && reminder.linkedId) {
-      const existing = clients.find((c) => c.id === reminder.linkedId)
-      if (existing) {
-        openTab(existing)
-      } else {
-        api.get<ClientDetail>(`/api/v1/clients/${reminder.linkedId}`)
-          .then((detail) => openTab(detail))
-          .catch(console.error)
-      }
+    if (reminder.linkedType !== 'client' || !reminder.linkedId) return
+    const existingClient = clients.find((client) => client.id === reminder.linkedId)
+    if (existingClient) {
+      openTab(existingClient)
+      return
     }
+    api.get<ClientDetail>(`/api/v1/clients/${reminder.linkedId}`).then(openTab).catch(() => undefined)
   }
 
   async function handleSend() {
     if (!chatInput.trim() || !activeDetail?.conversation?.id) return
     setSending(true)
     try {
-      const msg = await api.post<{ id: string; content: string; direction: string; createdAt: string }>(
+      const message = await api.post<{ id: string; content: string; direction: string; createdAt: string }>(
         '/api/v1/messages',
-        { conversation_id: activeDetail.conversation.id, content: chatInput.trim() }
+        { conversation_id: activeDetail.conversation.id, content: chatInput.trim() },
       )
       setChatInput('')
-      setActiveDetail((prev) => {
-        if (!prev?.conversation) return prev
+      setActiveDetail((currentDetail) => {
+        if (!currentDetail?.conversation) return currentDetail
         return {
-          ...prev,
+          ...currentDetail,
           conversation: {
-            ...prev.conversation,
-            messages: [
-              ...prev.conversation.messages,
-              { id: msg.id, conversationId: prev.conversation.id, organizationId: prev.organizationId, whatsappMessageId: null, content: msg.content, direction: msg.direction as 'in' | 'out', createdAt: msg.createdAt },
-            ],
+            ...currentDetail.conversation,
+            messages: [...currentDetail.conversation.messages, {
+              id: message.id,
+              conversationId: currentDetail.conversation.id,
+              organizationId: currentDetail.organizationId,
+              whatsappMessageId: null,
+              content: message.content,
+              direction: message.direction as 'in' | 'out',
+              createdAt: message.createdAt,
+            }],
           },
         }
       })
-    } catch (err) {
-      console.error('[chat] send error', err)
     } finally {
       setSending(false)
     }
   }
 
-  const selectedCompany = companies.find((c) => c.id === selectedCompanyId) ?? null
-  const defaultCompanyId = sidebarView === 'company' && selectedCompanyId ? selectedCompanyId : undefined
+  const selectedCompany = companies.find((company) => company.id === selectedCompanyId) ?? null
+  const pendingReminderCount = reminders.filter((reminder) => !reminder.completed).length
+  const defaultCompanyId = clientListView === 'company' && selectedCompanyId ? selectedCompanyId : undefined
 
-  return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      <AppSidebar
-        companies={companies}
-        sidebarView={sidebarView}
-        selectedCompanyId={selectedCompanyId}
-        onSelectCompany={selectCompany}
-        onViewAllClients={viewAllClients}
-        onViewReminders={viewReminders}
-        onAddCompany={() => setShowCompanyModal(true)}
-      />
-
+  const clientWorkspace = (
+    <div className="client-workspace">
       <ClientColumn
-        sidebarView={sidebarView}
+        sidebarView={clientListView}
         selectedCompany={selectedCompany}
         clients={clients}
         reminders={reminders}
@@ -191,54 +239,35 @@ export default function AppPage() {
         selectedClientId={activeTabId}
       />
 
-      {/* Main area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#fafafa' }}>
-        {/* Tabs bar */}
-        <div style={{
-          display: 'flex', alignItems: 'center',
-          height: 42, flexShrink: 0,
-          borderBottom: '1px solid rgba(0,0,0,0.07)',
-          backgroundColor: '#fff',
-          paddingLeft: 4, overflowX: 'auto',
-        }}>
-          {openTabs.length === 0 && (
-            <p style={{ fontSize: 12, color: '#ccc', margin: '0 16px' }}>Nenhuma aba aberta</p>
-          )}
+      <div className="client-workspace-main">
+        <div className="client-tabs">
+          {openTabs.length === 0 ? <p>Nenhuma aba aberta</p> : null}
           {openTabs.map((tab) => {
-            const isActive = tab.id === activeTabId
+            const active = tab.id === activeTabId
             return (
-              <div
-                key={tab.id}
-                onClick={() => setActiveTabId(tab.id)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '0 12px 0 14px', height: '100%',
-                  cursor: 'pointer', flexShrink: 0, userSelect: 'none',
-                  fontSize: 12, fontWeight: isActive ? 600 : 400,
-                  color: isActive ? '#111' : '#888',
-                  borderBottom: isActive ? '2px solid #F2E600' : '2px solid transparent',
-                  transition: 'all 0.1s',
-                }}
-              >
-                <span style={{ maxWidth: 130, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {tab.label}
-                </span>
-                <button
-                  onClick={(e) => { e.stopPropagation(); closeTab(tab.id) }}
-                  style={{
-                    background: 'none', border: 'none', cursor: 'pointer',
-                    padding: 2, display: 'flex', borderRadius: 3, color: '#bbb',
+              <button type="button" className={`client-tab${active ? ' is-active' : ''}`} key={tab.id} onClick={() => setActiveTabId(tab.id)}>
+                <span>{tab.label}</span>
+                <span
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Fechar ${tab.label}`}
+                  onClick={(event) => { event.stopPropagation(); closeTab(tab.id) }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      event.stopPropagation()
+                      closeTab(tab.id)
+                    }
                   }}
                 >
-                  <X size={11} />
-                </button>
-              </div>
+                  <X size={12} aria-hidden="true" />
+                </span>
+              </button>
             )
           })}
         </div>
 
-        {/* Chat + detail */}
-        <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+        <div className="client-conversation-area">
           <ChatMessages
             detail={activeDetail}
             loading={detailLoading}
@@ -250,21 +279,74 @@ export default function AppPage() {
           <ClientDetailPanel detail={activeDetail} />
         </div>
       </div>
+    </div>
+  )
 
-      {showClientModal && (
-        <NewClientModal
-          onClose={() => setShowClientModal(false)}
-          onCreate={handleCreatedClient}
-          defaultCompanyId={defaultCompanyId}
+  let content: React.ReactNode
+  switch (activeView) {
+    case 'overview':
+      content = (
+        <DashboardPage
+          clients={clients}
+          companies={companies}
+          reminders={reminders}
+          loading={overviewLoading}
+          syncError={syncError}
+          onNewClient={() => setShowClientModal(true)}
+          onOpenClients={openClients}
+          onOpenCompanies={() => setActiveView('companies')}
+          onOpenFinance={() => setActiveView('finance')}
+          onOpenPipeline={() => setActiveView('pipeline')}
+          onOpenReminders={openReminders}
         />
-      )}
+      )
+      break
+    case 'clients':
+    case 'reminders':
+      content = clientWorkspace
+      break
+    case 'companies':
+      content = <CompaniesPage companies={companies} clients={clients} loading={overviewLoading} onNewCompany={() => setShowCompanyModal(true)} onOpenCompany={openCompany} />
+      break
+    case 'inbox':
+      content = <InboxPage />
+      break
+    case 'pipeline':
+      content = <PipelinePage clients={clients} onNewClient={() => setShowClientModal(true)} />
+      break
+    case 'finance':
+      content = <FinancePage />
+      break
+  }
 
-      {showCompanyModal && (
-        <NewCompanyModal
-          onClose={() => setShowCompanyModal(false)}
-          onCreate={handleCreatedCompany}
-        />
-      )}
+  return (
+    <div className="app-shell">
+      <AppSidebar
+        activeView={activeView}
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        onChange={handleViewChange}
+        pendingReminders={pendingReminderCount}
+      />
+      {mobileMenuOpen ? <button type="button" className="sidebar-overlay" onClick={() => setMobileMenuOpen(false)} aria-label="Fechar menu" /> : null}
+
+      <main className="app-main">
+        <div className="mobile-app-bar">
+          <button type="button" className="icon-button" onClick={() => setMobileMenuOpen(true)} aria-label="Abrir menu">
+            <Menu size={19} aria-hidden="true" />
+          </button>
+          <span className="mobile-brand"><span>a</span> abelha</span>
+          <span className="mobile-avatar">HA</span>
+        </div>
+        <div className="app-view">{content}</div>
+      </main>
+
+      {showClientModal ? (
+        <NewClientModal onClose={() => setShowClientModal(false)} onCreate={handleCreatedClient} defaultCompanyId={defaultCompanyId} />
+      ) : null}
+      {showCompanyModal ? (
+        <NewCompanyModal onClose={() => setShowCompanyModal(false)} onCreate={handleCreatedCompany} />
+      ) : null}
     </div>
   )
 }

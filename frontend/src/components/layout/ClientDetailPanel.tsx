@@ -15,13 +15,21 @@ function formatDue(dueAt: string) {
 }
 
 export default function ClientDetailPanel({ detail }: Props) {
-  const [reminders, setReminders] = useState<Reminder[]>([])
+  const [reminderState, setReminderState] = useState<{ clientId: string | null; items: Reminder[] }>({ clientId: null, items: [] })
 
   useEffect(() => {
-    if (!detail?.id) { setReminders([]); return }
+    if (!detail?.id) return
+    let cancelled = false
+
     api.get<Reminder[]>(`/api/v1/reminders?linked_type=client&linked_id=${detail.id}`)
-      .then(setReminders)
-      .catch(() => setReminders([]))
+      .then((items) => {
+        if (!cancelled) setReminderState({ clientId: detail.id, items })
+      })
+      .catch(() => {
+        if (!cancelled) setReminderState({ clientId: detail.id, items: [] })
+      })
+
+    return () => { cancelled = true }
   }, [detail?.id])
 
   if (!detail) {
@@ -35,6 +43,7 @@ export default function ClientDetailPanel({ detail }: Props) {
   }
 
   const label = detail.name ?? detail.whatsapp ?? 'Sem nome'
+  const reminders = reminderState.clientId === detail.id ? reminderState.items : []
   const pending = reminders.filter((r) => !r.completed)
 
   const row = (icon: React.ReactNode, text: string) => (

@@ -38,8 +38,8 @@ export default function NewClientModal({ onClose, onCreate, defaultCompanyId }: 
       })
       onCreate(client)
       onClose()
-    } catch (err: any) {
-      setError(err.message ?? 'Erro ao criar cliente')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erro ao criar cliente')
     } finally {
       setSaving(false)
     }

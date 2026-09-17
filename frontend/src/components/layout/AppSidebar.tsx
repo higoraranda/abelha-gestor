@@ -1,105 +1,130 @@
-import { Plus, Users, Bell } from 'lucide-react'
-import type { Company } from '@/types'
+import {
+  Bell,
+  Building2,
+  ChartNoAxesCombined,
+  ChevronDown,
+  CircleDollarSign,
+  ContactRound,
+  LayoutDashboard,
+  MessageSquareText,
+  PanelLeftClose,
+  Settings,
+  Sparkles,
+  X,
+} from 'lucide-react'
 
-const COMPANY_COLORS = ['#4f46e5', '#0891b2', '#059669', '#d97706', '#dc2626', '#7c3aed', '#db2777', '#ea580c']
-
-export type SidebarView = 'company' | 'all-clients' | 'reminders'
+export type AppView =
+  | 'overview'
+  | 'clients'
+  | 'companies'
+  | 'inbox'
+  | 'pipeline'
+  | 'finance'
+  | 'reminders'
 
 interface Props {
-  companies:          Company[]
-  sidebarView:        SidebarView
-  selectedCompanyId:  string | null
-  onSelectCompany:    (id: string) => void
-  onViewAllClients:   () => void
-  onViewReminders:    () => void
-  onAddCompany:       () => void
+  activeView: AppView
+  isOpen: boolean
+  onClose: () => void
+  onChange: (view: AppView) => void
+  pendingReminders: number
 }
 
-export default function AppSidebar({
-  companies, sidebarView, selectedCompanyId,
-  onSelectCompany, onViewAllClients, onViewReminders, onAddCompany,
-}: Props) {
-  const iconBtn = (active: boolean, onClick: () => void, title: string, children: React.ReactNode) => (
-    <button
-      title={title}
-      onClick={onClick}
-      style={{
-        width: 36, height: 36, borderRadius: 8,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        border: 'none', cursor: 'pointer', flexShrink: 0,
-        backgroundColor: active ? '#1f1f1f' : 'transparent',
-        color: active ? '#F2E600' : '#666',
-      }}
-    >
-      {children}
-    </button>
-  )
+const PRIMARY_NAV = [
+  { id: 'overview', label: 'Visão geral', icon: LayoutDashboard },
+  { id: 'clients', label: 'Clientes', icon: ContactRound },
+  { id: 'companies', label: 'Empresas', icon: Building2 },
+  { id: 'inbox', label: 'Conversas', icon: MessageSquareText },
+] as const
+
+const OPERATIONS_NAV = [
+  { id: 'pipeline', label: 'Pipeline', icon: ChartNoAxesCombined },
+  { id: 'finance', label: 'Financeiro', icon: CircleDollarSign },
+  { id: 'reminders', label: 'Lembretes', icon: Bell },
+] as const
+
+export default function AppSidebar({ activeView, isOpen, onClose, onChange, pendingReminders }: Props) {
+  function select(view: AppView) {
+    onChange(view)
+    onClose()
+  }
+
+  const renderItem = ({ id, label, icon: Icon }: (typeof PRIMARY_NAV)[number] | (typeof OPERATIONS_NAV)[number]) => {
+    const active = activeView === id
+
+    return (
+      <button
+        key={id}
+        type="button"
+        className={`sidebar-nav-item${active ? ' is-active' : ''}`}
+        onClick={() => select(id)}
+        aria-current={active ? 'page' : undefined}
+      >
+        <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
+        <span>{label}</span>
+        {id === 'reminders' && pendingReminders > 0 ? (
+          <span className="sidebar-badge" aria-label={`${pendingReminders} lembretes pendentes`}>
+            {pendingReminders > 99 ? '99+' : pendingReminders}
+          </span>
+        ) : null}
+      </button>
+    )
+  }
 
   return (
-    <aside style={{
-      width: 64, flexShrink: 0,
-      backgroundColor: '#111',
-      display: 'flex', flexDirection: 'column', alignItems: 'center',
-      paddingTop: 14, paddingBottom: 14, gap: 4,
-    }}>
-      {/* Avatar */}
-      <div style={{
-        width: 34, height: 34, borderRadius: '50%',
-        backgroundColor: '#F2E600',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 13, fontWeight: 700, color: '#111',
-        flexShrink: 0, marginBottom: 6, cursor: 'default',
-      }}
-        title="Abelha"
-      >
-        A
+    <aside className={`app-sidebar${isOpen ? ' is-open' : ''}`} aria-label="Navegação principal">
+      <div className="sidebar-brand-row">
+        <button type="button" className="sidebar-brand" onClick={() => select('overview')} aria-label="Ir para a visão geral">
+          <span className="brand-mark">a</span>
+          <span className="brand-name">abelha</span>
+        </button>
+        <button type="button" className="sidebar-close" onClick={onClose} aria-label="Fechar menu">
+          <X size={18} aria-hidden="true" />
+        </button>
       </div>
 
-      <div style={{ width: 34, height: 1, backgroundColor: '#252525', margin: '2px 0 6px' }} />
-
-      {/* Company icons */}
-      {companies.map((co, i) => {
-        const isActive = sidebarView === 'company' && selectedCompanyId === co.id
-        const color    = COMPANY_COLORS[i % COMPANY_COLORS.length]
-        return (
-          <button
-            key={co.id}
-            title={co.name}
-            onClick={() => onSelectCompany(co.id)}
-            style={{
-              width: 34, height: 34, borderRadius: 8,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 12, fontWeight: 700, color: '#fff',
-              backgroundColor: color,
-              border: isActive ? '2.5px solid #F2E600' : '2.5px solid transparent',
-              cursor: 'pointer', flexShrink: 0, boxSizing: 'border-box',
-            }}
-          >
-            {co.name.charAt(0).toUpperCase()}
-          </button>
-        )
-      })}
-
-      {/* Add company */}
-      <button
-        title="Adicionar empresa"
-        onClick={onAddCompany}
-        style={{
-          width: 34, height: 34, borderRadius: 8,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          border: '1.5px dashed #333', backgroundColor: 'transparent',
-          cursor: 'pointer', color: '#555', flexShrink: 0,
-        }}
-      >
-        <Plus size={14} />
+      <button type="button" className="workspace-switcher" title="Trocar espaço de trabalho">
+        <span className="workspace-avatar">HG</span>
+        <span className="workspace-copy">
+          <strong>Meu negócio</strong>
+          <small>Espaço principal</small>
+        </span>
+        <ChevronDown size={15} aria-hidden="true" />
       </button>
 
-      <div style={{ width: 34, height: 1, backgroundColor: '#252525', margin: '6px 0' }} />
+      <nav className="sidebar-navigation">
+        <div className="sidebar-nav-group">
+          <p className="sidebar-label">CRM</p>
+          {PRIMARY_NAV.map(renderItem)}
+        </div>
 
-      {iconBtn(sidebarView === 'all-clients', onViewAllClients, 'Todos os clientes', <Users size={17} />)}
-      {iconBtn(sidebarView === 'reminders',   onViewReminders,  'Lembretes',         <Bell size={17} />)}
+        <div className="sidebar-nav-group">
+          <p className="sidebar-label">Gestão</p>
+          {OPERATIONS_NAV.map(renderItem)}
+        </div>
+      </nav>
 
-      <div style={{ flex: 1 }} />
+      <div className="sidebar-footer">
+        <div className="sidebar-insight">
+          <span className="insight-icon"><Sparkles size={15} aria-hidden="true" /></span>
+          <div>
+            <strong>Central de melhorias</strong>
+            <p>Seu CRM crescerá por módulos.</p>
+          </div>
+        </div>
+        <button type="button" className="sidebar-nav-item">
+          <Settings size={18} strokeWidth={1.8} aria-hidden="true" />
+          <span>Configurações</span>
+        </button>
+        <div className="sidebar-user">
+          <span className="sidebar-user-avatar">HA</span>
+          <span>
+            <strong>Higor Aranda</strong>
+            <small>Administrador</small>
+          </span>
+          <PanelLeftClose size={17} aria-hidden="true" />
+        </div>
+      </div>
     </aside>
   )
 }
