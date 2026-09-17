@@ -9,6 +9,9 @@ import eventsRouter from "./routes/events"
 import clientsRouter from "./routes/clients"
 import remindersRouter from "./routes/reminders"
 import catalogRouter from "./routes/catalog"
+import contractsRouter from "./routes/contracts"
+import financeRouter from "./routes/finance"
+import pricingRouter from "./routes/pricing"
 import webhooksRouter from "./routes/webhooks"
 
 const app = express()
@@ -32,6 +35,9 @@ app.use("/api/v1/messages", messagesRouter)
 app.use("/api/v1/clients", clientsRouter)
 app.use("/api/v1/reminders", remindersRouter)
 app.use("/api/v1/catalog", catalogRouter)
+app.use("/api/v1/contracts", contractsRouter)
+app.use("/api/v1/finance", financeRouter)
+app.use("/api/v1/pricing", pricingRouter)
 app.use("/api/events", eventsRouter)
 app.use("/webhooks", webhooksRouter)
 

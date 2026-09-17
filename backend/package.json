@@ -6,7 +6,8 @@
     "dev": "nodemon --exec ts-node src/app.ts",
     "build": "tsc",
     "start": "node dist/app.js",
-    "seed": "ts-node src/db/seed.ts"
+    "seed": "ts-node src/db/seed.ts",
+    "test": "npm run build && node --test dist/services/*.test.js"
   },
   "dependencies": {
     "@auth/express": "^0.6.1",

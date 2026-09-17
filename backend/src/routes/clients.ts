@@ -2,205 +2,181 @@ import { Router } from "express"
 import { authMiddleware } from "../middleware/auth"
 import { tenantMiddleware } from "../middleware/tenant"
 import { db } from "../db/index"
+import { insertContract, mapContract } from "../services/contract-store"
 
 const router = Router()
 router.use(authMiddleware, tenantMiddleware)
 
-// GET /api/v1/clients
+function mapClient(row: Record<string, any>) {
+  return {
+    id: row.id,
+    organizationId: row.organization_id,
+    name: row.name,
+    email: row.email,
+    whatsapp: row.whatsapp,
+    notes: row.notes,
+    createdAt: row.created_at,
+    activeService: row.active_service ?? null,
+    monthlyFee: row.monthly_fee == null ? null : Number(row.monthly_fee),
+    contractEndDate: row.contract_end_date ?? null,
+    financialStatus: row.financial_status ?? null,
+  }
+}
+
 router.get("/", async (req, res) => {
-  const orgId  = req.organizationId!
-  const page   = Math.max(1, parseInt(req.query.page as string) || 1)
-  const limit  = Math.min(50, parseInt(req.query.limit as string) || 30)
+  const orgId = req.organizationId!
+  const page = Math.max(1, Number.parseInt(String(req.query.page ?? "1"), 10) || 1)
+  const limit = Math.min(100, Number.parseInt(String(req.query.limit ?? "50"), 10) || 50)
   const offset = (page - 1) * limit
-  const search  = (req.query.search as string) || ""
+  const search = String(req.query.search ?? "").trim()
 
   try {
     const rows = await db`
-      SELECT
-        cl.id, cl.organization_id,
-        cl.name, cl.email, cl.whatsapp, cl.notes, cl.created_at
+      SELECT cl.id, cl.organization_id, cl.name, cl.email, cl.whatsapp, cl.notes, cl.created_at,
+        current_contract.service_name AS active_service,
+        current_contract.monthly_fee,
+        current_contract.contract_end_date,
+        CASE
+          WHEN EXISTS (
+            SELECT 1 FROM receivables r
+            WHERE r.client_id = cl.id AND r.organization_id = ${orgId}
+              AND r.status = 'open' AND r.due_date < CURRENT_DATE
+          ) THEN 'overdue'
+          WHEN EXISTS (
+            SELECT 1 FROM receivables r
+            WHERE r.client_id = cl.id AND r.organization_id = ${orgId} AND r.status = 'open'
+          ) THEN 'open'
+          WHEN EXISTS (
+            SELECT 1 FROM receivables r
+            WHERE r.client_id = cl.id AND r.organization_id = ${orgId} AND r.status = 'paid'
+          ) THEN 'paid'
+          ELSE NULL
+        END AS financial_status
       FROM clients cl
+      LEFT JOIN LATERAL (
+        SELECT service_name, monthly_fee, contract_end_date
+        FROM client_contracts cc
+        WHERE cc.client_id = cl.id AND cc.organization_id = ${orgId} AND cc.status <> 'cancelled'
+        ORDER BY (cc.status = 'active') DESC, cc.created_at DESC
+        LIMIT 1
+      ) current_contract ON TRUE
       WHERE cl.organization_id = ${orgId}
-        ${search
-          ? db`AND (cl.name ILIKE ${"%" + search + "%"} OR cl.whatsapp ILIKE ${"%" + search + "%"} OR cl.email ILIKE ${"%" + search + "%"})`
-          : db``}
+        ${search ? db`AND (
+          cl.name ILIKE ${`%${search}%`} OR cl.whatsapp ILIKE ${`%${search}%`} OR
+          cl.email ILIKE ${`%${search}%`} OR EXISTS (
+            SELECT 1 FROM client_contracts sc
+            WHERE sc.client_id = cl.id AND sc.organization_id = ${orgId}
+              AND sc.service_name ILIKE ${`%${search}%`}
+          )
+        )` : db``}
       ORDER BY cl.created_at DESC
       LIMIT ${limit} OFFSET ${offset}
     `
-
-    res.json(rows.map((r) => ({
-      id:             r.id,
-      organizationId: r.organization_id,
-      name:           r.name,
-      email:          r.email,
-      whatsapp:       r.whatsapp,
-      notes:          r.notes,
-      createdAt:      r.created_at,
-    })))
-  } catch (err) {
-    console.error("[clients] GET /", err)
-    res.status(500).json({ error: "Erro interno" })
+    res.json(rows.map(mapClient))
+  } catch (error) {
+    console.error("[clients] GET /", error)
+    res.status(500).json({ error: "Erro ao carregar clientes" })
   }
 })
 
-// GET /api/v1/clients/:id
 router.get("/:id", async (req, res) => {
   const orgId = req.organizationId!
-  const { id } = req.params
-
   try {
-    const [cl] = await db`
-      SELECT
-        cl.id, cl.organization_id,
-        cl.name, cl.email, cl.whatsapp, cl.notes, cl.created_at
-      FROM clients cl
-      WHERE cl.id = ${id} AND cl.organization_id = ${orgId}
+    const [client] = await db`
+      SELECT * FROM clients WHERE id = ${req.params.id} AND organization_id = ${orgId}
     `
+    if (!client) return res.status(404).json({ error: "Cliente não encontrado" })
 
-    if (!cl) return res.status(404).json({ error: "Cliente não encontrado" })
-
-    const [conv] = await db`
-      SELECT id, whatsapp_chat_id, last_message_at, unread_count
-      FROM conversations
-      WHERE client_id = ${id} AND organization_id = ${orgId}
-      ORDER BY last_message_at DESC NULLS LAST
-      LIMIT 1
+    const contracts = await db`
+      SELECT * FROM client_contracts
+      WHERE client_id = ${client.id} AND organization_id = ${orgId}
+      ORDER BY created_at DESC
     `
-
-    let messages: object[] = []
-    if (conv) {
-      const rows = await db`
-        SELECT * FROM (
-          SELECT id, conversation_id, direction, content, created_at
-          FROM messages
-          WHERE conversation_id = ${conv.id} AND organization_id = ${orgId}
-          ORDER BY created_at DESC
-          LIMIT 50
-        ) sub
-        ORDER BY created_at ASC
-      `
-      messages = rows.map((m) => ({
-        id:             m.id,
-        conversationId: m.conversation_id,
-        direction:      m.direction,
-        content:        m.content,
-        createdAt:      m.created_at,
-      }))
+    const receivables = contracts.length ? await db`
+      SELECT * FROM receivables
+      WHERE client_id = ${client.id} AND organization_id = ${orgId}
+      ORDER BY due_date ASC, created_at ASC
+    ` : []
+    const byContract = new Map<string, Record<string, any>[]>()
+    for (const item of receivables) {
+      const group = byContract.get(item.contract_id) ?? []
+      group.push(item)
+      byContract.set(item.contract_id, group)
     }
 
     res.json({
-      id:             cl.id,
-      organizationId: cl.organization_id,
-      name:           cl.name,
-      email:          cl.email,
-      whatsapp:       cl.whatsapp,
-      notes:          cl.notes,
-      createdAt:      cl.created_at,
-      conversation: conv ? {
-        id:             conv.id,
-        whatsappChatId: conv.whatsapp_chat_id,
-        lastMessageAt:  conv.last_message_at,
-        unreadCount:    conv.unread_count,
-        messages,
-      } : null,
+      ...mapClient(client),
+      contracts: contracts.map((contract) => mapContract(contract, byContract.get(contract.id) ?? [])),
     })
-  } catch (err) {
-    console.error("[clients] GET /:id", err)
-    res.status(500).json({ error: "Erro interno" })
+  } catch (error) {
+    console.error("[clients] GET /:id", error)
+    res.status(500).json({ error: "Erro ao carregar o cliente" })
   }
 })
 
-// POST /api/v1/clients
 router.post("/", async (req, res) => {
   const orgId = req.organizationId!
-  const { name, whatsapp, email, notes } = req.body
+  const { name, whatsapp, email, notes, initialContract } = req.body
+  if (!String(name ?? "").trim()) return res.status(400).json({ error: "Nome é obrigatório" })
 
   try {
-    const [cl] = await db`
-      INSERT INTO clients (organization_id, name, email, whatsapp, notes)
-      VALUES (${orgId}, ${name || null}, ${email || null}, ${whatsapp || null}, ${notes || null})
-      RETURNING id, organization_id, name, email, whatsapp, notes, created_at
-    `
-
-    res.status(201).json({
-      id:             cl.id,
-      organizationId: cl.organization_id,
-      name:           cl.name,
-      email:          cl.email,
-      whatsapp:       cl.whatsapp,
-      notes:          cl.notes,
-      createdAt:      cl.created_at,
+    const result = await db.begin(async (sql) => {
+      const [client] = await sql`
+        INSERT INTO clients (organization_id, name, email, whatsapp, notes)
+        VALUES (${orgId}, ${String(name).trim()}, ${email || null}, ${whatsapp || null}, ${notes || null})
+        RETURNING *
+      `
+      const contract = initialContract
+        ? await insertContract(sql, orgId, client.id, initialContract)
+        : null
+      return { ...mapClient(client), contracts: contract ? [contract] : [] }
     })
-  } catch (err: any) {
-    if (err.code === "23505") {
-      return res.status(409).json({ error: "Já existe um cliente com esse WhatsApp nessa organização" })
-    }
-    console.error("[clients] POST /", err)
-    res.status(500).json({ error: "Erro interno" })
+    res.status(201).json(result)
+  } catch (error: any) {
+    if (error.code === "23505") return res.status(409).json({ error: "Já existe um cliente com esse WhatsApp nessa organização" })
+    if (error instanceof Error && !(error as any).code) return res.status(400).json({ error: error.message })
+    console.error("[clients] POST /", error)
+    res.status(500).json({ error: "Erro ao criar cliente" })
   }
 })
 
-// PATCH /api/v1/clients/:id
+router.post("/:clientId/contracts", async (req, res) => {
+  const orgId = req.organizationId!
+  try {
+    const result = await db.begin(async (sql) => {
+      const [client] = await sql`
+        SELECT id FROM clients WHERE id = ${req.params.clientId} AND organization_id = ${orgId}
+      `
+      if (!client) throw new Error("Cliente não encontrado")
+      return insertContract(sql, orgId, client.id, req.body)
+    })
+    res.status(201).json(result)
+  } catch (error: any) {
+    if (error instanceof Error && !(error as any).code) return res.status(error.message === "Cliente não encontrado" ? 404 : 400).json({ error: error.message })
+    console.error("[clients] POST /:clientId/contracts", error)
+    res.status(500).json({ error: "Erro ao criar contrato" })
+  }
+})
+
 router.patch("/:id", async (req, res) => {
   const orgId = req.organizationId!
-  const { id }  = req.params
+  const allowed = ["name", "email", "whatsapp", "notes"] as const
+  const updates: Record<string, unknown> = {}
+  for (const key of allowed) if (key in req.body) updates[key] = req.body[key] ?? null
+  if (!Object.keys(updates).length) return res.status(400).json({ error: "Nenhum campo para atualizar" })
 
   try {
-    const [existing] = await db`
-      SELECT id FROM clients WHERE id = ${id} AND organization_id = ${orgId}
-    `
-    if (!existing) return res.status(404).json({ error: "Cliente não encontrado" })
-
-    const allowed = ["name", "email", "whatsapp", "notes"] as const
-    const updates: Record<string, unknown> = {}
-    for (const key of allowed) {
-      if (key in req.body) updates[key] = req.body[key] ?? null
-    }
-
-    if (Object.keys(updates).length === 0) {
-      return res.status(400).json({ error: "Nenhum campo para atualizar" })
-    }
-
-    const [cl] = await db`
+    const [client] = await db`
       UPDATE clients SET ${db(updates)}
-      WHERE id = ${id} AND organization_id = ${orgId}
-      RETURNING id, organization_id, name, email, whatsapp, notes, created_at
+      WHERE id = ${req.params.id} AND organization_id = ${orgId}
+      RETURNING *
     `
-
-    res.json({
-      id:             cl.id,
-      organizationId: cl.organization_id,
-      name:           cl.name,
-      email:          cl.email,
-      whatsapp:       cl.whatsapp,
-      notes:          cl.notes,
-      createdAt:      cl.created_at,
-    })
-  } catch (err: any) {
-    if (err.code === "23505") {
-      return res.status(409).json({ error: "Já existe um cliente com esse WhatsApp nessa organização" })
-    }
-    console.error("[clients] PATCH /:id", err)
-    res.status(500).json({ error: "Erro interno" })
-  }
-})
-
-// DELETE /api/v1/clients/:id
-router.delete("/:id", async (req, res) => {
-  const orgId = req.organizationId!
-  const { id } = req.params
-
-  try {
-    const [deleted] = await db`
-      DELETE FROM clients
-      WHERE id = ${id} AND organization_id = ${orgId}
-      RETURNING id
-    `
-    if (!deleted) return res.status(404).json({ error: "Cliente não encontrado" })
-    res.status(204).send()
-  } catch (err) {
-    console.error("[clients] DELETE /:id", err)
-    res.status(500).json({ error: "Erro interno" })
+    if (!client) return res.status(404).json({ error: "Cliente não encontrado" })
+    res.json(mapClient(client))
+  } catch (error: any) {
+    if (error.code === "23505") return res.status(409).json({ error: "Já existe um cliente com esse WhatsApp nessa organização" })
+    console.error("[clients] PATCH /:id", error)
+    res.status(500).json({ error: "Erro ao atualizar cliente" })
   }
 })
 

@@ -1,134 +1,77 @@
 import { useState } from 'react'
-import { X } from 'lucide-react'
+import { ArrowRight, X } from 'lucide-react'
 import { api } from '@/lib/api'
-import type { Client } from '@/types'
+import type { Client, NewContractInput } from '@/types'
+import ContractWizard from './ContractWizard'
 
 interface Props {
-  onClose:          () => void
-  onCreate:         (client: Client) => void
+  onClose: () => void
+  onCreate: (client: Client) => void
 }
 
 export default function NewClientModal({ onClose, onCreate }: Props) {
+  const [step, setStep] = useState(1)
   const [form, setForm] = useState({ name: '', whatsapp: '', email: '', notes: '' })
-  const [saving, setSaving]   = useState(false)
-  const [error, setError]     = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  function set(field: string, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value }))
+  function set(field: keyof typeof form, value: string) {
+    setForm((current) => ({ ...current, [field]: value }))
     setError(null)
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!form.name.trim()) { setError('Nome é obrigatório'); return }
-    setSaving(true)
-    try {
-      const client = await api.post<Client>('/api/v1/clients', {
-        name:       form.name.trim() || null,
-        whatsapp:   form.whatsapp.trim() || null,
-        email:      form.email.trim() || null,
-        notes:      form.notes.trim() || null,
-      })
-      onCreate(client)
-      onClose()
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Erro ao criar cliente')
-    } finally {
-      setSaving(false)
+  function continueToContract() {
+    if (!form.name.trim()) {
+      setError('Nome é obrigatório.')
+      return
     }
+    setStep(2)
   }
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%', boxSizing: 'border-box',
-    padding: '9px 12px', fontSize: '14px', color: '#111827',
-    border: '1px solid rgba(0,0,0,0.12)', borderRadius: '7px',
-    outline: 'none', backgroundColor: '#f9fafb',
-    fontFamily: 'inherit',
-  }
-
-  const labelStyle: React.CSSProperties = {
-    display: 'block', fontSize: '13px', fontWeight: 500,
-    color: '#374151', marginBottom: '5px',
+  async function createClient(initialContract: NewContractInput) {
+    const client = await api.post<Client>('/api/v1/clients', {
+      name: form.name.trim(),
+      whatsapp: form.whatsapp.trim() || null,
+      email: form.email.trim() || null,
+      notes: form.notes.trim() || null,
+      initialContract,
+    })
+    onCreate(client)
+    onClose()
   }
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 50,
-      backgroundColor: 'rgba(0,0,0,0.35)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-    }}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
-    >
-      <div style={{
-        backgroundColor: '#ffffff', borderRadius: '12px',
-        padding: '24px', width: '440px', maxWidth: 'calc(100vw - 32px)',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#111827', margin: 0 }}>Novo cliente</h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex' }}>
-            <X size={18} color="#6b7280" />
-          </button>
-        </div>
+    <div className="modal-backdrop" onClick={(event) => { if (event.target === event.currentTarget) onClose() }}>
+      <div className="contract-modal" role="dialog" aria-modal="true" aria-labelledby="new-client-title">
+        <header className="modal-heading contract-modal-heading">
+          <div><p className="eyebrow">Cadastro completo</p><h2 id="new-client-title">Novo cliente</h2></div>
+          <button type="button" className="icon-button" onClick={onClose} aria-label="Fechar"><X size={18} aria-hidden="true" /></button>
+        </header>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <div>
-            <label style={labelStyle}>Nome <span style={{ color: '#ef4444' }}>*</span></label>
-            <input style={inputStyle} type="text" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Nome do cliente" required autoFocus />
-          </div>
-
-          <div>
-            <label style={labelStyle}>WhatsApp</label>
-            <input style={inputStyle} type="text" value={form.whatsapp} onChange={(e) => set('whatsapp', e.target.value)} placeholder="Ex: 5585999887766" />
-          </div>
-
-          <div>
-            <label style={labelStyle}>Email</label>
-            <input style={inputStyle} type="email" value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="email@exemplo.com" />
-          </div>
-
-          <div>
-            <label style={labelStyle}>Observações</label>
-            <textarea
-              value={form.notes}
-              onChange={(e) => set('notes', e.target.value)}
-              placeholder="Observações sobre o cliente..."
-              rows={3}
-              style={{ ...inputStyle, resize: 'none', lineHeight: 1.5 }}
-            />
-          </div>
-
-          {error && (
-            <p style={{ fontSize: '13px', color: '#ef4444', margin: 0 }}>{error}</p>
+        <div className="contract-modal-body">
+          {step === 1 ? (
+            <>
+              <div className="wizard-progress" aria-label="Etapa 1 de 4">
+                {[1, 2, 3, 4].map((item) => <span className={item === 1 ? 'is-active' : ''} key={item} />)}
+              </div>
+              <section className="contract-step">
+                <div className="wizard-copy"><p>Etapa 1 de 4</p><h3>Dados do cliente</h3><span>Cadastre os canais de contato e informações importantes.</span></div>
+                <div className="form-grid-two">
+                  <label className="form-field"><span>Nome</span><input value={form.name} onChange={(event) => set('name', event.target.value)} placeholder="Nome ou razão social" autoFocus /></label>
+                  <label className="form-field"><span>WhatsApp</span><input value={form.whatsapp} onChange={(event) => set('whatsapp', event.target.value)} placeholder="55 11 99999-9999" /></label>
+                </div>
+                <label className="form-field"><span>Email</span><input type="email" value={form.email} onChange={(event) => set('email', event.target.value)} placeholder="cliente@empresa.com" /></label>
+                <label className="form-field"><span>Observações</span><textarea rows={4} value={form.notes} onChange={(event) => set('notes', event.target.value)} placeholder="Contexto, preferências e informações relevantes" /></label>
+              </section>
+              {error ? <p className="form-error" role="alert">{error}</p> : null}
+              <footer className="wizard-actions wizard-actions-end">
+                <button type="button" className="button button-secondary" onClick={onClose}>Cancelar</button>
+                <button type="button" className="button button-primary" onClick={continueToContract}>Continuar <ArrowRight size={16} aria-hidden="true" /></button>
+              </footer>
+            </>
+          ) : (
+            <ContractWizard onBack={() => setStep(1)} onSubmit={createClient} submitLabel="Criar cliente e contrato" />
           )}
-
-          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '4px' }}>
-            <button
-              type="button"
-              onClick={onClose}
-              style={{
-                padding: '9px 16px', fontSize: '14px', fontWeight: 500,
-                color: '#6b7280', backgroundColor: '#f3f4f6',
-                border: 'none', borderRadius: '7px', cursor: 'pointer',
-              }}
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              style={{
-                padding: '9px 16px', fontSize: '14px', fontWeight: 500,
-                color: '#111827', backgroundColor: '#F2E600',
-                border: 'none', borderRadius: '7px',
-                cursor: saving ? 'not-allowed' : 'pointer',
-                opacity: saving ? 0.6 : 1,
-              }}
-            >
-              {saving ? 'Salvando...' : 'Criar cliente'}
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   )

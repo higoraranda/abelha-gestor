@@ -1,11 +1,11 @@
 import {
   CalendarDays,
+  Calculator,
   ChartNoAxesCombined,
   CircleDollarSign,
   ContactRound,
   LayoutDashboard,
   MessageSquareText,
-  PackageOpen,
   LogOut,
   Settings,
   Sparkles,
@@ -40,7 +40,7 @@ const OPERATIONS_NAV = [
   { id: 'pipeline', label: 'Pipeline', icon: ChartNoAxesCombined },
   { id: 'finance', label: 'Financeiro', icon: CircleDollarSign },
   { id: 'agenda', label: 'Agenda', icon: CalendarDays },
-  { id: 'catalog', label: 'Serviços e preços', icon: PackageOpen },
+  { id: 'catalog', label: 'Calculadora de preços', icon: Calculator },
 ] as const
 
 export default function AppSidebar({ activeView, isOpen, onClose, onChange, onLogout, pendingReminders }: Props) {
@@ -75,7 +75,7 @@ export default function AppSidebar({ activeView, isOpen, onClose, onChange, onLo
     <aside className={`app-sidebar${isOpen ? ' is-open' : ''}`} aria-label="Navegação principal">
       <div className="sidebar-brand-row">
         <button type="button" className="sidebar-brand" onClick={() => select('overview')} aria-label="Ir para a visão geral">
-          <span className="brand-mark">a</span>
+          <img className="brand-mark" src="/bee-logo.png" alt="" />
           <span className="brand-name">abelha</span>
         </button>
         <button type="button" className="sidebar-close" onClick={onClose} aria-label="Fechar menu">

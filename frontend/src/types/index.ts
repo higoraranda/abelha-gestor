@@ -13,6 +13,10 @@ export interface Client {
   whatsapp: string | null
   notes: string | null
   createdAt: string
+  activeService?: string | null
+  monthlyFee?: number | null
+  contractEndDate?: string | null
+  financialStatus?: ReceivableStatus | null
 }
 
 export interface Conversation {
@@ -36,16 +40,76 @@ export interface Message {
   createdAt: string
 }
 
-export interface ClientConversation {
+export type PaymentMethod = 'cash' | 'two_installments' | 'three_installments'
+export type ContractStatus = 'active' | 'completed' | 'cancelled'
+export type ReceivableStatus = 'open' | 'paid' | 'overdue' | 'cancelled'
+
+export interface Receivable {
   id: string
-  whatsappChatId: string
-  lastMessageAt: string | null
-  unreadCount: number
-  messages: Message[]
+  organizationId: string
+  clientId: string
+  contractId: string
+  kind: 'setup_installment' | 'monthly_fee'
+  installmentNumber: number | null
+  description: string
+  amount: number
+  dueDate: string
+  status: ReceivableStatus
+  paidAt: string | null
+  createdAt: string
+  updatedAt: string
+  clientName?: string | null
+  serviceName?: string
+}
+
+export interface ClientContract {
+  id: string
+  organizationId: string
+  clientId: string
+  catalogItemId: string | null
+  serviceName: string
+  serviceDescription: string | null
+  serviceSnapshot: Record<string, unknown>
+  grossAmount: number
+  discountPercent: number
+  finalAmount: number
+  paymentMethod: PaymentMethod
+  monthlyFee: number
+  monthlyDueDay: number | null
+  developmentStartDate: string
+  developmentEndDate: string
+  contractEndDate: string
+  status: ContractStatus
+  notes: string | null
+  createdAt: string
+  updatedAt: string
+  receivables: Receivable[]
+}
+
+export interface NewContractInput {
+  catalogItemId: string | null
+  serviceName: string
+  serviceDescription: string | null
+  grossAmount: number
+  paymentMethod: PaymentMethod
+  monthlyFee: number
+  monthlyDueDay: number | null
+  developmentStartDate: string
+  developmentEndDate: string
+  contractEndDate: string
+  notes?: string | null
 }
 
 export interface ClientDetail extends Client {
-  conversation: ClientConversation | null
+  contracts: ClientContract[]
+}
+
+export interface FinanceSummary {
+  receivedMonth: number
+  openAmount: number
+  overdueAmount: number
+  projectedTotal: number
+  monthly: Array<{ month: string; received: number; projected: number }>
 }
 
 export interface Reminder {
@@ -85,4 +149,56 @@ export interface CatalogItem {
   attributes: Record<string, unknown>
   createdAt: string
   updatedAt: string
+}
+
+export interface PricingCity {
+  code: string
+  name: string
+  multiplier: number
+}
+
+export interface PricingConfig {
+  items: CatalogItem[]
+  cities: PricingCity[]
+  automationServices: CatalogItem[]
+  automationPackages: CatalogItem[]
+  siteTypes: CatalogItem[]
+  designs: CatalogItem[]
+  siteFeatures: CatalogItem[]
+  contents: CatalogItem[]
+  deadlines: CatalogItem[]
+  plans: CatalogItem[]
+}
+
+export interface PricingResult {
+  mode: 'automation' | 'site' | 'combo'
+  cityName: string
+  multiplier: number
+  automation?: {
+    mode: string
+    packageName: string
+    services: string[]
+    setup: number
+    monthly: number
+    savings: number
+    details: Record<string, number | string>
+  }
+  site?: {
+    typeName: string
+    totalPages: number
+    pagesIncluded: number
+    extraPages: number
+    designName: string
+    features: string[]
+    contentName: string
+    imageBank?: boolean
+    deadline: string
+    planName: string
+    planDescription: string
+    setup: number
+    monthly: number
+    isLinktree: boolean
+    details: Record<string, number | boolean>
+  }
+  combo?: { subtotalSetup: number; discount: number; totalSetup: number; monthly: number }
 }
