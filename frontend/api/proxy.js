@@ -51,8 +51,6 @@ export default async function handler(request, response) {
     })
 
     const isAuthRedirect = targetUrl.pathname.startsWith('/api/auth/')
-      && upstream.status >= 300
-      && upstream.status < 400
       && upstream.headers.has('location')
 
     response.statusCode = isAuthRedirect ? 200 : upstream.status
