@@ -53,6 +53,10 @@ export default function AppPage() {
     setActiveView('clients')
   }
 
+  function handleDeletedClient(clientId: string) {
+    setClients((current) => current.filter((client) => client.id !== clientId))
+  }
+
   async function handleLogout() {
     try {
       await logout()
@@ -81,7 +85,7 @@ export default function AppPage() {
       )
       break
     case 'clients':
-      content = <ClientsPage onClientCreated={handleCreatedClient} />
+      content = <ClientsPage onClientCreated={handleCreatedClient} onClientDeleted={handleDeletedClient} />
       break
     case 'inbox':
       content = <InboxPage />

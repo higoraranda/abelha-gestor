@@ -180,4 +180,21 @@ router.patch("/:id", async (req, res) => {
   }
 })
 
+router.delete("/:id", async (req, res) => {
+  const orgId = req.organizationId!
+
+  try {
+    const [client] = await db`
+      DELETE FROM clients
+      WHERE id = ${req.params.id} AND organization_id = ${orgId}
+      RETURNING id
+    `
+    if (!client) return res.status(404).json({ error: "Cliente não encontrado" })
+    res.status(204).send()
+  } catch (error) {
+    console.error("[clients] DELETE /:id", error)
+    res.status(500).json({ error: "Erro ao excluir cliente" })
+  }
+})
+
 export default router

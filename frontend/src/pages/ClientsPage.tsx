@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { CalendarDays, ChevronRight, CircleDollarSign, FileText, Mail, MessageCircle, Pencil, Plus, Search, UserRound } from 'lucide-react'
+import { CalendarDays, ChevronRight, CircleDollarSign, FileText, Mail, MessageCircle, Pencil, Plus, Search, Trash2, UserRound } from 'lucide-react'
 import { api } from '@/lib/api'
 import type { Client, ClientContract, ClientDetail, ReceivableStatus } from '@/types'
 import NewClientModal from '@/components/clients/NewClientModal'
@@ -7,6 +7,7 @@ import ContractModal from '@/components/clients/ContractModal'
 
 interface Props {
   onClientCreated?: (client: Client) => void
+  onClientDeleted?: (clientId: string) => void
 }
 
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -34,7 +35,7 @@ function ClientStatus({ status }: { status?: ReceivableStatus | null }) {
   return <span className={`status-pill status-${status}`}>{STATUS_LABEL[status]}</span>
 }
 
-export default function ClientsPage({ onClientCreated }: Props) {
+export default function ClientsPage({ onClientCreated, onClientDeleted }: Props) {
   const [clients, setClients] = useState<Client[]>([])
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
@@ -42,6 +43,7 @@ export default function ClientsPage({ onClientCreated }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [detail, setDetail] = useState<ClientDetail | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [showNewClient, setShowNewClient] = useState(false)
   const [contractModal, setContractModal] = useState<ClientContract | null | 'new'>(null)
 
@@ -94,6 +96,30 @@ export default function ClientsPage({ onClientCreated }: Props) {
     }
   }
 
+  async function deleteClient(client: ClientDetail) {
+    const label = client.name ?? client.whatsapp ?? 'este cliente'
+    const confirmed = window.confirm(
+      `Excluir permanentemente "${label}"? Os contratos e as cobranças desse cliente também serão apagados. O histórico de conversas será mantido, mas sem vínculo com o cadastro.`,
+    )
+    if (!confirmed) return
+
+    setDeleting(true)
+    try {
+      await api.delete<void>(`/api/v1/clients/${client.id}`)
+      setClients((current) => current.filter((item) => item.id !== client.id))
+      setSelectedId(null)
+      setDetail(null)
+      setContractModal(null)
+      setError(null)
+      onClientDeleted?.(client.id)
+      void fetchClients(search)
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Não foi possível excluir o cliente.')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   async function refreshSelected() {
     if (!selectedId) return
     await Promise.all([loadDetail(selectedId), fetchClients(search)])
@@ -140,7 +166,10 @@ export default function ClientsPage({ onClientCreated }: Props) {
             <>
               <header className="client-record-header">
                 <div><span className="client-record-avatar">{(detail.name ?? '?').slice(0, 2).toUpperCase()}</span><div><p>Cadastro do cliente</p><h2>{detail.name ?? 'Cliente sem nome'}</h2></div></div>
-                <button type="button" className="button button-primary button-small" onClick={() => setContractModal('new')}><Plus size={15} aria-hidden="true" /> Adicionar contrato</button>
+                <div className="client-record-actions">
+                  <button type="button" className="button button-danger-ghost button-small" onClick={() => void deleteClient(detail)} disabled={deleting}><Trash2 size={15} aria-hidden="true" /> {deleting ? 'Excluindo...' : 'Excluir cliente'}</button>
+                  <button type="button" className="button button-primary button-small" onClick={() => setContractModal('new')} disabled={deleting}><Plus size={15} aria-hidden="true" /> Adicionar contrato</button>
+                </div>
               </header>
 
               <div className="client-contact-strip">
