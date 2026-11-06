@@ -2,6 +2,39 @@
 
 # abelha-gestor
 
+## Uso pessoal local
+
+Na prévia de desenvolvimento (`frontend`: `vite`), o Abelha abre diretamente em
+`localhost` ou `127.0.0.1`, sem tela de login. O backend de desenvolvimento escuta
+somente em `127.0.0.1` e usa a única organização já cadastrada no banco, mantendo
+os filtros por `organization_id`. Não cria usuários ou organizações automaticamente.
+Conexões remotas, proxies e produção continuam exigindo a sessão existente.
+
+O armazenamento deste checkout é PostgreSQL no Neon, não um arquivo local. Com
+o banco arquivado ou indisponível, a interface pode ser examinada, mas consultar
+ou salvar registros exige que o banco esteja disponível. A retirada do login
+não reativa nem migra o banco. As seções abaixo de “Arquitetura original” são um registro histórico do projeto.
+
+## Reformulação pessoal de 2026
+
+O escopo atual é um CRM individual: nova navegação, entregas em quadro/checklist,
+pipeline com conversão assistida, relacionamento, extrato, busca, relatórios,
+notificações internas e exportações. A estrutura de organização continua sendo
+usada para isolamento técnico.
+
+- [Escopo aprovado](docs/escopo-implementacao.md)
+- [Direção visual](DESIGN.md)
+- [Progresso e verificações](docs/PROGRESSO.md)
+- [Migration e ativação pendente](docs/BANCO-REFORMULACAO.md)
+
+A migration da reformulação foi aplicada com autorização ao banco de negócio
+no projeto existente, após testes em branch isolada. Os registros históricos
+foram preservados e as consultas reais foram conferidas em leitura. Para outro
+ambiente, consulte o procedimento de migration na documentação. Não execute
+backend/src/db/schema.sql: ele apaga tabelas.
+
+## Arquitetura original
+
 CRM web integrado ao WhatsApp, distribuído como SaaS multi-tenant. Permite que profissionais autônomos e pequenas empresas gerenciem conversas de WhatsApp, contatos e relacionamento comercial em um único painel — sem depender do WhatsApp Web.
 
 ---

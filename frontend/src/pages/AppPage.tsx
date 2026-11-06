@@ -1,129 +1,46 @@
 import { useEffect, useState } from 'react'
-import { Menu } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
-import { api } from '@/lib/api'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { logout } from '@/lib/auth'
 import { useAuthStore } from '@/store/auth'
+import { personalAccess } from '@/lib/personalAccess'
+import { useRemote } from '@/hooks/useRemote'
 import type { Client, Reminder } from '@/types'
-import AppSidebar, { type AppView } from '@/components/layout/AppSidebar'
+import type { Notice } from '@/types/crm'
+import AppSidebar from '@/components/layout/AppSidebar'
+import { NAVIGATION, type AppView } from '@/lib/navigation'
+import { SearchPanel, NotificationsPanel, ExportPanel } from '@/components/layout/GlobalPanels'
+import { ErrorState, LoadingState } from '@/components/ui/DataState'
 import NewClientModal from '@/components/clients/NewClientModal'
-import DashboardPage from '@/pages/DashboardPage'
-import ClientsPage from '@/pages/ClientsPage'
-import FinancePage from '@/pages/FinancePage'
-import InboxPage from '@/pages/InboxPage'
-import AgendaPage from '@/pages/AgendaPage'
-
+import DashboardPage from './DashboardPage'
+import ClientsPage from './ClientsPage'
+import TasksPage from './TasksPage'
+import PipelinePage from './PipelinePage'
+import ReportsPage from './ReportsPage'
+import FinancePage from './FinancePage'
+import InboxPage from './InboxPage'
+import AgendaPage from './AgendaPage'
 export default function AppPage() {
-  const navigate = useNavigate()
-  const clearAuth = useAuthStore((state) => state.clearAuth)
-  const [activeView, setActiveView] = useState<AppView>('overview')
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [clients, setClients] = useState<Client[]>([])
-  const [reminders, setReminders] = useState<Reminder[]>([])
-  const [overviewLoading, setOverviewLoading] = useState(true)
-  const [syncError, setSyncError] = useState<string | null>(null)
-  const [showClientModal, setShowClientModal] = useState(false)
-
-  useEffect(() => {
-    let active = true
-    Promise.allSettled([
-      api.get<Client[]>('/api/v1/clients'),
-      api.get<Reminder[]>('/api/v1/reminders'),
-    ]).then(([clientResult, reminderResult]) => {
-      if (!active) return
-      if (clientResult.status === 'fulfilled') setClients(clientResult.value)
-      if (reminderResult.status === 'fulfilled') setReminders(reminderResult.value)
-      setSyncError([clientResult, reminderResult].some((result) => result.status === 'rejected')
-        ? 'A API não respondeu com uma sessão válida.'
-        : null)
-      setOverviewLoading(false)
-    })
-    return () => { active = false }
-  }, [])
-
-  useEffect(() => {
-    if (activeView !== 'agenda') return
-    api.get<Reminder[]>('/api/v1/reminders').then(setReminders).catch(() => undefined)
-  }, [activeView])
-
-  function handleCreatedClient(client: Client) {
-    setClients((current) => current.some((item) => item.id === client.id)
-      ? current.map((item) => item.id === client.id ? client : item)
-      : [client, ...current])
-    setActiveView('clients')
-  }
-
-  function handleDeletedClient(clientId: string) {
-    setClients((current) => current.filter((client) => client.id !== clientId))
-  }
-
-  async function handleLogout() {
-    try {
-      await logout()
-    } finally {
-      clearAuth()
-      navigate('/login', { replace: true })
-    }
-  }
-
-  const pendingReminderCount = reminders.filter((reminder) => !reminder.completed).length
-  let content: React.ReactNode
-
-  switch (activeView) {
-    case 'overview':
-      content = (
-        <DashboardPage
-          clients={clients}
-          reminders={reminders}
-          loading={overviewLoading}
-          syncError={syncError}
-          onNewClient={() => setShowClientModal(true)}
-          onOpenClients={() => setActiveView('clients')}
-          onOpenFinance={() => setActiveView('finance')}
-          onOpenReminders={() => setActiveView('agenda')}
-        />
-      )
-      break
-    case 'clients':
-      content = <ClientsPage onClientCreated={handleCreatedClient} onClientDeleted={handleDeletedClient} />
-      break
-    case 'inbox':
-      content = <InboxPage />
-      break
-    case 'finance':
-      content = <FinancePage />
-      break
-    case 'agenda':
-      content = <AgendaPage clients={clients} reminders={reminders} onRemindersChange={setReminders} />
-      break
-  }
-
-  return (
-    <div className="app-shell">
-      <AppSidebar
-        activeView={activeView}
-        isOpen={mobileMenuOpen}
-        onClose={() => setMobileMenuOpen(false)}
-        onChange={setActiveView}
-        onLogout={handleLogout}
-        pendingReminders={pendingReminderCount}
-      />
-      {mobileMenuOpen ? <button type="button" className="sidebar-overlay" onClick={() => setMobileMenuOpen(false)} aria-label="Fechar menu" /> : null}
-
-      <main className="app-main">
-        <div className="mobile-app-bar">
-          <button type="button" className="icon-button" onClick={() => setMobileMenuOpen(true)} aria-label="Abrir menu">
-            <Menu size={19} aria-hidden="true" />
-          </button>
-          <span className="mobile-brand"><img src="/bee-mark.png" alt="" /> abelha</span>
-          <span className="mobile-avatar">HA</span>
-        </div>
-        <div className="app-view">{content}</div>
-      </main>
-
-      {showClientModal ? (
-        <NewClientModal onClose={() => setShowClientModal(false)} onCreate={handleCreatedClient} />
-      ) : null}
-    </div>
-  )
+  const navigate=useNavigate();const [params,setParams]=useSearchParams();const clearAuth=useAuthStore(state=>state.clearAuth)
+  const requested=params.get('view');const view:AppView=NAVIGATION.some(item=>item.id===requested)?requested as AppView:'overview';const record=params.get('record')||undefined;const contract=params.get('contract')||undefined
+  const [panel,setPanel]=useState<'search'|'notifications'|'export'|null>(null);const [showClient,setShowClient]=useState(false)
+  const clients=useRemote<Client[]>(view==='agenda'?'/api/v1/clients?limit=100':null);const reminders=useRemote<Reminder[]>(view==='agenda'?'/api/v1/reminders':null);const notices=useRemote<Notice[]>('/api/v1/crm/notifications')
+  useEffect(()=>{const timer=window.setInterval(notices.reload,60000);return()=>window.clearInterval(timer)},[notices.reload])
+  useEffect(()=>{function search(event:KeyboardEvent){if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'&&!event.isComposing){event.preventDefault();setPanel('search')}}window.addEventListener('keydown',search);return()=>window.removeEventListener('keydown',search)},[])
+  function open(next:AppView,id?:string,contractId?:string){const nextParams:Record<string,string>={view:next};if(id)nextParams.record=id;if(contractId)nextParams.contract=contractId;setParams(nextParams)}
+  async function signOut(){try{await logout()}finally{clearAuth();navigate('/login',{replace:true})}}
+  let content:React.ReactNode
+  if(view==='overview')content=<DashboardPage onNewClient={()=>setShowClient(true)} onOpenClients={id=>open('clients',id)} onOpenFinance={()=>open('finance')} onOpenReminders={()=>open('agenda')}/>
+  else if(view==='clients')content=<ClientsPage key={record} focusId={record} onOpenTasks={id=>open('deliveries',undefined,id)}/>
+  else if(view==='deliveries')content=<TasksPage key={(record||'')+(contract||'')} focusId={record} contractId={contract}/>
+  else if(view==='pipeline')content=<PipelinePage key={record} focusId={record}/>
+  else if(view==='reports')content=<ReportsPage/>
+  else if(view==='finance')content=<FinancePage key={record} focusId={record}/>
+  else if(view==='inbox')content=<div className="inbox-workspace crm-panel"><InboxPage/></div>
+  else content=(clients.loading&&!clients.data)||(reminders.loading&&!reminders.data)?<LoadingState/>:clients.error||reminders.error?<ErrorState message={clients.error||reminders.error||''} retry={()=>{clients.reload();reminders.reload()}}/>:<AgendaPage key={record} focusId={record} clients={clients.data||[]} reminders={reminders.data||[]} onRemindersChange={reminders.reload}/>
+  return <div className="app-shell"><AppSidebar activeView={view} onChange={next=>open(next)} pendingReminders={notices.data?.filter(n=>!n.read).length||0} onLogout={personalAccess?undefined:signOut} onSearch={()=>setPanel('search')} onNotifications={()=>{setPanel('notifications');notices.reload()}} onExport={()=>setPanel('export')} onCreate={()=>setShowClient(true)}/><main className="app-main" id="main"><div className="app-view">{content}</div></main>
+    {showClient&&<NewClientModal onClose={()=>setShowClient(false)} onCreate={client=>{setShowClient(false);open('clients',client.id)}}/>}
+    {panel==='search'&&<SearchPanel onClose={()=>setPanel(null)} onOpen={open}/>}
+    {panel==='notifications'&&<NotificationsPanel notices={notices.data||[]} loading={notices.loading} error={notices.error} reload={notices.reload} onClose={()=>setPanel(null)} onOpen={open}/>}
+    {panel==='export'&&<ExportPanel onClose={()=>setPanel(null)}/>}
+  </div>
 }

@@ -1,0 +1,7 @@
+import Modal from '@/components/ui/Modal'
+import type { FinanceClientDetail } from '@/types'
+import { civilDate, money, today } from '@/types/crm'
+const LABELS:Record<string,string>={open:'A vencer',paid:'Paga',overdue:'Atrasada',cancelled:'Cancelada'}
+export default function StatementModal({detail,onClose}:{detail:FinanceClientDetail;onClose:()=>void}) {
+  return <Modal wide title="Extrato do cliente" onClose={onClose}><article className="statement"><header><p>ABELHA · CARTEIRA PESSOAL</p><h2>{detail.clientName}</h2><p>{detail.email} {detail.whatsapp?' · '+detail.whatsapp:''}</p><p>Emitido em {civilDate(today())}</p></header><dl><div><dt>Recebido</dt><dd>{money(detail.paidAmount)}</dd></div><div><dt>Falta receber</dt><dd>{money(detail.remainingAmount)}</dd></div><div><dt>Em atraso</dt><dd>{money(detail.overdueAmount)}</dd></div></dl><div className="crm-table-wrap"><table className="crm-table"><thead><tr><th>Serviço / cobrança</th><th>Vencimento</th><th>Valor</th><th>Situação</th></tr></thead><tbody>{detail.receivables.map(item=><tr key={item.id}><td>{item.serviceName}<small style={{display:'block'}}>{item.description}</small></td><td>{civilDate(item.dueDate)}</td><td>{money(item.amount)}</td><td>{LABELS[item.status]}</td></tr>)}</tbody></table></div><p>Extrato de acompanhamento. Não é nota fiscal. Valores em reais.</p><button className="button button-primary no-print" onClick={()=>window.print()}>Imprimir / salvar em PDF</button></article></Modal>
+}

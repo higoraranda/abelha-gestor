@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express"
 import { getSession } from "@auth/express"
 import { authConfig } from "../auth.config"
+import { db } from "../db/index"
+import { isPersonalRequest, personalOrganizationId } from "../services/personal-access"
 
 // Adiciona o campo "user" ao tipo Request do Express
 // Isso permite acessar req.user em qualquer rota sem erros de TypeScript
@@ -25,6 +27,16 @@ type SessionUser = {
 }
 
 export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
+  if (isPersonalRequest(req)) {
+    try {
+      const organizations = await db<{ id: string }[]>`SELECT id FROM organizations LIMIT 2`
+      req.organizationId = personalOrganizationId(organizations)
+      return next()
+    } catch {
+      return res.status(503).json({ error: "Banco de dados indisponível ou carteira pessoal não identificada. O acesso local exige uma única organização existente." })
+    }
+  }
+
   const session = await getSession(req, authConfig)
   const user = session?.user as SessionUser | undefined
 

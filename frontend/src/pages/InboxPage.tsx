@@ -4,6 +4,7 @@ import { useSSE } from '@/hooks/useSSE'
 import ConversationList from '@/components/inbox/ConversationList'
 import MessageThread from '@/components/inbox/MessageThread'
 import type { Conversation, Message } from '@/types'
+import { ErrorState } from '@/components/ui/DataState'
 
 type ConversationDetail = Conversation & { messages: Message[] }
 
@@ -14,11 +15,12 @@ export default function InboxPage() {
   const [loadingConvs,  setLoadingConvs]  = useState(true)
   const [loadingMsgs,   setLoadingMsgs]   = useState(false)
   const [sending,       setSending]       = useState(false)
+  const [error,setError] = useState<string|null>(null)
 
   useEffect(() => {
     api.get<Conversation[]>('/api/v1/conversations')
       .then(setConversations)
-      .catch(console.error)
+      .catch(error=>setError(error instanceof Error?error.message:'Não foi possível carregar as conversas.'))
       .finally(() => setLoadingConvs(false))
   }, [])
 
@@ -39,6 +41,7 @@ export default function InboxPage() {
           conversation.id === selectedId ? { ...conversation, unreadCount: 0 } : conversation
         ))
       } catch (error) {
+        setError(error instanceof Error?error.message:'Não foi possível abrir a conversa.')
         console.error(error)
       } finally {
         if (!cancelled) setLoadingMsgs(false)
@@ -89,14 +92,17 @@ export default function InboxPage() {
         prev.map((c) => (c.id === selectedId ? { ...c, lastMessageAt: message.createdAt } : c))
       )
     } catch (err) {
+      setError(err instanceof Error?err.message:'Não foi possível enviar a mensagem.')
       console.error('[inbox] falha ao enviar mensagem', err)
     } finally {
       setSending(false)
     }
   }
 
+  if(error) return <ErrorState message={error} retry={()=>{setSelectedId(null);setMessages([]);setError(null);setLoadingConvs(true);api.get<Conversation[]>('/api/v1/conversations').then(setConversations).catch(e=>setError(e instanceof Error?e.message:'Falha na consulta.')).finally(()=>setLoadingConvs(false))}}/>
   return (
-    <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
+    <div className={'inbox-shell'+(selectedId?' has-selection':'')}>
+      {selectedId&&<button className="inbox-back button button-secondary" onClick={()=>setSelectedId(null)}>Voltar para conversas</button>}
       <ConversationList
         conversations={conversations}
         selectedId={selectedId}

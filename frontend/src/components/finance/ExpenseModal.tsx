@@ -1,5 +1,7 @@
 import { useState, type FormEvent } from 'react'
-import { LoaderCircle, ReceiptText, X } from 'lucide-react'
+import { LoaderCircle, ReceiptText } from 'lucide-react'
+import Modal from '@/components/ui/Modal'
+import { today } from '@/types/crm'
 import { api } from '@/lib/api'
 import type { Expense, ExpenseCategory, ExpenseStatus } from '@/types'
 
@@ -22,7 +24,7 @@ export default function ExpenseModal({ onClose, onSaved }: Props) {
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState<ExpenseCategory>('subscriptions')
   const [amount, setAmount] = useState('')
-  const [expenseDate, setExpenseDate] = useState(() => new Date().toISOString().slice(0, 10))
+  const [expenseDate, setExpenseDate] = useState(() => today())
   const [status, setStatus] = useState<ExpenseStatus>('paid')
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
@@ -30,6 +32,7 @@ export default function ExpenseModal({ onClose, onSaved }: Props) {
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
+    if(saving) return
     const numericAmount = Number(amount.replace(',', '.'))
     if (!description.trim()) return setError('Informe a descrição do gasto.')
     if (!Number.isFinite(numericAmount) || numericAmount <= 0) return setError('Informe um valor válido.')
@@ -55,13 +58,7 @@ export default function ExpenseModal({ onClose, onSaved }: Props) {
   }
 
   return (
-    <div className="modal-backdrop" onClick={(event) => { if (event.target === event.currentTarget) onClose() }}>
-      <div className="expense-modal" role="dialog" aria-modal="true" aria-labelledby="expense-modal-title">
-        <header className="modal-heading">
-          <div><p className="eyebrow">Saída financeira</p><h2 id="expense-modal-title">Registrar gasto</h2><span>Inclua assinaturas, anúncios, ferramentas e outras despesas do negócio.</span></div>
-          <button type="button" className="icon-button" onClick={onClose} aria-label="Fechar"><X size={18} aria-hidden="true" /></button>
-        </header>
-
+    <Modal title="Registrar gasto" description="Inclua assinaturas, ferramentas e outras despesas do negócio." onClose={()=>{if(!saving)onClose()}}>
         <form className="expense-form" onSubmit={handleSubmit}>
           <div className="expense-form-intro"><span><ReceiptText size={18} aria-hidden="true" /></span><div><strong>Informações do gasto</strong><small>Os gastos pagos entram no saldo do mês pela data informada.</small></div></div>
           <label className="form-field expense-description"><span>Descrição</span><input value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Ex.: Assinatura do servidor" autoFocus /></label>
@@ -73,9 +70,8 @@ export default function ExpenseModal({ onClose, onSaved }: Props) {
           </div>
           <label className="form-field"><span>Observações</span><textarea value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Detalhes opcionais" rows={3} /></label>
           {error ? <p className="form-error" role="alert">{error}</p> : null}
-          <footer><button type="button" className="button button-secondary" onClick={onClose}>Cancelar</button><button type="submit" className="button button-primary" disabled={saving}>{saving ? <><LoaderCircle className="spin" size={15} aria-hidden="true" /> Salvando...</> : 'Registrar gasto'}</button></footer>
+          <footer><button type="button" className="button button-secondary" disabled={saving} onClick={onClose}>Cancelar</button><button type="submit" className="button button-primary" disabled={saving}>{saving ? <><LoaderCircle className="spin" size={15} aria-hidden="true" /> Salvando...</> : 'Registrar gasto'}</button></footer>
         </form>
-      </div>
-    </div>
+    </Modal>
   )
 }

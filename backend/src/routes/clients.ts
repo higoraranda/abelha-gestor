@@ -16,6 +16,8 @@ function mapClient(row: Record<string, any>) {
     whatsapp: row.whatsapp,
     notes: row.notes,
     createdAt: row.created_at,
+    favorite: Boolean(row.favorite),
+    totalCount: row.total_count == null ? undefined : Number(row.total_count),
     activeService: row.active_service ?? null,
     monthlyFee: row.monthly_fee == null ? null : Number(row.monthly_fee),
     contractEndDate: row.contract_end_date ?? null,
@@ -29,10 +31,13 @@ router.get("/", async (req, res) => {
   const limit = Math.min(100, Number.parseInt(String(req.query.limit ?? "50"), 10) || 50)
   const offset = (page - 1) * limit
   const search = String(req.query.search ?? "").trim()
+  const service = String(req.query.service ?? '').trim()
+  const financial = String(req.query.financial ?? '')
+  if (!['','open','overdue','paid','none'].includes(financial)) return res.status(400).json({error:'Filtro financeiro inválido'})
 
   try {
     const rows = await db`
-      SELECT cl.id, cl.organization_id, cl.name, cl.email, cl.whatsapp, cl.notes, cl.created_at,
+      SELECT cl.id, cl.organization_id, cl.name, cl.email, cl.whatsapp, cl.notes, cl.created_at, cl.favorite, count(*) OVER()::int AS total_count,
         current_contract.service_name AS active_service,
         current_contract.monthly_fee,
         current_contract.contract_end_date,
@@ -40,7 +45,7 @@ router.get("/", async (req, res) => {
           WHEN EXISTS (
             SELECT 1 FROM receivables r
             WHERE r.client_id = cl.id AND r.organization_id = ${orgId}
-              AND r.status = 'open' AND r.due_date < CURRENT_DATE
+              AND r.status = 'open' AND r.due_date < (NOW() AT TIME ZONE 'America/Sao_Paulo')::date
           ) THEN 'overdue'
           WHEN EXISTS (
             SELECT 1 FROM receivables r
@@ -61,6 +66,12 @@ router.get("/", async (req, res) => {
         LIMIT 1
       ) current_contract ON TRUE
       WHERE cl.organization_id = ${orgId}
+        ${req.query.favorites === 'true' ? db`AND cl.favorite` : db``}
+        ${service ? db`AND EXISTS (SELECT 1 FROM client_contracts fc WHERE fc.organization_id=${orgId} AND fc.client_id=cl.id AND fc.status<>'cancelled' AND fc.service_name=${service})` : db``}
+        ${financial === 'overdue' ? db`AND EXISTS(SELECT 1 FROM receivables fr WHERE fr.organization_id=${orgId} AND fr.client_id=cl.id AND fr.status='open' AND fr.due_date<(NOW() AT TIME ZONE 'America/Sao_Paulo')::date)` : db``}
+        ${financial === 'open' ? db`AND EXISTS(SELECT 1 FROM receivables fr WHERE fr.organization_id=${orgId} AND fr.client_id=cl.id AND fr.status='open' AND fr.due_date>=(NOW() AT TIME ZONE 'America/Sao_Paulo')::date)` : db``}
+        ${financial === 'paid' ? db`AND EXISTS(SELECT 1 FROM receivables fr WHERE fr.organization_id=${orgId} AND fr.client_id=cl.id AND fr.status='paid') AND NOT EXISTS(SELECT 1 FROM receivables fr WHERE fr.organization_id=${orgId} AND fr.client_id=cl.id AND fr.status='open')` : db``}
+        ${financial === 'none' ? db`AND NOT EXISTS(SELECT 1 FROM receivables fr WHERE fr.organization_id=${orgId} AND fr.client_id=cl.id AND fr.status<>'cancelled')` : db``}
         ${search ? db`AND (
           cl.name ILIKE ${`%${search}%`} OR cl.whatsapp ILIKE ${`%${search}%`} OR
           cl.email ILIKE ${`%${search}%`} OR EXISTS (
@@ -73,7 +84,8 @@ router.get("/", async (req, res) => {
       LIMIT ${limit} OFFSET ${offset}
     `
     res.json(rows.map(mapClient))
-  } catch (error) {
+  } catch (error:any) {
+    if(error.code==='42703') return res.status(503).json({error:"A atualização do banco ainda não foi aplicada. Os registros existentes foram preservados."})
     console.error("[clients] GET /", error)
     res.status(500).json({ error: "Erro ao carregar clientes" })
   }
@@ -160,9 +172,10 @@ router.post("/:clientId/contracts", async (req, res) => {
 
 router.patch("/:id", async (req, res) => {
   const orgId = req.organizationId!
-  const allowed = ["name", "email", "whatsapp", "notes"] as const
+  const allowed = ["name", "email", "whatsapp", "notes", "favorite"] as const
   const updates: Record<string, unknown> = {}
   for (const key of allowed) if (key in req.body) updates[key] = req.body[key] ?? null
+  if ('favorite' in updates && typeof updates.favorite !== 'boolean') return res.status(400).json({error:'Favorito inválido'})
   if (!Object.keys(updates).length) return res.status(400).json({ error: "Nenhum campo para atualizar" })
 
   try {

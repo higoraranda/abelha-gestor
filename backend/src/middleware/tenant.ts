@@ -10,9 +10,9 @@ declare global {
 }
 
 // Deve ser usado DEPOIS do authMiddleware
-// Extrai o organizationId do req.user e expõe como req.organizationId
+// Preserva a carteira pessoal local ou usa a organização da sessão autenticada.
 // para facilitar o uso nas queries: WHERE organization_id = ${req.organizationId}
 export function tenantMiddleware(req: Request, _res: Response, next: NextFunction) {
-  req.organizationId = req.user?.organizationId
+  req.organizationId ??= req.user?.organizationId
   next()
 }

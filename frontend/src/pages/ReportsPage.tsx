@@ -1,0 +1,13 @@
+import { useState } from 'react'
+import { useRemote } from '@/hooks/useRemote'
+import { ErrorState, LoadingState } from '@/components/ui/DataState'
+import { money, today } from '@/types/crm'
+interface Report {from:string;to:string;received:number;open_count:number;open_value:number;weighted_value:number;monthly:{month:string;received:number}[]}
+export default function ReportsPage() {
+  const [range,setRange]=useState({from:today().slice(0,7)+'-01',to:today()});const [draft,setDraft]=useState(range)
+  const remote=useRemote<Report>('/api/v1/crm/reports?'+new URLSearchParams(range))
+  const max=Math.max(1,...(remote.data?.monthly.map(m=>m.received)||[]))
+  return <div className="module-page"><header className="page-heading"><div><p className="eyebrow">Clareza para decidir</p><h1>Seu negócio em perspectiva</h1><p className="page-subtitle">Recebimentos reais e negociações futuras, cada um com sua definição.</p></div></header><form className="crm-toolbar" onSubmit={e=>{e.preventDefault();setRange(draft)}}><label>De <input aria-label="Início do período" type="date" required value={draft.from} onChange={e=>setDraft({...draft,from:e.target.value})}/></label><label>Até <input aria-label="Fim do período" type="date" required min={draft.from} value={draft.to} onChange={e=>setDraft({...draft,to:e.target.value})}/></label><button className="button button-primary">Aplicar período</button></form>
+    {remote.loading?<LoadingState/>:remote.error?<ErrorState message={remote.error} retry={remote.reload}/>:remote.data&&<><div className="report-metrics"><article><span>Recebido no período</span><strong>{money(remote.data.received)}</strong><p>Somente cobranças pagas, pela data de pagamento. Oportunidades ganhas não são somadas aqui.</p></article><article><span>Pipeline aberto</span><strong>{money(remote.data.open_value)}</strong><p>{remote.data.open_count} negociações abertas com fechamento previsto no período.</p></article><article><span>Previsão ponderada</span><strong>{money(remote.data.weighted_value)}</strong><p>Soma do valor × probabilidade de cada negociação aberta. Não representa dinheiro recebido.</p></article></div><section className="crm-panel"><h2>Recebimentos por mês</h2>{remote.data.monthly.length?<><div className="report-bars">{remote.data.monthly.map(m=><div key={m.month}><i style={{height:Math.max(2,m.received/max*145)}} title={money(m.received)}/>{m.month}</div>)}</div><div className="crm-table-wrap"><table className="crm-table"><thead><tr><th>Mês</th><th>Recebido</th></tr></thead><tbody>{remote.data.monthly.map(m=><tr key={m.month}><td>{m.month}</td><td>{money(m.received)}</td></tr>)}</tbody></table></div></>:<p className="page-subtitle">Nenhum recebimento registrado neste período.</p>}</section></>}
+  </div>
+}

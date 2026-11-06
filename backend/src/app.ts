@@ -12,6 +12,7 @@ import catalogRouter from "./routes/catalog"
 import contractsRouter from "./routes/contracts"
 import financeRouter from "./routes/finance"
 import webhooksRouter from "./routes/webhooks"
+import crmRouter from "./routes/crm"
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -36,6 +37,7 @@ app.use("/api/v1/reminders", remindersRouter)
 app.use("/api/v1/catalog", catalogRouter)
 app.use("/api/v1/contracts", contractsRouter)
 app.use("/api/v1/finance", financeRouter)
+app.use("/api/v1/crm", crmRouter)
 app.use("/api/events", eventsRouter)
 app.use("/webhooks", webhooksRouter)
 
@@ -43,7 +45,8 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok" })
 })
 
-app.listen(PORT, () => {
+const HOST = process.env.NODE_ENV === "production" ? "0.0.0.0" : "127.0.0.1"
+app.listen(Number(PORT), HOST, () => {
   console.log(`Servidor rodando na porta ${PORT}`)
 })
 

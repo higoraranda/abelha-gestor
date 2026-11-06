@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { CalendarClock, X } from 'lucide-react'
+import { CalendarClock } from 'lucide-react'
+import Modal from '@/components/ui/Modal'
 import { api } from '@/lib/api'
+import { localDateTimeToIso } from '@/lib/time'
 import type { Client, Reminder } from '@/types'
 
 interface Props {
@@ -22,6 +24,7 @@ export default function AppointmentModal({ date, clients, onClose, onCreated }: 
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
+    if(saving) return
     if (!form.title.trim()) {
       setError('Informe um título para o compromisso.')
       return
@@ -33,7 +36,7 @@ export default function AppointmentModal({ date, clients, onClose, onCreated }: 
 
     setSaving(true)
     try {
-      const dueAt = new Date(`${form.date}T${form.time}:00`).toISOString()
+      const dueAt = localDateTimeToIso(form.date+'T'+form.time)
       const reminder = await api.post<Reminder>('/api/v1/reminders', {
         title: form.title.trim(),
         description: form.description.trim() || null,
@@ -51,16 +54,7 @@ export default function AppointmentModal({ date, clients, onClose, onCreated }: 
   }
 
   return (
-    <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}>
-      <div className="appointment-modal" role="dialog" aria-modal="true" aria-labelledby="appointment-modal-title">
-        <div className="modal-heading">
-          <div>
-            <p className="eyebrow">Agenda</p>
-            <h2 id="appointment-modal-title">Novo compromisso</h2>
-          </div>
-          <button type="button" className="icon-button" onClick={onClose} aria-label="Fechar"><X size={18} aria-hidden="true" /></button>
-        </div>
-
+    <Modal title="Novo compromisso" description="Organize seus compromissos no horário de Brasília." onClose={()=>{if(!saving)onClose()}}>
         <form className="appointment-form" onSubmit={handleSubmit}>
           <div className="appointment-callout"><CalendarClock size={19} aria-hidden="true" /><span>O compromisso também aparecerá nos lembretes da visão geral.</span></div>
           <label className="form-field"><span>Título *</span><input autoFocus value={form.title} onChange={(event) => set('title', event.target.value)} placeholder="Ex.: Reunião de alinhamento" /></label>
@@ -78,11 +72,10 @@ export default function AppointmentModal({ date, clients, onClose, onCreated }: 
           <label className="form-field"><span>Observações</span><textarea rows={4} value={form.description} onChange={(event) => set('description', event.target.value)} placeholder="Pauta, local, link da reunião ou próximos passos..." /></label>
           {error ? <p className="form-error" role="alert">{error}</p> : null}
           <div className="modal-actions">
-            <button type="button" className="button button-secondary" onClick={onClose}>Cancelar</button>
+            <button type="button" className="button button-secondary" disabled={saving} onClick={onClose}>Cancelar</button>
             <button type="submit" className="button button-primary" disabled={saving}>{saving ? 'Agendando...' : 'Agendar'}</button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   )
 }

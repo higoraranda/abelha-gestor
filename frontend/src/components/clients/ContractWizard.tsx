@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { emptyContract } from '@/lib/contractDefaults'
 import { ArrowLeft, ArrowRight, Check, FileText, LoaderCircle } from 'lucide-react'
 import { api } from '@/lib/api'
 import type { CatalogItem, NewContractInput, PaymentMethod } from '@/types'
@@ -9,6 +10,7 @@ interface Props {
   onSubmit: (contract: NewContractInput) => Promise<void>
   submitLabel: string
   lockedStructure?: boolean
+  onBusyChange?: (busy: boolean) => void
 }
 
 interface PreviewItem {
@@ -19,29 +21,6 @@ interface PreviewItem {
 
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
 const dateFormat = new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' })
-
-function isoOffset(days: number) {
-  const date = new Date()
-  date.setHours(12, 0, 0, 0)
-  date.setDate(date.getDate() + days)
-  return date.toISOString().slice(0, 10)
-}
-
-function emptyContract(): NewContractInput {
-  return {
-    catalogItemId: null,
-    serviceName: '',
-    serviceDescription: '',
-    grossAmount: 0,
-    paymentMethod: 'two_installments',
-    monthlyFee: 0,
-    monthlyDueDay: 10,
-    developmentStartDate: isoOffset(0),
-    developmentEndDate: isoOffset(30),
-    contractEndDate: isoOffset(365),
-    notes: '',
-  }
-}
 
 function clampDueDate(year: number, month: number, dueDay: number) {
   const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate()
@@ -92,7 +71,7 @@ function schedulePreview(contract: NewContractInput) {
   return items
 }
 
-export default function ContractWizard({ initial, onBack, onSubmit, submitLabel, lockedStructure = false }: Props) {
+export default function ContractWizard({ initial, onBack, onSubmit, submitLabel, lockedStructure = false, onBusyChange }: Props) {
   const [step, setStep] = useState(2)
   const [form, setForm] = useState<NewContractInput>(() => initial ?? emptyContract())
   const [catalog, setCatalog] = useState<CatalogItem[]>([])
@@ -156,7 +135,9 @@ export default function ContractWizard({ initial, onBack, onSubmit, submitLabel,
   }
 
   async function save() {
+    if (saving) return
     setSaving(true)
+    onBusyChange?.(true)
     setError(null)
     try {
       await onSubmit({ ...form, serviceDescription: form.serviceDescription || null, notes: form.notes || null })
@@ -164,6 +145,7 @@ export default function ContractWizard({ initial, onBack, onSubmit, submitLabel,
       setError(caught instanceof Error ? caught.message : 'Não foi possível salvar o contrato.')
     } finally {
       setSaving(false)
+      onBusyChange?.(false)
     }
   }
 

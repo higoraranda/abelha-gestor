@@ -1,7 +1,8 @@
 import { buildContractSchedule, type NewContractInput } from "./contracts"
+import { businessDay, civilKey } from './crm'
 
 export function mapReceivable(row: Record<string, any>) {
-  const dynamicStatus = row.status === "open" && String(row.due_date) < new Date().toISOString().slice(0, 10)
+  const dynamicStatus = row.status === "open" && civilKey(row.due_date) < businessDay()
     ? "overdue"
     : row.status
   return {
@@ -13,7 +14,7 @@ export function mapReceivable(row: Record<string, any>) {
     installmentNumber: row.installment_number,
     description: row.description,
     amount: Number(row.amount),
-    dueDate: row.due_date,
+    dueDate: civilKey(row.due_date),
     status: dynamicStatus,
     paidAt: row.paid_at,
     createdAt: row.created_at,
@@ -36,9 +37,9 @@ export function mapContract(row: Record<string, any>, receivables: Record<string
     paymentMethod: row.payment_method,
     monthlyFee: Number(row.monthly_fee),
     monthlyDueDay: row.monthly_due_day,
-    developmentStartDate: row.development_start_date,
-    developmentEndDate: row.development_end_date,
-    contractEndDate: row.contract_end_date,
+    developmentStartDate: civilKey(row.development_start_date),
+    developmentEndDate: civilKey(row.development_end_date),
+    contractEndDate: civilKey(row.contract_end_date),
     status: row.status,
     notes: row.notes,
     createdAt: row.created_at,

@@ -1,0 +1,17 @@
+import { useState } from 'react'
+import { api } from '@/lib/api'
+import { localDateTimeToIso } from '@/lib/time'
+import { useRemote } from '@/hooks/useRemote'
+import { ErrorState, LoadingState } from '@/components/ui/DataState'
+interface Relationship {notes:{id:string;body:string;created_at:string}[];nextAction:{id:string;title:string;due_at:string;completed:boolean}|null}
+const timestamp=(value:string)=>new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',dateStyle:'short',timeStyle:'short'}).format(new Date(value))
+export default function ClientRelationship({clientId}:{clientId:string}) {
+  const remote=useRemote<Relationship>('/api/v1/crm/relationships/'+clientId)
+  const [note,setNote]=useState('');const [action,setAction]=useState('');const [due,setDue]=useState('');const [busy,setBusy]=useState(false);const [error,setError]=useState('')
+  async function save(kind:'notes'|'next-action') {if(busy)return;setBusy(true);setError('');try{await api.post('/api/v1/crm/relationships/'+clientId+'/'+kind,kind==='notes'?{body:note}:{title:action,due_at:localDateTimeToIso(due)});if(kind==='notes')setNote('');else{setAction('');setDue('')}remote.reload()}catch(e){setError(e instanceof Error?e.message:'Não foi possível salvar.')}finally{setBusy(false)}}
+  async function complete(){if(!remote.data?.nextAction)return;setBusy(true);setError('');try{await api.patch('/api/v1/reminders/'+remote.data.nextAction.id,{completed:true});remote.reload()}catch(e){setError(e instanceof Error?e.message:'Não foi possível concluir.')}finally{setBusy(false)}}
+  if(remote.loading&&!remote.data)return <LoadingState/>
+  if(remote.error)return <ErrorState message={remote.error} retry={remote.reload}/>
+  return <><div className="relationship-grid"><section><h3>Próxima ação</h3>{remote.data?.nextAction&&!remote.data.nextAction.completed?<div><strong>{remote.data.nextAction.title}</strong><p>{timestamp(remote.data.nextAction.due_at)}</p><button className="button button-secondary button-small" disabled={busy} onClick={()=>void complete()}>Concluir ação</button></div>:<p className="page-subtitle">Nenhum retorno pendente para este contato.</p>}<form className="crm-form" onSubmit={e=>{e.preventDefault();void save('next-action')}}><label>O próximo passo<input required maxLength={240} value={action} onChange={e=>setAction(e.target.value)} placeholder="Ex.: Retornar sobre a proposta"/></label><label>Data e horário<input type="datetime-local" required value={due} onChange={e=>setDue(e.target.value)}/></label><button className="button button-secondary" disabled={busy}>{remote.data?.nextAction&&!remote.data.nextAction.completed?'Substituir próxima ação':'Agendar próxima ação'}</button></form></section>
+    <section><h3>Notas datadas</h3><form className="crm-form" onSubmit={e=>{e.preventDefault();void save('notes')}}><label>Nova nota<textarea required rows={3} maxLength={10000} value={note} onChange={e=>setNote(e.target.value)} placeholder="O que foi combinado?"/></label><button className="button button-secondary" disabled={busy}>Adicionar nota</button></form>{remote.data?.notes.map(n=><article className="note-item" key={n.id}><time dateTime={n.created_at}>{timestamp(n.created_at)}</time>{n.body}</article>)}{!remote.data?.notes.length&&<p className="page-subtitle">As conversas importantes começam a ganhar contexto aqui.</p>}</section></div>{error&&<p className="form-error" role="alert">{error}</p>}</>
+}

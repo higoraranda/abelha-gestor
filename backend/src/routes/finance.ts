@@ -2,6 +2,7 @@ import { Router } from "express"
 import { authMiddleware } from "../middleware/auth"
 import { tenantMiddleware } from "../middleware/tenant"
 import { db } from "../db/index"
+import { businessDay } from "../services/crm"
 import { mapReceivable } from "../services/contract-store"
 
 const router = Router()
@@ -31,11 +32,11 @@ router.get("/summary", async (req, res) => {
     const [totals] = await db`
       SELECT
         COALESCE(SUM(amount) FILTER (
-          WHERE status = 'paid' AND paid_at >= date_trunc('month', CURRENT_DATE)
-            AND paid_at < date_trunc('month', CURRENT_DATE) + interval '1 month'
+          WHERE status = 'paid' AND paid_at >= date_trunc('month', (NOW() AT TIME ZONE 'America/Sao_Paulo')::date)
+            AND paid_at < date_trunc('month', (NOW() AT TIME ZONE 'America/Sao_Paulo')::date) + interval '1 month'
         ), 0) AS received_month,
-        COALESCE(SUM(amount) FILTER (WHERE status = 'open' AND due_date >= CURRENT_DATE), 0) AS open_amount,
-        COALESCE(SUM(amount) FILTER (WHERE status = 'open' AND due_date < CURRENT_DATE), 0) AS overdue_amount,
+        COALESCE(SUM(amount) FILTER (WHERE status = 'open' AND due_date >= (NOW() AT TIME ZONE 'America/Sao_Paulo')::date), 0) AS open_amount,
+        COALESCE(SUM(amount) FILTER (WHERE status = 'open' AND due_date < (NOW() AT TIME ZONE 'America/Sao_Paulo')::date), 0) AS overdue_amount,
         COALESCE(SUM(amount) FILTER (WHERE status <> 'cancelled'), 0) AS projected_total,
         COALESCE((
           SELECT SUM(cc.monthly_fee)
@@ -43,24 +44,24 @@ router.get("/summary", async (req, res) => {
           WHERE cc.organization_id = ${orgId}
             AND cc.status = 'active'
             AND cc.monthly_fee > 0
-            AND cc.development_end_date <= CURRENT_DATE
-            AND cc.contract_end_date >= CURRENT_DATE
+            AND cc.development_end_date <= (NOW() AT TIME ZONE 'America/Sao_Paulo')::date
+            AND cc.contract_end_date >= (NOW() AT TIME ZONE 'America/Sao_Paulo')::date
         ), 0) AS active_mrr,
         COALESCE((
           SELECT SUM(e.amount)
           FROM expenses e
           WHERE e.organization_id = ${orgId}
             AND e.status = 'paid'
-            AND e.paid_at >= date_trunc('month', CURRENT_DATE)
-            AND e.paid_at < date_trunc('month', CURRENT_DATE) + interval '1 month'
+            AND e.paid_at >= date_trunc('month', (NOW() AT TIME ZONE 'America/Sao_Paulo')::date)
+            AND e.paid_at < date_trunc('month', (NOW() AT TIME ZONE 'America/Sao_Paulo')::date) + interval '1 month'
         ), 0) AS expenses_month
       FROM receivables WHERE organization_id = ${orgId}
     `
     const monthly = await db`
       WITH months AS (
         SELECT generate_series(
-          date_trunc('month', CURRENT_DATE) - interval '5 months',
-          date_trunc('month', CURRENT_DATE), interval '1 month'
+          date_trunc('month', (NOW() AT TIME ZONE 'America/Sao_Paulo')::date) - interval '5 months',
+          date_trunc('month', (NOW() AT TIME ZONE 'America/Sao_Paulo')::date), interval '1 month'
         )::date AS month
       )
       SELECT months.month,
@@ -111,11 +112,11 @@ router.get("/clients", async (req, res) => {
           WHERE r.client_id = cl.id AND r.organization_id = ${orgId} AND r.status = 'open'), 0) AS remaining_amount,
         COALESCE((SELECT SUM(r.amount) FROM receivables r
           WHERE r.client_id = cl.id AND r.organization_id = ${orgId}
-            AND r.status = 'open' AND r.due_date < CURRENT_DATE), 0) AS overdue_amount,
+            AND r.status = 'open' AND r.due_date < (NOW() AT TIME ZONE 'America/Sao_Paulo')::date), 0) AS overdue_amount,
         COALESCE((SELECT SUM(cc.monthly_fee) FROM client_contracts cc
           WHERE cc.client_id = cl.id AND cc.organization_id = ${orgId}
             AND cc.status = 'active' AND cc.monthly_fee > 0
-            AND cc.development_end_date <= CURRENT_DATE AND cc.contract_end_date >= CURRENT_DATE), 0) AS active_mrr,
+            AND cc.development_end_date <= (NOW() AT TIME ZONE 'America/Sao_Paulo')::date AND cc.contract_end_date >= (NOW() AT TIME ZONE 'America/Sao_Paulo')::date), 0) AS active_mrr,
         (SELECT MIN(r.due_date) FROM receivables r
           WHERE r.client_id = cl.id AND r.organization_id = ${orgId} AND r.status = 'open') AS next_due_date
       FROM clients cl
@@ -127,7 +128,7 @@ router.get("/clients", async (req, res) => {
         )` : db``}
       ORDER BY
         (SELECT COALESCE(SUM(r.amount), 0) FROM receivables r
-          WHERE r.client_id = cl.id AND r.organization_id = ${orgId} AND r.status = 'open' AND r.due_date < CURRENT_DATE) DESC,
+          WHERE r.client_id = cl.id AND r.organization_id = ${orgId} AND r.status = 'open' AND r.due_date < (NOW() AT TIME ZONE 'America/Sao_Paulo')::date) DESC,
         (SELECT COALESCE(SUM(r.amount), 0) FROM receivables r
           WHERE r.client_id = cl.id AND r.organization_id = ${orgId} AND r.status = 'open') DESC,
         cl.name NULLS LAST
@@ -173,7 +174,7 @@ router.get("/clients/:clientId", async (req, res) => {
       SELECT
         COALESCE((SELECT SUM(monthly_fee) FROM client_contracts
           WHERE client_id = ${clientId} AND organization_id = ${orgId}
-            AND status = 'active' AND development_end_date <= CURRENT_DATE AND contract_end_date >= CURRENT_DATE), 0) AS active_mrr,
+            AND status = 'active' AND development_end_date <= (NOW() AT TIME ZONE 'America/Sao_Paulo')::date AND contract_end_date >= (NOW() AT TIME ZONE 'America/Sao_Paulo')::date), 0) AS active_mrr,
         COALESCE((SELECT STRING_AGG(DISTINCT service_name, ', ' ORDER BY service_name) FROM client_contracts
           WHERE client_id = ${clientId} AND organization_id = ${orgId} AND status <> 'cancelled'), '') AS service_names
     `
@@ -254,7 +255,7 @@ router.patch("/expenses/:expenseId", async (req, res) => {
   const orgId = req.organizationId!
   const status = req.body.status
   if (status !== "paid" && status !== "planned") return res.status(400).json({ error: "Situação inválida" })
-  const paidAt = status === "paid" ? (req.body.paidAt || new Date().toISOString().slice(0, 10)) : null
+  const paidAt = status === "paid" ? (req.body.paidAt || businessDay()) : null
   try {
     const [row] = await db`
       UPDATE expenses SET status = ${status}, paid_at = ${paidAt}, updated_at = NOW()
@@ -284,8 +285,8 @@ router.get("/receivables", async (req, res) => {
       JOIN client_contracts cc ON cc.id = r.contract_id AND cc.organization_id = ${orgId}
       WHERE r.organization_id = ${orgId}
         ${search ? db`AND (cl.name ILIKE ${`%${search}%`} OR cc.service_name ILIKE ${`%${search}%`})` : db``}
-        ${status === "overdue" ? db`AND r.status = 'open' AND r.due_date < CURRENT_DATE` : db``}
-        ${status === "open" ? db`AND r.status = 'open' AND r.due_date >= CURRENT_DATE` : db``}
+        ${status === "overdue" ? db`AND r.status = 'open' AND r.due_date < (NOW() AT TIME ZONE 'America/Sao_Paulo')::date` : db``}
+        ${status === "open" ? db`AND r.status = 'open' AND r.due_date >= (NOW() AT TIME ZONE 'America/Sao_Paulo')::date` : db``}
         ${status === "paid" ? db`AND r.status = 'paid'` : db``}
         ${status === "cancelled" ? db`AND r.status = 'cancelled'` : db``}
         ${from ? db`AND r.due_date >= ${from}` : db``}
@@ -304,7 +305,7 @@ router.patch("/receivables/:receivableId", async (req, res) => {
   const orgId = req.organizationId!
   const status = req.body.status
   if (!["paid", "open"].includes(status)) return res.status(400).json({ error: "Situação inválida" })
-  const paidAt = status === "paid" ? (req.body.paidAt || new Date().toISOString().slice(0, 10)) : null
+  const paidAt = status === "paid" ? (req.body.paidAt || businessDay()) : null
   try {
     const [row] = await db`
       UPDATE receivables SET status = ${status}, paid_at = ${paidAt}, updated_at = NOW()

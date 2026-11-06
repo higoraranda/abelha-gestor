@@ -6,6 +6,8 @@ export interface User {
 }
 
 export interface Client {
+  favorite?: boolean
+  totalCount?: number
   id: string
   organizationId: string
   name: string | null

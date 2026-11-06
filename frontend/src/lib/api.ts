@@ -10,6 +10,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     ...options,
     headers,
     credentials: 'include',
+    signal: options.signal ? AbortSignal.any([options.signal,AbortSignal.timeout(20000)]) : AbortSignal.timeout(20000),
   })
 
   if (!response.ok) {
@@ -18,13 +19,18 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     throw new Error(body.error ?? body.message ?? `HTTP ${response.status}`)
   }
 
-  if (response.status === 204) return undefined as T
+  if (response.status === 204) {
+    window.dispatchEvent(new Event('abelha:updated'))
+    return undefined as T
+  }
 
-  return response.json() as Promise<T>
+  const result = await response.json() as T
+  if (options.method && options.method !== 'GET') window.dispatchEvent(new Event('abelha:updated'))
+  return result
 }
 
 export const api = {
-  get: <T>(path: string) => request<T>(path),
+  get: <T>(path: string, signal?: AbortSignal) => request<T>(path, { signal }),
   post: <T>(path: string, body: unknown) =>
     request<T>(path, { method: 'POST', body: JSON.stringify(body) }),
   patch: <T>(path: string, body: unknown) =>

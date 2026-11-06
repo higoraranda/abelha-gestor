@@ -9,20 +9,23 @@ import {
   Trash2,
   UserRound,
 } from 'lucide-react'
+import Modal from '@/components/ui/Modal'
+import { today as brazilToday } from '@/types/crm'
 import { api } from '@/lib/api'
 import type { Client, Reminder } from '@/types'
 import AppointmentModal from '@/components/agenda/AppointmentModal'
 
 interface Props {
+  focusId?:string
   clients: Client[]
   reminders: Reminder[]
-  onRemindersChange: React.Dispatch<React.SetStateAction<Reminder[]>>
+  onRemindersChange: () => void
 }
 
 const WEEKDAYS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
 const monthFormatter = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' })
 const longDateFormatter = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })
-const timeFormatter = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' })
+const timeFormatter = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone:'America/Sao_Paulo' })
 
 function dateKey(date: Date) {
   const year = date.getFullYear()
@@ -48,16 +51,20 @@ function buildCalendarDays(month: Date) {
   })
 }
 
-export default function AgendaPage({ clients, reminders, onRemindersChange }: Props) {
-  const today = new Date()
-  const [month, setMonth] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1))
-  const [selectedDate, setSelectedDate] = useState(() => dateKey(today))
+export default function AgendaPage({ clients, reminders, onRemindersChange, focusId }: Props) {
+  const today = parseDateKey(brazilToday())
+  const initialDay=focusId?reminders.find(r=>r.id===focusId)?.dueAt:undefined
+  const initialDate=initialDay?new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(initialDay)):dateKey(today)
+  const [error,setError]=useState('')
+  const [removing,setRemoving]=useState<Reminder|null>(null)
+  const [month, setMonth] = useState(() => new Date(parseDateKey(initialDate).getFullYear(), parseDateKey(initialDate).getMonth(), 1))
+  const [selectedDate, setSelectedDate] = useState(() => initialDate)
   const [showModal, setShowModal] = useState(false)
   const [busyId, setBusyId] = useState<string | null>(null)
 
   const calendarDays = useMemo(() => buildCalendarDays(month), [month])
   const remindersByDay = useMemo(() => reminders.reduce<Record<string, Reminder[]>>((groups, reminder) => {
-    const key = dateKey(new Date(reminder.dueAt))
+    const key = new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(reminder.dueAt))
     groups[key] = [...(groups[key] ?? []), reminder].sort((a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime())
     return groups
   }, {}), [reminders])
@@ -65,7 +72,7 @@ export default function AgendaPage({ clients, reminders, onRemindersChange }: Pr
   const selectedReminders = remindersByDay[selectedDate] ?? []
   const pendingCount = reminders.filter((reminder) => !reminder.completed).length
   const thisMonthCount = reminders.filter((reminder) => {
-    const date = new Date(reminder.dueAt)
+    const date = parseDateKey(new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(reminder.dueAt)))
     return date.getMonth() === month.getMonth() && date.getFullYear() === month.getFullYear()
   }).length
 
@@ -76,7 +83,7 @@ export default function AgendaPage({ clients, reminders, onRemindersChange }: Pr
   }
 
   function goToday() {
-    const current = new Date()
+    const current = parseDateKey(brazilToday())
     setMonth(new Date(current.getFullYear(), current.getMonth(), 1))
     setSelectedDate(dateKey(current))
   }
@@ -84,19 +91,19 @@ export default function AgendaPage({ clients, reminders, onRemindersChange }: Pr
   async function toggleComplete(reminder: Reminder) {
     setBusyId(reminder.id)
     try {
-      const saved = await api.patch<Reminder>(`/api/v1/reminders/${reminder.id}`, { completed: !reminder.completed })
-      onRemindersChange((current) => current.map((item) => item.id === saved.id ? saved : item))
-    } finally {
+      await api.patch<Reminder>(`/api/v1/reminders/${reminder.id}`, { completed: !reminder.completed })
+      onRemindersChange()
+    } catch(caught) {setError(caught instanceof Error?caught.message:"Não foi possível atualizar a agenda.")} finally {
       setBusyId(null)
     }
   }
 
   async function removeReminder(reminder: Reminder) {
-    if (!window.confirm(`Excluir "${reminder.title}" da agenda?`)) return
+    setError('')
     setBusyId(reminder.id)
     try {
       await api.delete<void>(`/api/v1/reminders/${reminder.id}`)
-      onRemindersChange((current) => current.filter((item) => item.id !== reminder.id))
+      setRemoving(null);onRemindersChange()
     } finally {
       setBusyId(null)
     }
@@ -113,6 +120,7 @@ export default function AgendaPage({ clients, reminders, onRemindersChange }: Pr
         <button type="button" className="button button-primary" onClick={() => setShowModal(true)}><Plus size={17} aria-hidden="true" /> Novo compromisso</button>
       </header>
 
+      {error&&<p className="form-error" role="alert">{error}</p>}
       <section className="agenda-summary" aria-label="Resumo da agenda">
         <div><span><CalendarDays size={18} aria-hidden="true" /></span><p><strong>{thisMonthCount}</strong><small>neste mês</small></p></div>
         <div><span><Clock3 size={18} aria-hidden="true" /></span><p><strong>{pendingCount}</strong><small>pendentes</small></p></div>
@@ -178,7 +186,7 @@ export default function AgendaPage({ clients, reminders, onRemindersChange }: Pr
                   </div>
                   <div className="agenda-event-actions">
                     <button type="button" onClick={() => toggleComplete(reminder)} disabled={busyId === reminder.id} title={reminder.completed ? 'Reabrir' : 'Concluir'}><Check size={15} aria-hidden="true" /></button>
-                    <button type="button" onClick={() => removeReminder(reminder)} disabled={busyId === reminder.id} title="Excluir"><Trash2 size={15} aria-hidden="true" /></button>
+                    <button type="button" onClick={() => setRemoving(reminder)} disabled={busyId === reminder.id} title="Excluir"><Trash2 size={15} aria-hidden="true" /></button>
                   </div>
                 </article>
               ))}
@@ -194,12 +202,13 @@ export default function AgendaPage({ clients, reminders, onRemindersChange }: Pr
         </aside>
       </div>
 
+      {removing&&<Modal title="Excluir compromisso?" description={removing.title} onClose={()=>{if(!busyId)setRemoving(null)}}><p>Esta ação remove o compromisso da agenda.</p><div className="modal-actions"><button className="button button-secondary" disabled={Boolean(busyId)} onClick={()=>setRemoving(null)}>Cancelar</button><button className="button button-primary" disabled={Boolean(busyId)} onClick={()=>void removeReminder(removing)}>Excluir compromisso</button></div></Modal>}
       {showModal ? (
         <AppointmentModal
           date={selectedDate}
           clients={clients}
           onClose={() => setShowModal(false)}
-          onCreated={(reminder) => onRemindersChange((current) => [...current, reminder])}
+          onCreated={onRemindersChange}
         />
       ) : null}
     </div>

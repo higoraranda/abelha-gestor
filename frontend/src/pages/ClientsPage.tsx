@@ -1,217 +1,46 @@
-import { useCallback, useEffect, useState } from 'react'
-import { CalendarDays, ChevronRight, CircleDollarSign, FileText, Mail, MessageCircle, Pencil, Plus, Search, Trash2, UserRound } from 'lucide-react'
+import { useState } from 'react'
+import { CalendarDays, CircleDollarSign, FileText, Mail, MessageCircle, Pencil, Plus, Search, Star, Trash2, X } from 'lucide-react'
 import { api } from '@/lib/api'
-import type { Client, ClientContract, ClientDetail, ReceivableStatus } from '@/types'
+import { useRemote } from '@/hooks/useRemote'
+import type { Client, ClientContract, ClientDetail } from '@/types'
+import type { ContractOption } from '@/types/crm'
+import { civilDate, money } from '@/types/crm'
 import NewClientModal from '@/components/clients/NewClientModal'
 import ContractModal from '@/components/clients/ContractModal'
-
-interface Props {
-  onClientCreated?: (client: Client) => void
-  onClientDeleted?: (clientId: string) => void
-}
-
-const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
-const dateFormat = new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' })
-
-const STATUS_LABEL: Record<ReceivableStatus, string> = {
-  open: 'Em aberto',
-  paid: 'Pago',
-  overdue: 'Atrasado',
-  cancelled: 'Cancelado',
-}
-
-const PAYMENT_LABEL = {
-  cash: 'À vista com 5% de desconto',
-  two_installments: '2x — início e entrega',
-  three_installments: '3x — início, entrega e primeira mensalidade',
-}
-
-function formatDate(value: string | null | undefined) {
-  return value ? dateFormat.format(new Date(`${value.slice(0, 10)}T00:00:00Z`)) : '—'
-}
-
-function ClientStatus({ status }: { status?: ReceivableStatus | null }) {
-  if (!status) return <span className="status-pill status-neutral">Sem cobranças</span>
-  return <span className={`status-pill status-${status}`}>{STATUS_LABEL[status]}</span>
-}
-
-export default function ClientsPage({ onClientCreated, onClientDeleted }: Props) {
-  const [clients, setClients] = useState<Client[]>([])
-  const [search, setSearch] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [detail, setDetail] = useState<ClientDetail | null>(null)
-  const [detailLoading, setDetailLoading] = useState(false)
-  const [deleting, setDeleting] = useState(false)
-  const [showNewClient, setShowNewClient] = useState(false)
-  const [contractModal, setContractModal] = useState<ClientContract | null | 'new'>(null)
-
-  const fetchClients = useCallback(async (query: string) => {
-    setLoading(true)
-    try {
-      const data = await api.get<Client[]>(`/api/v1/clients${query.trim() ? `?search=${encodeURIComponent(query.trim())}` : ''}`)
-      setClients(data)
-      setError(null)
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Não foi possível carregar os clientes.')
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  const loadDetail = useCallback(async (clientId: string) => {
-    setDetailLoading(true)
-    try {
-      setDetail(await api.get<ClientDetail>(`/api/v1/clients/${clientId}`))
-      setError(null)
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Não foi possível carregar o cliente.')
-      setDetail(null)
-    } finally {
-      setDetailLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => { void fetchClients(search) }, 250)
-    return () => window.clearTimeout(timer)
-  }, [fetchClients, search])
-
-  function handleCreated(client: Client) {
-    onClientCreated?.(client)
-    setSelectedId(client.id)
-    void loadDetail(client.id)
-    setShowNewClient(false)
-    void fetchClients('')
-  }
-
-  async function cancelContract(contract: ClientContract) {
-    if (!window.confirm(`Cancelar o contrato de ${contract.serviceName}? As cobranças abertas serão canceladas e o histórico será mantido.`)) return
-    try {
-      await api.patch(`/api/v1/contracts/${contract.id}`, { status: 'cancelled' })
-      await Promise.all([loadDetail(contract.clientId), fetchClients(search)])
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Não foi possível cancelar o contrato.')
-    }
-  }
-
-  async function deleteClient(client: ClientDetail) {
-    const label = client.name ?? client.whatsapp ?? 'este cliente'
-    const confirmed = window.confirm(
-      `Excluir permanentemente "${label}"? Os contratos e as cobranças desse cliente também serão apagados. O histórico de conversas será mantido, mas sem vínculo com o cadastro.`,
-    )
-    if (!confirmed) return
-
-    setDeleting(true)
-    try {
-      await api.delete<void>(`/api/v1/clients/${client.id}`)
-      setClients((current) => current.filter((item) => item.id !== client.id))
-      setSelectedId(null)
-      setDetail(null)
-      setContractModal(null)
-      setError(null)
-      onClientDeleted?.(client.id)
-      void fetchClients(search)
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Não foi possível excluir o cliente.')
-    } finally {
-      setDeleting(false)
-    }
-  }
-
-  async function refreshSelected() {
-    if (!selectedId) return
-    await Promise.all([loadDetail(selectedId), fetchClients(search)])
-  }
-
-  return (
-    <div className="module-page clients-directory-page">
-      <header className="page-heading clients-heading">
-        <div><p className="eyebrow">Relacionamento e contratos</p><h1>Clientes</h1><p className="page-subtitle">Encontre contatos, acompanhe serviços contratados e consulte cada cobrança.</p></div>
-        <button type="button" className="button button-primary" onClick={() => setShowNewClient(true)}><Plus size={17} aria-hidden="true" /> Novo cliente</button>
-      </header>
-
-      <label className="directory-search">
-        <Search size={18} aria-hidden="true" />
-        <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Pesquisar por nome, WhatsApp, email ou serviço" />
-        {!loading ? <span>{clients.length} {clients.length === 1 ? 'cliente' : 'clientes'}</span> : null}
-      </label>
-
-      {error ? <div className="module-error" role="alert">{error}<button type="button" onClick={() => setError(null)}>Fechar</button></div> : null}
-
-      <div className="clients-directory-layout">
-        <section className="clients-list-panel" aria-label="Lista de clientes">
-          <div className="clients-list-head"><span>Cliente e serviço</span><span>Contrato</span><span>Financeiro</span><span /></div>
-          {loading ? Array.from({ length: 6 }, (_, index) => <div className="skeleton client-row-skeleton" key={index} />) : null}
-          {!loading && clients.map((client) => (
-            <button type="button" className={`client-directory-row${selectedId === client.id ? ' is-selected' : ''}`} onClick={() => { setSelectedId(client.id); void loadDetail(client.id) }} key={client.id}>
-              <span className="client-directory-person"><span className="client-initial">{(client.name ?? '?').slice(0, 1).toUpperCase()}</span><span><strong>{client.name ?? 'Cliente sem nome'}</strong><small>{client.activeService ?? 'Sem contrato cadastrado'}</small></span></span>
-              <span className="client-directory-contract"><strong>{client.monthlyFee != null ? `${currency.format(client.monthlyFee)}/mês` : '—'}</strong><small>{client.contractEndDate ? `até ${formatDate(client.contractEndDate)}` : 'Sem vigência'}</small></span>
-              <ClientStatus status={client.financialStatus} />
-              <ChevronRight size={17} aria-hidden="true" />
-            </button>
-          ))}
-          {!loading && clients.length === 0 ? (
-            <div className="panel-empty client-list-empty"><span className="empty-icon"><UserRound size={21} aria-hidden="true" /></span><strong>Nenhum cliente encontrado</strong><p>Revise a busca ou cadastre o primeiro cliente da carteira.</p><button type="button" className="button button-secondary" onClick={() => setShowNewClient(true)}>Cadastrar cliente</button></div>
-          ) : null}
-        </section>
-
-        <section className="client-record-panel" aria-label="Detalhes do cliente">
-          {detailLoading ? <div className="client-record-loading"><div className="skeleton" /><div className="skeleton" /><div className="skeleton" /></div> : null}
-          {!detailLoading && !detail ? (
-            <div className="panel-empty client-record-empty"><span className="empty-icon"><FileText size={22} aria-hidden="true" /></span><strong>Selecione um cliente</strong><p>Os dados de contato, contratos e cobranças aparecerão aqui.</p></div>
-          ) : null}
-          {!detailLoading && detail ? (
-            <>
-              <header className="client-record-header">
-                <div><span className="client-record-avatar">{(detail.name ?? '?').slice(0, 2).toUpperCase()}</span><div><p>Cadastro do cliente</p><h2>{detail.name ?? 'Cliente sem nome'}</h2></div></div>
-                <div className="client-record-actions">
-                  <button type="button" className="button button-danger-ghost button-small" onClick={() => void deleteClient(detail)} disabled={deleting}><Trash2 size={15} aria-hidden="true" /> {deleting ? 'Excluindo...' : 'Excluir cliente'}</button>
-                  <button type="button" className="button button-primary button-small" onClick={() => setContractModal('new')} disabled={deleting}><Plus size={15} aria-hidden="true" /> Adicionar contrato</button>
-                </div>
-              </header>
-
-              <div className="client-contact-strip">
-                <span><MessageCircle size={15} aria-hidden="true" /><span><small>WhatsApp</small><strong>{detail.whatsapp ?? 'Não informado'}</strong></span></span>
-                <span><Mail size={15} aria-hidden="true" /><span><small>Email</small><strong>{detail.email ?? 'Não informado'}</strong></span></span>
-                <span><FileText size={15} aria-hidden="true" /><span><small>Observações</small><strong>{detail.notes ?? 'Sem observações'}</strong></span></span>
-              </div>
-
-              <div className="client-contracts-heading"><div><p className="panel-kicker">Histórico</p><h3>Contratos e cobranças</h3></div><span>{detail.contracts.length} {detail.contracts.length === 1 ? 'contrato' : 'contratos'}</span></div>
-              {detail.contracts.length === 0 ? (
-                <div className="panel-empty contract-empty"><strong>Nenhum contrato cadastrado</strong><p>Este contato pode ter sido criado automaticamente pelo WhatsApp.</p><button type="button" className="button button-secondary" onClick={() => setContractModal('new')}>Adicionar contrato</button></div>
-              ) : (
-                <div className="contract-history">
-                  {detail.contracts.map((contract) => (
-                    <article className={`contract-record is-${contract.status}`} key={contract.id}>
-                      <header>
-                        <div><span className={`contract-status status-${contract.status}`}>{contract.status === 'active' ? 'Ativo' : contract.status === 'completed' ? 'Concluído' : 'Cancelado'}</span><h4>{contract.serviceName}</h4><p>{contract.serviceDescription || 'Sem descrição adicional.'}</p></div>
-                        <div className="contract-actions"><button type="button" className="icon-button" onClick={() => setContractModal(contract)} aria-label={`Editar ${contract.serviceName}`}><Pencil size={15} aria-hidden="true" /></button>{contract.status !== 'cancelled' ? <button type="button" className="text-danger-button" onClick={() => cancelContract(contract)}>Cancelar</button> : null}</div>
-                      </header>
-                      <div className="contract-facts">
-                        <span><CircleDollarSign size={15} aria-hidden="true" /><span><small>Serviço</small><strong>{currency.format(contract.finalAmount)}{contract.discountPercent ? ` (${contract.discountPercent}% desc.)` : ''}</strong></span></span>
-                        <span><CircleDollarSign size={15} aria-hidden="true" /><span><small>Mensalidade</small><strong>{currency.format(contract.monthlyFee)}{contract.monthlyDueDay ? ` · dia ${contract.monthlyDueDay}` : ''}</strong></span></span>
-                        <span><FileText size={15} aria-hidden="true" /><span><small>Pagamento</small><strong>{PAYMENT_LABEL[contract.paymentMethod]}</strong></span></span>
-                        <span><CalendarDays size={15} aria-hidden="true" /><span><small>Vigência</small><strong>{formatDate(contract.developmentStartDate)} a {formatDate(contract.contractEndDate)}</strong></span></span>
-                      </div>
-                      <div className="receivables-table">
-                        <div className="receivables-head"><span>Cobrança</span><span>Vencimento</span><span>Valor</span><span>Situação</span></div>
-                        {contract.receivables.map((receivable) => (
-                          <div className="receivable-row" key={receivable.id}><span>{receivable.description}</span><span>{formatDate(receivable.dueDate)}</span><strong>{currency.format(receivable.amount)}</strong><span className={`status-pill status-${receivable.status}`}>{STATUS_LABEL[receivable.status]}</span></div>
-                        ))}
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              )}
-            </>
-          ) : null}
-        </section>
-      </div>
-
-      {showNewClient ? <NewClientModal onClose={() => setShowNewClient(false)} onCreate={handleCreated} /> : null}
-      {contractModal && detail ? <ContractModal clientId={detail.id} contract={contractModal === 'new' ? null : contractModal} onClose={() => setContractModal(null)} onSaved={refreshSelected} /> : null}
-    </div>
-  )
+import ClientRelationship from '@/components/clients/ClientRelationship'
+import Modal from '@/components/ui/Modal'
+import { EmptyState, ErrorState, LoadingState } from '@/components/ui/DataState'
+interface Props {onClientCreated?:(client:Client)=>void;onClientDeleted?:(id:string)=>void;focusId?:string;onOpenTasks?:(contractId:string)=>void}
+const STATUS:Record<string,string>={open:'Em aberto',overdue:'Atrasado',paid:'Pago',cancelled:'Cancelado'}
+const PAYMENT={cash:'À vista com 5% de desconto',two_installments:'2x — início e entrega',three_installments:'3x — início, entrega e primeira mensalidade'}
+export default function ClientsPage({onClientCreated,onClientDeleted,focusId,onOpenTasks}:Props) {
+  const [search,setSearch]=useState('');const [service,setService]=useState('');const [financial,setFinancial]=useState('');const [favorites,setFavorites]=useState(false);const [page,setPage]=useState(1)
+  const [selected,setSelected]=useState<string|null>(focusId||null);const [showNew,setShowNew]=useState(false);const [contract,setContract]=useState<ClientContract|'new'|null>(null)
+  const [confirmation,setConfirmation]=useState<{kind:'delete'|'cancel';id:string;label:string}|null>(null);const [busy,setBusy]=useState(false);const [error,setError]=useState('')
+  const params=new URLSearchParams({search,service,financial,favorites:String(favorites),page:String(page),limit:'40'})
+  const clients=useRemote<Client[]>('/api/v1/clients?'+params);const detail=useRemote<ClientDetail>(selected?'/api/v1/clients/'+selected:null);const contracts=useRemote<ContractOption[]>('/api/v1/crm/contracts')
+  const total=clients.data?.[0]?.totalCount||0
+  function refresh(){clients.reload();detail.reload();contracts.reload()}
+  async function favorite(){if(!detail.data)return;setBusy(true);setError('');try{await api.patch('/api/v1/clients/'+detail.data.id,{favorite:!detail.data.favorite});refresh()}catch(e){setError(e instanceof Error?e.message:'Não foi possível atualizar.')}finally{setBusy(false)}}
+  async function confirm(){if(!confirmation||busy)return;setBusy(true);setError('');try{if(confirmation.kind==='delete'){await api.delete('/api/v1/clients/'+confirmation.id);setSelected(null);onClientDeleted?.(confirmation.id)}else await api.patch('/api/v1/contracts/'+confirmation.id,{status:'cancelled'});setConfirmation(null);refresh()}catch(e){setError(e instanceof Error?e.message:'Não foi possível concluir.')}finally{setBusy(false)}}
+  return <div className="module-page clients-directory-page"><header className="page-heading"><div><p className="eyebrow">Uma carteira, muitas histórias</p><h1>Clientes</h1><p className="page-subtitle">Pessoas, próximos passos e serviços contratados em um mesmo lugar.</p></div><button className="button button-primary" onClick={()=>setShowNew(true)}><Plus size={17}/> Novo contato</button></header>
+    <div className="crm-toolbar"><Search size={18}/><input aria-label="Buscar clientes" value={search} onChange={e=>{setSearch(e.target.value);setPage(1)}} placeholder="Nome, WhatsApp, email ou serviço"/>{search&&<button className="icon-button" aria-label="Limpar busca" onClick={()=>{setSearch('');setPage(1)}}><X size={16}/></button>}<select aria-label="Serviço contratado" value={service} onChange={e=>{setService(e.target.value);setPage(1)}}><option value="">Todos os serviços</option>{[...new Set(contracts.data?.map(c=>c.service_name)||[])].sort().map(name=><option key={name}>{name}</option>)}</select><select aria-label="Situação financeira" value={financial} onChange={e=>{setFinancial(e.target.value);setPage(1)}}><option value="">Todas as situações</option><option value="open">A vencer</option><option value="overdue">Atrasadas</option><option value="paid">Em dia / pagas</option><option value="none">Sem cobranças</option></select><button className={'button '+(favorites?'button-primary':'button-secondary')} aria-pressed={favorites} onClick={()=>{setFavorites(!favorites);setPage(1)}}><Star size={15}/> Favoritos</button></div>
+    {error&&<p className="form-error" role="alert">{error}</p>}
+    <div className="clients-directory-layout"><section className="clients-list-panel" aria-label="Lista de clientes">
+      {clients.loading?<LoadingState/>:clients.error?<ErrorState message={clients.error} retry={clients.reload}/>:!clients.data?.length?<EmptyState title="Nenhum contato neste filtro" text="Revise sua busca ou cadastre um cliente ou prospect sem obrigação de contrato."/>:clients.data.map(c=><button key={c.id} className={'client-directory-row'+(selected===c.id?' is-selected':'')} onClick={()=>setSelected(c.id)}><span className="client-directory-person"><span className="client-initial">{(c.name||'?').slice(0,1)}</span><span><strong>{c.favorite?'★ ':''}{c.name}</strong><small>{c.activeService||'Prospect · sem contrato'}</small></span></span><span className="client-directory-contract"><strong>{c.monthlyFee!=null?money(c.monthlyFee)+'/mês':'—'}</strong><small>{c.contractEndDate?civilDate(c.contractEndDate):'Sem vigência'}</small></span><span className={'status-pill status-'+(c.financialStatus||'neutral')}>{c.financialStatus?STATUS[c.financialStatus]:'Sem cobranças'}</span></button>)}
+      <div className="crm-toolbar" style={{padding:14}}><button className="button button-secondary button-small" disabled={page===1} onClick={()=>setPage(p=>p-1)}>Anterior</button><small>Página {page}{total?' · '+total+' contatos':''}</small><button className="button button-secondary button-small" disabled={page*40>=total} onClick={()=>setPage(p=>p+1)}>Próxima</button></div>
+    </section><section className="client-record-panel" aria-label="Detalhes do cliente">
+      {detail.loading&&!detail.data?<LoadingState/>:detail.error?<ErrorState message={detail.error} retry={detail.reload}/>:!detail.data?<EmptyState title="Cada contato tem um contexto" text="Selecione uma pessoa para ver notas, próximos passos, contratos e cobranças."/>:<>
+        <header className="client-record-header"><div><span className="client-record-avatar">{(detail.data.name||'?').slice(0,2)}</span><div><p>Cadastro do cliente</p><h2>{detail.data.name}</h2></div></div><div className="client-record-actions"><button className="icon-button" title="Favorito" aria-label={detail.data.favorite?'Remover dos favoritos':'Marcar favorito'} aria-pressed={Boolean(detail.data.favorite)} disabled={busy} onClick={()=>void favorite()}><Star size={18} fill={detail.data.favorite?'#d2b215':'none'}/></button><button className="button button-primary button-small" onClick={()=>setContract('new')}><Plus size={14}/> Contrato</button><button className="icon-button" aria-label="Excluir cliente" onClick={()=>setConfirmation({kind:'delete',id:detail.data!.id,label:detail.data!.name||'este contato'})}><Trash2 size={16}/></button></div></header>
+        <div className="client-contact-strip"><span><MessageCircle size={15}/><span><small>WhatsApp</small><strong>{detail.data.whatsapp||'Não informado'}</strong></span></span><span><Mail size={15}/><span><small>Email</small><strong>{detail.data.email||'Não informado'}</strong></span></span><span><FileText size={15}/><span><small>Observações</small><strong>{detail.data.notes||'Sem observações'}</strong></span></span></div>
+        <ClientRelationship key={detail.data.id} clientId={detail.data.id}/>
+        <div className="client-contracts-heading"><div><p className="panel-kicker">Serviços e valores</p><h3>Contratos e cobranças</h3></div><span>{detail.data.contracts.length} contratos</span></div>
+        {!detail.data.contracts.length&&<EmptyState title="Um relacionamento antes de um contrato" text="Este contato já pode receber notas, uma próxima ação e oportunidades comerciais."><button className="button button-secondary" onClick={()=>setContract('new')}>Adicionar contrato</button></EmptyState>}
+        <div className="contract-history">{detail.data.contracts.map(c=><article key={c.id} className={'contract-record is-'+c.status}><header><div><span className="status-pill">{c.status==='active'?'Ativo':c.status==='completed'?'Concluído':'Cancelado'}</span><h4>{c.serviceName}</h4><p>{c.serviceDescription}</p></div><div className="contract-actions"><button className="icon-button" aria-label={'Editar '+c.serviceName} onClick={()=>setContract(c)}><Pencil size={16}/></button>{c.status!=='cancelled'&&<button className="text-danger-button" onClick={()=>setConfirmation({kind:'cancel',id:c.id,label:c.serviceName})}>Cancelar</button>}</div></header><div className="contract-facts"><span><CircleDollarSign size={15}/><span><small>Serviço</small><strong>{money(c.finalAmount)}{c.discountPercent?' · '+c.discountPercent+'% desc.':''}</strong></span></span><span><CircleDollarSign size={15}/><span><small>Mensalidade</small><strong>{money(c.monthlyFee)}</strong></span></span><span><FileText size={15}/><span><small>Pagamento</small><strong>{PAYMENT[c.paymentMethod]}</strong></span></span><span><CalendarDays size={15}/><span><small>Vigência</small><strong>{civilDate(c.developmentStartDate)} a {civilDate(c.contractEndDate)}</strong></span></span></div>{onOpenTasks&&<button className="button button-secondary button-small" onClick={()=>onOpenTasks(c.id)}>Quadro e checklist desta entrega</button>}<div className="receivables-table"><div className="receivables-head"><span>Cobrança</span><span>Vencimento</span><span>Valor</span><span>Situação</span></div>{c.receivables.map(r=><div className="receivable-row" key={r.id}><span>{r.description}</span><span>{civilDate(r.dueDate)}</span><strong>{money(r.amount)}</strong><span className={'status-pill status-'+r.status}>{STATUS[r.status]}</span></div>)}</div></article>)}</div>
+      </>}
+    </section></div>
+    {showNew&&<NewClientModal onClose={()=>setShowNew(false)} onCreate={c=>{setSelected(c.id);setShowNew(false);onClientCreated?.(c);refresh()}}/>}
+    {contract&&detail.data&&<ContractModal clientId={detail.data.id} contract={contract==='new'?null:contract} onClose={()=>setContract(null)} onSaved={refresh}/>}
+    {confirmation&&<Modal title={confirmation.kind==='delete'?'Excluir cliente?':'Cancelar contrato?'} description={confirmation.kind==='delete'?'Os contratos e cobranças também serão apagados. Conversas permanecem sem vínculo com o contato.':'As cobranças abertas serão canceladas e o histórico será preservado.'} onClose={()=>{if(!busy)setConfirmation(null)}}><p>{confirmation.label}</p><div className="crm-toolbar"><button autoFocus className="button button-secondary" disabled={busy} onClick={()=>setConfirmation(null)}>Voltar</button><button className="button button-primary" disabled={busy} onClick={()=>void confirm()}>{busy?'Aguarde…':'Confirmar '+(confirmation.kind==='delete'?'exclusão':'cancelamento')}</button></div></Modal>}
+  </div>
 }
