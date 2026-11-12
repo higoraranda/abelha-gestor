@@ -1,0 +1,120 @@
+{
+  "date": "2026-11-12",
+  "status": "live-and-verified",
+  "backendUrl": "https://abelha-gestor-api-hml.onrender.com",
+  "render": {
+    "serviceId": "srv-dbr3if3tqb8s73cr2jn0",
+    "name": "abelha-gestor-api-hml",
+    "workspaceId": "tea-d0sgutadbo4c73f2qgvg",
+    "plan": "free",
+    "region": "oregon",
+    "runtime": "node",
+    "branch": "codex/homologacao-abelha",
+    "commit": "37f989809041aff6150b3ec3405bdda65622adf8",
+    "deployId": "dep-dbr3in49v7es73ekeq6g",
+    "deployStatus": "live",
+    "autoDeploy": false,
+    "rootDir": "",
+    "buildCommand": "cd backend && npm ci --include=dev && npm run build",
+    "startCommand": "cd backend && npm start",
+    "healthCheckMode": "Render default TCP",
+    "httpHealthPath": "/health",
+    "httpHealthStatus": 200,
+    "configurationAdaptationExplicitlyAuthorized": true
+  },
+  "neon": {
+    "projectId": "curly-river-94350351",
+    "plan": "free_v3",
+    "branchId": "br-hidden-night-ace956m0",
+    "endpointId": "ep-crimson-snow-acmuhqgp",
+    "database": "abelha_homologacao",
+    "role": "abelha_hml_app",
+    "disabled": false,
+    "observedState": "idle",
+    "minCU": 0.25,
+    "maxCU": 0.25,
+    "newCompute": false,
+    "newBranch": false,
+    "migrationsExecuted": false
+  },
+  "configuredVariables": [
+    "DATABASE_URL",
+    "AUTH_SECRET",
+    "AUTH_URL",
+    "FRONTEND_URL",
+    "NODE_ENV",
+    "ABELHA_INTEGRATION_TOKEN",
+    "ABELHA_INTEGRATION_ORGANIZATION_ID",
+    "ABELHA_INTEGRATION_USER_ID",
+    "VAPID_PUBLIC_KEY",
+    "VAPID_PRIVATE_KEY",
+    "VAPID_SUBJECT",
+    "GITHUB_WEBHOOK_SECRET"
+  ],
+  "pendingOptionalVariables": [
+    "PRICE_ALLOWED_HOSTS",
+    "EVOLUTION_API_URL",
+    "EVOLUTION_API_KEY",
+    "EVOLUTION_WEBHOOK_SECRET"
+  ],
+  "nextPreviewVariable": "BACKEND_URL",
+  "tests": {
+    "syntheticOnly": true,
+    "checksPassed": 12,
+    "httpHealth": true,
+    "anonymousRejected401": true,
+    "loginCsrfSession": true,
+    "secureHttpOnlySameSiteCookie": true,
+    "personalGetRoutes": 7,
+    "cors": true,
+    "mutationGuard403": true,
+    "httpWriteConfirmedInIsolatedDatabase": true,
+    "integrationInvalidToken401": true,
+    "integrationTick200": true,
+    "pushesSent": 0,
+    "pricesWithoutProvider503": true,
+    "captureAndIdempotentReplay": true,
+    "githubSignedPing": true,
+    "logout401": true,
+    "all35TableCountsAndFingerprintsRestored": true
+  },
+  "logs": {
+    "unexpectedErrorsFound": 0,
+    "warning": "env-url-basepath-redundant",
+    "warningEffect": "informational; login/session passed; not suppressed"
+  },
+  "production": {
+    "serviceId": "srv-daldd0142hec73c3ltt0",
+    "configurationUnchanged": true,
+    "deployHistoryUnchanged": true,
+    "liveCommit": "4f78117b308f71b08fcb55dc9e102e7d3e3c9acd"
+  },
+  "n8n": {
+    "id": "n20DNyb13Aaw3nq5",
+    "active": false,
+    "nodes": 62,
+    "updatedAt": "2026-11-12T04:01:00.660Z"
+  },
+  "frontend": {
+    "productionChanged": false,
+    "previewChanged": false,
+    "previewDeploymentId": "dpl_8Q5KnzUywmnTrPruxmFRvXgmz6pc"
+  },
+  "cleanup": {
+    "testConnectionsClosed": true,
+    "testCookieJarCleared": true,
+    "syntheticFixturesRemoved": true,
+    "localServersStarted": 0,
+    "requestedPersistentResourcesKept": [
+      "abelha-gestor-api-hml",
+      "ep-crimson-snow-acmuhqgp enabled at 0.25 CU"
+    ]
+  },
+  "git": {
+    "commitPerformed": false,
+    "pushPerformed": false,
+    "mergePerformed": false,
+    "pullRequestCreated": false,
+    "preexistingLocalChangesPreserved": true
+  }
+}

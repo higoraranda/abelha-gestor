@@ -6,30 +6,41 @@
     "expectedActive": false,
     "expectedNodes": 62
   },
-  "remoteChanged": false,
-  "homologationBackendUrl": null,
+  "homologationBackendUrl": "https://abelha-gestor-api-hml.onrender.com",
   "render": {
     "createOrDeploy": false,
     "existingProductionServiceId": "srv-daldd0142hec73c3ltt0",
     "proposedStagingName": "abelha-gestor-api-hml",
     "repo": "https://github.com/higoraranda/abelha-gestor",
-    "rootDir": "backend",
+    "rootDir": "",
     "runtime": "node",
-    "buildCommand": "npm ci --include=dev && npm run build",
-    "startCommand": "npm start",
-    "healthCheckPath": "/health",
+    "buildCommand": "cd backend && npm ci --include=dev && npm run build",
+    "startCommand": "cd backend && npm start",
+    "healthCheckPath": "",
     "autoDeploy": false,
     "proposedPlan": "free",
-    "requiresAuthorizationForPersistentEnvironment": true,
-    "branch": "main",
-    "requiresManuallyPublishedRevision": true
+    "requiresAuthorizationForPersistentEnvironment": false,
+    "branch": "codex/homologacao-abelha",
+    "requiresManuallyPublishedRevision": false,
+    "serviceId": "srv-dbr3if3tqb8s73cr2jn0",
+    "name": "abelha-gestor-api-hml",
+    "plan": "free",
+    "workingDirectoryViaCommands": "backend",
+    "healthCheckMode": "tcp",
+    "verifiedHttpHealthPath": "/health",
+    "live": true,
+    "deployId": "dep-dbr3in49v7es73ekeq6g",
+    "persistentEnvironmentAuthorized": true,
+    "created": true,
+    "deployedCommit": "37f989809041aff6150b3ec3405bdda65622adf8"
   },
   "vercel": {
     "projectId": "prj_Cd3vrf5gNVRmT3CjBJeX8saUrVVv",
     "teamId": "team_rCFoZANDaJrYTdcCsF9DxHI0",
     "target": "preview",
     "serverEnvironmentVariable": "BACKEND_URL",
-    "productionEnvironmentChanged": false
+    "productionEnvironmentChanged": false,
+    "backendUrlConfigured": false
   },
   "nodes": [
     {
@@ -142,7 +153,10 @@
     "database": "abelha_homologacao",
     "appRole": "abelha_hml_app",
     "schemaReady": true,
-    "computeDisabled": true,
-    "availabilityAuthorizationRequired": true
-  }
+    "computeDisabled": false,
+    "availabilityAuthorizationRequired": false,
+    "minCU": 0.25,
+    "maxCU": 0.25
+  },
+  "n8nRemoteChanged": false
 }

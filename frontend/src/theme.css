@@ -1,0 +1,98 @@
+/* Paleta canônica compartilhada por CRM, Personal e componentes de interface. */
+:root {
+  color-scheme: dark;
+  --canvas: #141719;
+  --surface: #1d2224;
+  --card-surface: #252a2c;
+  --surface-hover: #2e3538;
+  --field: #191e20;
+  --line: #353b3e;
+  --line-strong: #69777d;
+  --ink: #f5f5f3;
+  --ink-soft: #aab3b5;
+  --ink-faint: #9aa5a8;
+  --accent-yellow: #f4d22f;
+  --accent-hover: #f8de60;
+  --accent-pressed: #dfbc24;
+  --on-accent: #141719;
+  --accent-muted: #343222;
+  --accent-border: #75682d;
+  --context-green: #244e42;
+  --context-ink: #e0ece5;
+  --success: #9bc9b3;
+  --success-muted: #21392f;
+  --success-border: #426653;
+  --danger: #e8a49b;
+  --danger-muted: #3d2928;
+  --danger-border: #76504b;
+  --info: #a3c7d6;
+  --info-muted: #23343d;
+  --sidebar: var(--surface);
+  --sidebar-soft: var(--card-surface);
+  --chart-muted: #69777d;
+  --overlay: rgb(0 0 0 / 68%);
+  --shadow-sm: 0 4px 14px rgb(0 0 0 / 12%);
+  --shadow-panel: 0 12px 32px -16px rgb(0 0 0 / 35%);
+  --shadow-modal: 0 28px 80px rgb(0 0 0 / 45%);
+  --focus-shadow: 0 0 0 3px rgb(244 210 47 / 18%);
+  --skeleton-shine: rgb(245 245 243 / 5%);
+  --scrollbar-track: var(--canvas);
+  --scrollbar-thumb: #596468;
+  --scrollbar-hover: #849195;
+  --scrollbar-active: var(--ink-soft);
+  --print-paper: #fff;
+  --print-ink: #17191a;
+  --print-muted: #62635e;
+  --print-line: #d0d0cc;
+  --font-body: 'Urbanist', system-ui, sans-serif;
+  --radius-panel: 26px;
+  --radius-card: 20px;
+  --radius-control: 13px;
+  --radius-pill: 999px;
+
+  /* Adaptadores das primitivas existentes. */
+  --background: var(--canvas);
+  --foreground: var(--ink);
+  --card: var(--card-surface);
+  --card-foreground: var(--ink);
+  --popover: var(--card-surface);
+  --popover-foreground: var(--ink);
+  --primary: var(--accent-yellow);
+  --primary-foreground: var(--on-accent);
+  --secondary: var(--card-surface);
+  --secondary-foreground: var(--ink);
+  --muted: var(--surface);
+  --muted-foreground: var(--ink-soft);
+  --accent: var(--accent-muted);
+  --accent-foreground: var(--accent-yellow);
+  --destructive: var(--danger-muted);
+  --destructive-foreground: var(--danger);
+  --border: var(--line);
+  --input: var(--line-strong);
+  --ring: var(--accent-yellow);
+  --radius: var(--radius-control);
+}
+
+@theme inline {
+  --font-sans: var(--font-body);
+  --font-display: var(--font-body);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}

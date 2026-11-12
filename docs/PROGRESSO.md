@@ -189,3 +189,16 @@ Prévia final encerrada: sessão50225; backend21544 e filho22428; Vite5800 e fil
 -53 testes backend,16 frontend, TypeScript/builds e lint aprovados. Relatório: [ATIVACAO-BRANCH-BANCO.md](ATIVACAO-BRANCH-BANCO.md).
 - Alterações preparadas na main local para revisão e commit manual pelo usuário. Nenhum novo commit, push ou reescrita de histórico nesta etapa.
 - Próximo: definir URLs e autorizar serviço Render Free separado/disponibilidade do compute. Publicação da main pode acionar os deploys de produção existentes e deve ser decidida manualmente.
+
+
+## Backend de homologação ativo — Render Free — 12/11/2026
+
+**Deploy live e12 verificações remotas aprovadas.** URL: https://abelha-gestor-api-hml.onrender.com. Relatório: [RENDER-HOMOLOGACAO.md](RENDER-HOMOLOGACAO.md); [evidência estruturada](audits/render-homologation-20261112.json).
+
+- Serviço novo srv-dbr3if3tqb8s73cr2jn0, Free/Node/Oregon, Auto-Deploy desligado, branch codex/homologacao-abelha/37f9898. Deploy final dep-dbr3in49v7es73ekeq6g. Adaptação autorizada: build/start entram em backend com cd; saúde TCP do Render e GET /health200 verificado separadamente.
+- Neon Free: compute existente ep-crimson-snow-acmuhqgp habilitado em0,25–0,25CU para manter o backend solicitado disponível. Apenas database abelha_homologacao/role abelha_hml_app. Schema existente reutilizado; nenhuma migration, nova branch/compute ou recurso pago.
+-12 verificações: banco/role, health, rejeição anônima, login CSRF/sessão/cookie seguro,7 GETs Personal, CORS, guard de mutação, projeto HTTP→banco isolado, token inválido/correto/tick, captura idempotente, ping HMAC e logout, mais limpeza comparando35 contagens/fingerprints. Nenhum push real ou preço consultado; somente identidade sintética persistida.
+- Configuradas12 variáveis de homologação, incluindo AUTH_URL real, FRONTEND_URL do Preview e VAPID próprio; segredos somente em ambiente do serviço/arquivos privados ignorados. PRICE_ALLOWED_HOSTS e EVOLUTION_* opcionais continuam pendentes.
+- Produção srv-daldd0142hec73c3ltt0 manteve configuração e histórico de deploys, com4f78117 live observado antes/depois. Nenhuma mudança na Vercel ou ativação n8n; workflow único continua inativo/62 nós. Alterações locais de tema preservadas; nenhum commit/push/merge/PR.
+- Logs sem erros inesperados; aviso informativo env-url-basepath-redundant da biblioteca Auth.js documentado, sem ocultação. Login/sessão aprovados. Próximo: definir BACKEND_URL somente em Vercel Preview e reimplantar apenas esse Preview quando autorizado; depois validar proxy/cookies/PWA.
+- Testes encerraram conexões e descartaram cookies/fixtures. Nenhum servidor local temporário iniciado. Mantidos apenas o serviço e a disponibilidade do compute necessários à homologação solicitada.

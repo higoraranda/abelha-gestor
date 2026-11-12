@@ -1,0 +1,732 @@
+{
+  "synthetic": true,
+  "viewports": [
+    "1440x1000",
+    "390x844"
+  ],
+  "pages": 18,
+  "results": [
+    {
+      "name": "overview-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "clients-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "deliveries-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "pipeline-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "finance-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "agenda-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "inbox-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "reports-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "leads-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "templates-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "personal-overview-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "personal-projects-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "personal-finance-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "personal-subscriptions-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "personal-prices-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "personal-review-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "personal-settings-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "client-detail-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "contract-modal-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "finance-detail-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "statement-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "expenses-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "expense-modal-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "messages-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "appointment-modal-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "task-modal-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "opportunity-modal-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "contact-modal-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "notifications-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "export-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "search-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "project-modal-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "project-detail-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "invoice-modal-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "subscription-modal-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "price-modal-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "personal-notifications-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "login-desktop",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "overview-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "clients-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "deliveries-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "pipeline-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "finance-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "agenda-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "inbox-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "reports-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "leads-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "templates-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "personal-overview-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "personal-projects-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "personal-finance-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "personal-subscriptions-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "personal-prices-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "personal-review-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "personal-settings-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "client-detail-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "contract-modal-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "finance-detail-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "statement-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "expenses-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "expense-modal-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "messages-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "appointment-modal-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "task-modal-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "opportunity-modal-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "contact-modal-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "notifications-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "export-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "search-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "project-modal-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "project-detail-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "invoice-modal-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "subscription-modal-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "price-modal-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "personal-notifications-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "login-mobile",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "tasks-loading",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "tasks-empty",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    },
+    {
+      "name": "tasks-error",
+      "scheme": "dark",
+      "background": "rgb(20, 23, 25)",
+      "overflow": false,
+      "contrast": [],
+      "lightSurfaces": [],
+      "unnamedButtons": []
+    }
+  ],
+  "checks": [
+    "error retry restores populated board",
+    "17 routes reflow at 320px and 768px",
+    "statement dark on screen, light on paper",
+    "native date and select keyboard; dark color-scheme",
+    "reduced motion and yellow keyboard focus",
+    "PWA metadata and manifest match dark canvas",
+    "dark remains default under system light preference"
+  ],
+  "pageErrors": [],
+  "failures": []
+}

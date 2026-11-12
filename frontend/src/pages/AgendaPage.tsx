@@ -151,6 +151,8 @@ export default function AgendaPage({ clients, reminders, onRemindersChange, focu
                   type="button"
                   key={key}
                   className={`calendar-day${outside ? ' is-outside' : ''}${isToday ? ' is-today' : ''}${selected ? ' is-selected' : ''}`}
+                  aria-pressed={selected}
+                  aria-label={`${longDateFormatter.format(date)} · ${dayReminders.length} compromisso(s)`}
                   onClick={() => setSelectedDate(key)}
                 >
                   <span className="calendar-date-number">{date.getDate()}</span>

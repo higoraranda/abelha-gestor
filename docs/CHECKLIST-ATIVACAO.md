@@ -1,8 +1,10 @@
 # Checklist de ativação — Abelha CRM + Personal
 
+Atualização12/11: **backend de homologação live no Render Free**, Neon habilitado em0,25CU e12 verificações remotas sintéticas aprovadas. Produção preservada e workflow n8n desativado. Configuração real, variáveis e limites em [RENDER-HOMOLOGACAO.md](RENDER-HOMOLOGACAO.md). Próximo passo é BACKEND_URL somente no Vercel Preview; nada foi alterado no frontend publicado nesta etapa.
+
 Estado em12/11: **ensaios locais/Neon aprovados, integrações externas ainda não ativadas**. Render/Vercel já publicaram a base2485697; migration Personal de produção continua pendente. Resultado, matriz de credenciais e passos manuais exatos em [HOMOLOGACAO-INTEGRACAO.md](HOMOLOGACAO-INTEGRACAO.md). Este checklist não autoriza executar mudanças automaticamente.
 
-Ação A posteriormente autorizada/concluída: banco vazio separado abelha_homologacao,35 tabelas/18 Personal, role restrita sem acesso ao neondb e identidade sintética. Compute teste voltou a disabled/idle. Alterações na main local para revisão e commit manual, sem nova publicação nesta etapa. Próximo passo: [configuração do Render de homologação](ATIVACAO-BRANCH-BANCO.md), ainda sem criação de serviço autorizada.
+Ação A posteriormente autorizada/concluída: banco vazio separado abelha_homologacao,35 tabelas/18 Personal, role restrita sem acesso ao neondb e identidade sintética. Na etapa seguinte, a disponibilidade do compute e o serviço Render Free foram autorizados e configurados. Alterações locais continuam sem commit/push nesta etapa. Próximo passo: [conectar Vercel Preview](RENDER-HOMOLOGACAO.md).
 
 Atualização de 12/11: os sete workflows já foram criados **desativados** na Cloudfy/socialbaboon. Não importar de novo. [CLOUDFY-N8N.md](CLOUDFY-N8N.md) contém IDs, nós, credenciais, URLs e passos de teste.
 
@@ -12,7 +14,7 @@ Consolidação posterior concluída: administrar somente **🐝 ABELHA — AUTOM
 
 - [ ] Revisar `AUDITORIA-ATIVACAO.md`, os relatórios de dependências e o diff local. Conservar os lockfiles revisados.
 - [ ] Confirmar Node 22.12+ e URLs distintas de teste/produção. O proxy da prévia deve apontar para o backend de teste; nunca deixar `BACKEND_URL` cair no endereço de produção durante testes de gravação.
-- [x] Ensaio temporário Neon autorizado em12/11: compute existente0,25CU Free, dois schemas/role sintéticos já removidos, compute restaurado disabled/idle. A autorização não cobre mantê-lo ligado para serviço persistente; ambiente contínuo ainda requer aprovação.
+- [x] Neon e Render de homologação autorizados: banco isolado provisionado, compute existente habilitado em0,25CU Free e backend live. Recursos mantidos para a homologação solicitada; nenhum upgrade autorizado.
 - [ ] Confirmar backup/ponto de restauração do ambiente que receberá a migration e procedimento de recuperação. Conservar o schema e as contagens/fingerprints dos registros comerciais antes da alteração.
 - [ ] Confirmar qual `organization_id` e qual `users.id` existente pertencem à mesma conta. A integração recebe esses IDs no servidor; nunca do payload externo.
 
@@ -76,7 +78,7 @@ No `.env` local inspecionado, DATABASE_URL, AUTH_SECRET, AUTH_URL e FRONTEND_URL
 ## 6. n8n — ativar somente o que está pronto
 
 - [x] Instância `socialbaboon` confirmada; fontes conferidas e consolidado criado/relido, com62 nós, sem subworkflows. Sete backups mantidos existentes/desativados. Inventário em `integrations/cloudfy-workflows.json`.
-- [ ] Abrir **somente n20DNyb13Aaw3nq5** e confirmar versão n8n em Help/About. Não trocar `N8N_ENCRYPTION_KEY`. Conferir os dez nós backend pelo manifesto de homologação; host publicado já contém a rota nova, respondendo503 sem integração. Não testar gravações nele. Nenhum backend HTTPS de homologação está disponível ainda.
+- [ ] Abrir **somente n20DNyb13Aaw3nq5** e confirmar versão n8n em Help/About. Não trocar `N8N_ENCRYPTION_KEY`. Conferir os dez nós backend pelo manifesto de homologação; host publicado já contém a rota nova, respondendo503 sem integração. Não testar gravações nele. Backend HTTPS de homologação disponível e autenticado; configurar os dez destinos do workflow antes de qualquer execução de teste.
 - [ ] Criar **Abelha — Backend** (Header Auth: `Authorization`, valor `Bearer <ABELHA_INTEGRATION_TOKEN>`) e selecioná-la somente nos nós backend listados no guia. Criar **Abelha — Entrada Webhook** com `X-Abelha-Webhook-Token` e segredo distinto nos três webhooks protegidos. Não colocar segredo em formulário público, JSON exportado, URL ou logs.
 - [ ] Manter o único relógio do consolidado a cada15min, America/Sao_Paulo; ele roteia tick/preços e o backend verifica o que está devido. Configurar horários no Personal. Não ativar nenhum backup. Testes manuais escolhem uma operation por vez.
 - [ ] Conferir saída ok:false e configurar/verificar CODE_ENABLE_STDOUT=true no host n8n para logs genéricos, sem payloads/secrets. Falhas tratadas não devem ser interpretadas como aprovação de todos os blocos pelo status global concluído.

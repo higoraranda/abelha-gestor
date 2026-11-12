@@ -2,7 +2,7 @@
 
 ## Desenvolvimento
 
-Homologação persistente preparada após autorização A: database **abelha_homologacao** na branch Neon de teste, schema completo e role própria verificados. Conexão/secrets novos somente em `.abelha-homologacao/backend.env`, fora do Git; URLs/contato VAPID ainda pendentes. Compute desativado até a próxima autorização de disponibilidade. Backend futuro deve usar a revisão de homologação aprovada e publicada manualmente, nunca reutilizar backend/.env de produção. Consulte [ATIVACAO-BRANCH-BANCO.md](ATIVACAO-BRANCH-BANCO.md).
+Backend de homologação **ativo no Render Free**: https://abelha-gestor-api-hml.onrender.com, branch codex/homologacao-abelha, Auto-Deploy desligado. Database **abelha_homologacao**, role própria e compute Neon existente habilitado em0,25CU. AUTH_URL, FRONTEND_URL e VAPID foram configurados com os destinos de homologação. Conexão/secrets somente em `.abelha-homologacao/backend.env`, fora do Git; backend/.env de produção preservado. Resultado e próximo passo Preview: [RENDER-HOMOLOGACAO.md](RENDER-HOMOLOGACAO.md).
 
 Use Node 22.12+ (Vite 8 e dependências atuais). Frontend e backend mantêm seus `package-lock.json`. Instale com `npm ci` em cada diretório; nunca use `npm run seed` ou schema.sql em uma base existente.
 
@@ -26,7 +26,7 @@ Subscriptions contêm endpoint e chaves de um dispositivo; persistem somente no 
 
 Consulte INTEGRACOES-N8N.md. `ABELHA_INTEGRATION_TOKEN` é separado da sessão do usuário e do secret GitHub. Conta da integração é fixada em `ABELHA_INTEGRATION_ORGANIZATION_ID` / `ABELHA_INTEGRATION_USER_ID`. `PRICE_ALLOWED_HOSTS` lista hosts exatos de lojas cuja fonte foi autorizada; sozinho não cria um provedor. O backend não faz scraping ou consultas pagas.
 
-Em12/11, Render/Vercel já publicaram a base2485697. A nova rota de preços responde503 por integração não configurada; o404 anterior é histórico. O serviço de homologação ainda não existe. Os sete workflows antigos são backups desativados, documentados em [CLOUDFY-N8N.md](CLOUDFY-N8N.md); não reimportar.
+O backend de homologação está live e seu token de integração foi validado. Preços retornam503 enquanto não houver fonte/allowlist autorizada. O workflow único ainda precisa receber credenciais e destinos de homologação; permanece desativado. Os sete workflows antigos são backups desativados, documentados em [CLOUDFY-N8N.md](CLOUDFY-N8N.md); não reimportar.
 
 Eles foram posteriormente consolidados em **🐝 ABELHA — AUTOMAÇÕES / n20DNyb13Aaw3nq5**. Configurar somente esse workflow conforme [WORKFLOW-UNICO-N8N.md](WORKFLOW-UNICO-N8N.md); os sete anteriores permanecem backups desativados, sem chamadas entre workflows.
 

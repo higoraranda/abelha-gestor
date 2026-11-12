@@ -1,6 +1,6 @@
 # Contratos de interface — Abelha
 
-Fonte de produto: docs/ROADMAP-ABELHA.md, docs/ARQUITETURA-PERSONAL.md, docs/briefing-aprovado.md. Valores visuais: DESIGN.md; tokens executáveis: frontend/src/workspace.css.
+Fonte de produto: docs/ROADMAP-ABELHA.md, docs/ARQUITETURA-PERSONAL.md, docs/briefing-aprovado.md. Valores visuais atuais: DESIGN.md; tokens executáveis: frontend/src/theme.css; componentes compartilhados: frontend/src/workspace.css. A direção escura de 12/11/2026 substitui a paleta clara do briefing, preservando os fluxos.
 
 | Capability | Canonical owner | Source of truth | Allowed variants | Verification |
 |---|---|---|---|---|
@@ -12,6 +12,8 @@ Fonte de produto: docs/ROADMAP-ABELHA.md, docs/ARQUITETURA-PERSONAL.md, docs/bri
 | CRUD | useRemote.ts + lib/api.ts | docs/ARQUITETURA-PERSONAL.md | Consultas canceláveis; atualizar após salvar; cancelar não grava | Testes HTTP/SQL e browser |
 | Modal | components/ui/Modal.tsx | DESIGN.md | Radix, Escape, foco/restauração, conteúdo rolável | Browser/teclado |
 | Navegação | lib/navigation.ts + AppSidebar/AppPage | docs/ROADMAP-ABELHA.md | Ambiente/tela na URL e histórico | Testes e browser |
+
+Tema: escuro fixo e padrão para CRM/Personal/login, com adaptadores das primitivas Tailwind. Controles nativos respeitam `color-scheme:dark`; popups pertencem ao navegador/sistema. Extrato claro somente em impressão. Conversas usam os tokens compartilhados, incluindo seleção, bolhas, composição e estados vazios. Evidência visual: `frontend/scripts/verify-dark-mode.cjs` e `docs/DARK-MODE.md`.
 
 Decisão de compatibilidade: manter validação nativa dos formulários, com validação de autoridade no servidor, e textareas redimensionáveis verticalmente como no CRM existente. O auditor da skill exige `noValidate` e `resize:none` independentemente do contrato: esses achados serão registrados como divergências conhecidas, sem reescrever os formulários comerciais para atender uma preferência genérica da ferramenta. Isso não representa aprovação integral na auditoria estática.
 

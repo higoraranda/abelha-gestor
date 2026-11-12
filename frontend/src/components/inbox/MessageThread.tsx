@@ -20,7 +20,7 @@ export default function MessageThread({ conversation, messages, loading, sending
   const textareaRef           = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    bottomRef.current?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
   }, [messages])
 
   function submit() {
@@ -39,138 +39,32 @@ export default function MessageThread({ conversation, messages, loading, sending
   }
 
   if (!conversation) {
-    return (
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fafafa' }}>
-        <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0 }}>
-          Selecione uma conversa para começar
-        </p>
-      </div>
-    )
+    return <div className="message-thread message-thread-empty"><p>Selecione uma conversa para começar</p></div>
   }
 
   const label = conversation.client?.name ?? conversation.client?.whatsapp ?? conversation.whatsappChatId
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#fafafa' }}>
-
-      {/* Cabeçalho */}
-      <div style={{
-        padding: '14px 20px',
-        borderBottom: '1px solid rgba(0,0,0,0.06)',
-        backgroundColor: '#ffffff',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        flexShrink: 0,
-      }}>
-        <div style={{
-          width: '36px', height: '36px', borderRadius: '50%',
-          backgroundColor: '#f3f4f6', display: 'flex', alignItems: 'center',
-          justifyContent: 'center', fontSize: '14px', fontWeight: 600, color: '#6b7280',
-          flexShrink: 0,
-        }}>
-          {label.charAt(0).toUpperCase()}
-        </div>
-        <div>
-          <p style={{ fontSize: '15px', fontWeight: 600, color: '#111827', margin: 0, lineHeight: 1.3 }}>
-            {label}
-          </p>
-          {conversation.client?.whatsapp && (
-            <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>
-              {conversation.client.whatsapp}
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Mensagens */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-        {loading && (
-          <p style={{ textAlign: 'center', color: '#9ca3af', fontSize: '14px', margin: '32px 0 0' }}>
-            Carregando mensagens...
-          </p>
-        )}
-
-        {!loading && messages.length === 0 && (
-          <p style={{ textAlign: 'center', color: '#9ca3af', fontSize: '14px', margin: '32px 0 0' }}>
-            Nenhuma mensagem ainda
-          </p>
-        )}
-
+    <div className="message-thread">
+      <header className="message-thread-heading">
+        <span className="conversation-avatar">{label.charAt(0).toUpperCase()}</span>
+        <div><strong>{label}</strong>{conversation.client?.whatsapp && <small>{conversation.client.whatsapp}</small>}</div>
+      </header>
+      <div className="message-list">
+        {loading && <p className="conversation-empty">Carregando mensagens...</p>}
+        {!loading && messages.length === 0 && <p className="conversation-empty">Nenhuma mensagem ainda</p>}
         {messages.map((msg) => (
-          <div
-            key={msg.id}
-            style={{ display: 'flex', justifyContent: msg.direction === 'out' ? 'flex-end' : 'flex-start' }}
-          >
-            <div style={{
-              maxWidth: '68%',
-              padding: '8px 12px',
-              borderRadius: msg.direction === 'out' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
-              backgroundColor: msg.direction === 'out' ? '#F2E600' : '#ffffff',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
-            }}>
-              <p style={{ fontSize: '14px', color: '#111827', lineHeight: 1.5, margin: 0, wordBreak: 'break-word' }}>
-                {msg.content}
-              </p>
-              <p style={{ fontSize: '11px', color: 'rgba(0,0,0,0.4)', margin: '3px 0 0', textAlign: 'right' }}>
-                {formatTime(msg.createdAt)}
-              </p>
-            </div>
+          <div key={msg.id} className={'message-row message-' + msg.direction}>
+            <div className="message-bubble"><p>{msg.content}</p><time>{formatTime(msg.createdAt)}</time></div>
           </div>
         ))}
-
         <div ref={bottomRef} />
       </div>
-
-      {/* Input */}
-      <div style={{ padding: '12px 20px', borderTop: '1px solid rgba(0,0,0,0.06)', backgroundColor: '#ffffff', flexShrink: 0 }}>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
-          <textarea
-            ref={textareaRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Digite uma mensagem... (Enter para enviar, Shift+Enter para nova linha)"
-            rows={1}
-            style={{
-              flex: 1,
-              resize: 'none',
-              border: '1px solid rgba(0,0,0,0.1)',
-              borderRadius: '8px',
-              padding: '10px 14px',
-              fontSize: '14px',
-              color: '#111827',
-              outline: 'none',
-              fontFamily: 'inherit',
-              lineHeight: 1.5,
-              backgroundColor: '#f9fafb',
-              maxHeight: '120px',
-              overflowY: 'auto',
-            }}
-          />
-          <button
-            type="button"
-            onClick={submit}
-            disabled={!input.trim() || sending}
-            style={{
-              backgroundColor: '#F2E600',
-              border: 'none',
-              borderRadius: '8px',
-              padding: '10px 14px',
-              cursor: !input.trim() || sending ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-              opacity: !input.trim() || sending ? 0.45 : 1,
-              transition: 'opacity 0.15s',
-            }}
-          >
-            <Send size={16} color="#111827" />
-          </button>
-        </div>
+      <div className="message-composer">
+        <textarea className="resize-none" ref={textareaRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown}
+          aria-label="Mensagem" placeholder="Digite uma mensagem... (Enter para enviar, Shift+Enter para nova linha)" rows={1} />
+        <button type="button" className="button button-primary" onClick={submit} disabled={!input.trim() || sending} aria-label={sending ? 'Enviando mensagem' : 'Enviar mensagem'}><Send size={16} /></button>
       </div>
-
     </div>
   )
 }

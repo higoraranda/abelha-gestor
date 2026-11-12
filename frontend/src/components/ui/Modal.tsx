@@ -1,10 +1,11 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 export default function Modal({ title, description, onClose, children, wide = false }: { title: string; description?: string; onClose: () => void; children: ReactNode; wide?: boolean }) {
+  const [opener] = useState(() => document.activeElement instanceof HTMLElement ? document.activeElement : null)
   return <Dialog.Root open onOpenChange={open => { if (!open) onClose() }}><Dialog.Portal>
     <Dialog.Overlay className="crm-modal-overlay" />
-    <Dialog.Content className={'crm-modal' + (wide ? ' crm-modal-wide' : '')} {...(!description ? {'aria-describedby':undefined} : {})}>
+    <Dialog.Content className={'crm-modal' + (wide ? ' crm-modal-wide' : '')} onCloseAutoFocus={event => { if (opener?.isConnected) { event.preventDefault(); opener.focus({preventScroll:true}) } }} {...(!description ? {'aria-describedby':undefined} : {})}>
       <header className="crm-modal-heading"><div><Dialog.Title>{title}</Dialog.Title>{description && <Dialog.Description>{description}</Dialog.Description>}</div><Dialog.Close className="icon-button" aria-label="Fechar"><X size={20} /></Dialog.Close></header>
       {children}
     </Dialog.Content>

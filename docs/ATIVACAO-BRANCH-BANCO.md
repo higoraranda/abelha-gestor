@@ -1,6 +1,8 @@
 # Homologação — banco e publicação — 12/11/2026
 
-**Banco Neon isolado pronto. Alterações locais na main, sem novo commit ou push, para revisão e publicação manual pelo usuário.** Produção, Render e n8n permanecem sem alteração nesta etapa.
+Atualização: backend de homologação agora **live no Render Free**, conectado a este database e validado com conta sintética. Compute habilitado em0,25CU para atender ao serviço solicitado. Implantada a branch codex/homologacao-abelha, sem trocar o checkout local ou publicar alterações locais. Estado atual e próximo passo: [RENDER-HOMOLOGACAO.md](RENDER-HOMOLOGACAO.md). Os detalhes de provisionamento abaixo registram a etapa anterior.
+
+**Banco Neon isolado pronto. Alterações locais na main, sem novo commit ou push, para revisão e publicação manual pelo usuário.** Produção e n8n preservados; somente o novo serviço Render de homologação foi criado após autorização.
 
 ## Preparação local
 
@@ -16,7 +18,7 @@
 | Projeto existente / plano | MELAO CRM / curly-river-94350351 / free_v3 |
 | Branch de teste existente | br-hidden-night-ace956m0 |
 | Compute existente | ep-crimson-snow-acmuhqgp / ep-crimson-snow-acmuhqgp.sa-east-1.aws.neon.tech |
-| Estado final / limite | disabled=true, idle, mínimo=máximo0,25CU |
+| Estado atual / limite | habilitado, suspensão automática por ociosidade, mínimo=máximo0,25CU |
 | Database criado | abelha_homologacao / ID3074787 / owner neondb_owner |
 | Role de aplicação | abelha_hml_app / read_write somente no database novo/public |
 | Banco preservado | neondb da branch antiga |
@@ -43,10 +45,8 @@ Arquivo: [bootstrap-empty.sql](../backend/src/db/homologation/bootstrap-empty.sq
 - AUTH_URL, FRONTEND_URL e VAPID_SUBJECT continuam vazios até definir URLs e contato de homologação. Evolution/preços não estão configurados.
 - backend/.env foi preservado. As credenciais de produção não foram reutilizadas.
 
-## Próxima etapa: Render
+## Backend ativo e próximo passo
 
-Banco pronto para configurar o backend de homologação. Faltam definir URLs e autorizar separadamente a criação do serviço/disponibilidade do compute. Serviço proposto: abelha-gestor-api-hml, repo higoraranda/abelha-gestor, revisão publicada manualmente na main, Root Directory backend, Node, build npm ci --include=dev && npm run build, start npm start, health /health, Auto-Deploy desligado e Free somente se disponível.
+O serviço abelha-gestor-api-hml está live no Render Free, implantando a branch codex/homologacao-abelha/37f9898 com Auto-Deploy desligado. AUTH_URL, FRONTEND_URL e VAPID foram configurados apenas com os destinos/segredos de homologação. A adaptação de build/start com cd backend e health check TCP foi autorizada; GET /health200 e12 verificações remotas passaram.
 
-Injetar somente as credenciais privadas de homologação. Nenhum serviço Render foi criado. A migration Personal de produção e a ativação n8n seguem pendentes de autorização própria.
-
-Verificações da implementação:53 testes backend,16 frontend, TypeScript/builds e ESLint aprovados. Nesta preparação editorial foram conferidos links, JSON, ausência de créditos, integridade dos arquivos funcionais e estado do Git. Nenhum processo temporário mantido ativo.
+Estado e instruções: [RENDER-HOMOLOGACAO.md](RENDER-HOMOLOGACAO.md). Próximo passo: BACKEND_URL somente no Vercel Preview, seguido de novo deployment apenas desse Preview quando autorizado. Produção/n8n permanecem sem alterações; nenhuma migration foi repetida. Alterações locais preservadas, sem commit ou push.

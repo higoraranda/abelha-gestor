@@ -24,6 +24,7 @@ usada para isolamento técnico.
 
 - [Escopo aprovado](docs/escopo-implementacao.md)
 - [Direção visual](DESIGN.md)
+- [Dark Mode — capturas e validações](docs/DARK-MODE.md)
 - [Progresso e verificações](docs/PROGRESSO.md)
 - [Migration e ativação pendente](docs/BANCO-REFORMULACAO.md)
 

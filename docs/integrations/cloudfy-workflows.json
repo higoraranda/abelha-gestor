@@ -29,8 +29,8 @@
   "production_migration_applied": false,
   "backend_deployed": true,
   "backend_deployed_commit": "248569753b3c7a8fd78676524426c2ef1f0e2eac",
-  "homologation_report": "../HOMOLOGACAO-INTEGRACAO.md",
-  "homologation_backend_available": false,
+  "homologation_report": "../RENDER-HOMOLOGACAO.md",
+  "homologation_backend_available": true,
   "neon_synthetic_rehearsal_passed": true,
   "existing_workflows_preserved": [
     "shDnJzDKrgyfnkIp",
@@ -194,5 +194,7 @@
         "executionTimeout": 900
       }
     }
-  ]
+  ],
+  "homologation_backend_url": "https://abelha-gestor-api-hml.onrender.com",
+  "homologation_backend_integration_auth_tested": true
 }

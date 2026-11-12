@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test src/lib/*.test.mjs",
+    "test:visual": "node scripts/verify-dark-mode.cjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
