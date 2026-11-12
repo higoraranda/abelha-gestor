@@ -1,0 +1,338 @@
+{
+  "date": "2026-11-12",
+  "baseCommit": "248569753b3c7a8fd78676524426c2ef1f0e2eac",
+  "productionReady": false,
+  "productionWrites": false,
+  "commitsPushesDeploysPerformed": false,
+  "existingLocalChangesPreserved": true,
+  "neon": {
+    "projectId": "curly-river-94350351",
+    "branchId": "br-hidden-night-ace956m0",
+    "endpointId": "ep-crimson-snow-acmuhqgp",
+    "plan": "free_v3",
+    "authorization": "explicit-temporary-existing-compute-0.25CU-synthetic-only",
+    "rehearsalPassed": true,
+    "remoteIntegratedTests": 2,
+    "platformTables": 18,
+    "migrationRerun": true,
+    "migrationSha256": "9812B2BD74ACC1FB983318BAB62590DA6CF8E92A1536E85032FB8B604F84DCDB",
+    "crossOrganizationForeignKeys": true,
+    "sameOrganizationUserForeignKeys": true,
+    "publicCatalogRehearsalRolledBack": true,
+    "publicTablesBeforeAfter": 13,
+    "publicFingerprintsUnchanged": true,
+    "temporarySchemasRemaining": 0,
+    "temporaryRolesRemaining": 0,
+    "connectionFileRemoved": true,
+    "finalCompute": {
+      "disabled": true,
+      "currentState": "idle",
+      "minCU": 0.25,
+      "maxCU": 0.25
+    },
+    "productionPlatformTables": 0,
+    "productionMigrationApplied": false
+  },
+  "tests": {
+    "backend": 49,
+    "frontend": 16,
+    "neonIntegrated": 2,
+    "browserScenarios": 11,
+    "backendTypescriptBuild": true,
+    "frontendTypescriptBuild": true,
+    "frontendLint": true,
+    "npmAudit": {
+      "backend": 0,
+      "frontend": 0
+    },
+    "regressions": [
+      "preview refuses absent, production and trailing-dot production backend without fetch",
+      "preview preserves isolated HTTPS requests and existing production fallback",
+      "runner does not inherit arbitrary ambient secrets",
+      "preload prevents dotenv from reading selected secret file"
+    ],
+    "independentReview": "two findings fixed, no remaining blockers in reviewed scope"
+  },
+  "publicProbes": [
+    {
+      "url": "https://abelha-gestor-api.onrender.com/health",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": null,
+      "serviceWorkerAllowed": null,
+      "bytes": 15,
+      "sha256": "a29ee2b15c494311c52521766e44af56a3ad2248e7a8ab465e5206463c13d288"
+    },
+    {
+      "url": "https://abelha-gestor-api.onrender.com/api/auth/session",
+      "status": 200,
+      "contentType": "application/json",
+      "cacheControl": "private, no-cache, no-store",
+      "serviceWorkerAllowed": null,
+      "bytes": 4,
+      "sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b"
+    },
+    {
+      "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/prices/due",
+      "status": 503,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store",
+      "serviceWorkerAllowed": null,
+      "bytes": 42,
+      "sha256": "2fa1a97c5bcf9594e0eca92113450b351080eb01195dcdb152bc129b56c29dac"
+    },
+    {
+      "url": "https://abelha-gestor-api.onrender.com/api/v1/personal/projects",
+      "status": 401,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store",
+      "serviceWorkerAllowed": null,
+      "bytes": 27,
+      "sha256": "6b5af989c02556cd7f3e1f3a4e2ce5d93f7719606e91acd2647e070b0a0bcaf1"
+    },
+    {
+      "url": "https://abelha-gestor.vercel.app/",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "serviceWorkerAllowed": null,
+      "bytes": 871,
+      "sha256": "6b766e55cae21c3f26602e612f3b275d854d2c7e5fbbba3f7b40e1d145831657",
+      "scripts": [
+        "/assets/index-lj4EVIZl.js"
+      ]
+    },
+    {
+      "url": "https://abelha-gestor.vercel.app/manifest.webmanifest",
+      "status": 200,
+      "contentType": "application/manifest+json; charset=utf-8",
+      "cacheControl": "no-cache",
+      "serviceWorkerAllowed": null,
+      "bytes": 895,
+      "sha256": "afd279b57b65f40f043f1e59ab8a7ea367a3a15c3cd3dc483c9ac711380c486d",
+      "manifest": {
+        "id": "/",
+        "name": "Abelha — CRM e Personal",
+        "short_name": "Abelha",
+        "description": "Seu trabalho e sua vida pessoal, cada um no seu espaço.",
+        "lang": "pt-BR",
+        "start_url": "/?space=personal&view=personal-overview",
+        "scope": "/",
+        "display": "standalone",
+        "background_color": "#ebe8e1",
+        "theme_color": "#f4d22f",
+        "icons": [
+          {
+            "src": "/pwa/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+          },
+          {
+            "src": "/pwa/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+          },
+          {
+            "src": "/pwa/maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+          }
+        ],
+        "shortcuts": [
+          {
+            "name": "Registrar fatura",
+            "url": "/?space=personal&view=personal-finance"
+          },
+          {
+            "name": "Meus projetos",
+            "url": "/?space=personal&view=personal-projects"
+          },
+          {
+            "name": "Abelha CRM",
+            "url": "/?view=overview"
+          }
+        ]
+      }
+    },
+    {
+      "url": "https://abelha-gestor.vercel.app/sw.js",
+      "status": 200,
+      "contentType": "application/javascript; charset=utf-8",
+      "cacheControl": "no-cache, no-store, must-revalidate",
+      "serviceWorkerAllowed": "/",
+      "bytes": 3859,
+      "sha256": "3d2386791fcf9ede506b6e451c44c7af820deeb594ce7829cb624373eba37a76"
+    },
+    {
+      "url": "https://abelha-gestor.vercel.app/api/auth/session",
+      "status": 200,
+      "contentType": "application/json",
+      "cacheControl": "private, no-cache, no-store",
+      "serviceWorkerAllowed": null,
+      "bytes": 4,
+      "sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b"
+    },
+    {
+      "url": "https://abelha-gestor.vercel.app/api/v1/personal/projects",
+      "status": 401,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store",
+      "serviceWorkerAllowed": null,
+      "bytes": 27,
+      "sha256": "6b5af989c02556cd7f3e1f3a4e2ce5d93f7719606e91acd2647e070b0a0bcaf1"
+    },
+    {
+      "url": "https://abelha-gestor.vercel.app/assets/index-lj4EVIZl.js",
+      "status": 200,
+      "contentType": "application/javascript; charset=utf-8",
+      "isHtml": false,
+      "bytes": 459395
+    }
+  ],
+  "credentials": {
+    "local": [
+      {
+        "name": "DATABASE_URL",
+        "configured": true
+      },
+      {
+        "name": "AUTH_SECRET",
+        "configured": true,
+        "minimumLength": true
+      },
+      {
+        "name": "AUTH_URL",
+        "configured": true
+      },
+      {
+        "name": "FRONTEND_URL",
+        "configured": true
+      },
+      {
+        "name": "ABELHA_INTEGRATION_TOKEN",
+        "configured": false
+      },
+      {
+        "name": "ABELHA_INTEGRATION_ORGANIZATION_ID",
+        "configured": false
+      },
+      {
+        "name": "ABELHA_INTEGRATION_USER_ID",
+        "configured": false
+      },
+      {
+        "name": "VAPID_PUBLIC_KEY",
+        "configured": false
+      },
+      {
+        "name": "VAPID_PRIVATE_KEY",
+        "configured": false
+      },
+      {
+        "name": "VAPID_SUBJECT",
+        "configured": false
+      },
+      {
+        "name": "GITHUB_WEBHOOK_SECRET",
+        "configured": false
+      },
+      {
+        "name": "PRICE_ALLOWED_HOSTS",
+        "configured": false
+      }
+    ],
+    "renderReadCapability": false,
+    "renderIntegrationTokenPublicProbe": "503 Integration not configured",
+    "vercel": [
+      {
+        "name": "VITE_API_URL",
+        "targets": [
+          "production",
+          "preview"
+        ],
+        "configured": true
+      },
+      {
+        "name": "BACKEND_URL",
+        "configured": false
+      }
+    ],
+    "n8nAbelhaBackend": false,
+    "n8nAbelhaIncoming": false,
+    "githubWebhookPresence": "not-verifiable-with-current-connector"
+  },
+  "n8n": {
+    "workflowId": "n20DNyb13Aaw3nq5",
+    "name": "🐝 ABELHA — AUTOMAÇÕES",
+    "nodes": 62,
+    "active": false,
+    "remoteDefinitionUnchanged": true,
+    "remoteUpdatedAt": "2026-11-12T04:01:00.660Z",
+    "runtimeTested": false,
+    "backendUrls": 10,
+    "backendHeaderAuthNodes": 9,
+    "webhooks": 4,
+    "schedules": 1,
+    "legacyBackups": [
+      {
+        "id": "RIUNsrZPnldxps8j",
+        "name": "Abelha — Lembretes Financeiros",
+        "active": false
+      },
+      {
+        "id": "Sb4LGFXnX2q8QQVO",
+        "name": "Abelha — Captura de Leads",
+        "active": false
+      },
+      {
+        "id": "3glUHHeETfeQzJbr",
+        "name": "Abelha — Busca de Leads",
+        "active": false
+      },
+      {
+        "id": "KQ29tKdXsT4seDHN",
+        "name": "Abelha — Monitor de Preços",
+        "active": false
+      },
+      {
+        "id": "vHpvCObsiu5fRXWe",
+        "name": "Abelha — Sincronização de Projetos",
+        "active": false
+      },
+      {
+        "id": "U9xr0ZokbZeXDaAb",
+        "name": "Abelha — Contas e Assinaturas",
+        "active": false
+      },
+      {
+        "id": "RnE5lBhUY3k0hoAV",
+        "name": "Abelha — Revisão Semanal",
+        "active": false
+      }
+    ],
+    "stagingBackendAvailable": false
+  },
+  "cleanup": {
+    "previewPid": 12848,
+    "previewStopped": true,
+    "portsReleased": [
+      43170,
+      64354
+    ],
+    "browserClosed": true,
+    "neonTemporaryResourcesRemoved": true
+  },
+  "pending": [
+    "authorized persistent isolated backend and DB baseline",
+    "Vercel Preview server BACKEND_URL and publication of guard",
+    "integration identity and backend/incoming credentials",
+    "GitHub secret and webhook validation",
+    "VAPID and physical device delivery",
+    "Cloudfy runtime manual tests, n8n version and stdout",
+    "authorized real price provider",
+    "explicit production migration/publication/workflow activation authorizations"
+  ]
+}

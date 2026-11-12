@@ -10,7 +10,7 @@ Pedido: continuação com preservação integral das alterações locais; sem mi
 - [x] Testar timeout Overpass e alinhar o orçamento servidor/cliente, com erro claro e sem resultado fictício.
 - [x] Revisar migration, adicionar verificações de integridade/isolamento/remoção e incompatibilidade de ambiente, sem executar no Neon.
 - [x] Revisar PWA/push/n8n; corrigir problemas concretos e distinguir modelos, credenciais e implementações pendentes.
-- [x] Reexecutar suites, builds, lint e fluxos de navegador relevantes; encerrar somente recursos temporários iniciados pelo agente.
+- [x] Reexecutar suites, builds, lint e fluxos de navegador relevantes; encerrar somente recursos temporários iniciados durante a tarefa.
 - [x] Atualizar progresso/auditorias e entregar checklist de ativação com configuração manual e autorizações separadas.
 
 ## Evidência e limites

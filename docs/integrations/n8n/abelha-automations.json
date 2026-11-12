@@ -1,0 +1,2206 @@
+{
+  "name": "🐝 ABELHA — AUTOMAÇÕES",
+  "active": false,
+  "nodes": [
+    {
+      "id": "14183d83-4b21-bf5c-66f3-97dee6ea1cee",
+      "name": "🐝 CONTROLE E CONFIGURAÇÃO",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "content": "# 🐝 CONTROLE E CONFIGURAÇÃO\n\nDESATIVADO até credenciais e ensaio. Um relógio compartilha tick/preços; webhooks não passam pelo roteador. Teste manual: editar operation em Escolher operação. Erros são tratados por bloco, sem subworkflows. Mesmo backend/conta/hosts revisados; não apontar testes de gravação à produção.",
+        "color": 1,
+        "width": 4400,
+        "height": 750
+      }
+    },
+    {
+      "id": "2d5d5d80-6948-dc57-4b45-4a063b0f78b2",
+      "name": "Relógio compartilhado",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "f3a2ae7f-194b-d809-9f66-fb4650e4bdaa",
+      "name": "Operações do relógio",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "return [{json:{operation:\"tick\"}},{json:{operation:\"prices\"}}];"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "8b10db7e-8629-5110-8236-452d4d6cbf90",
+      "name": "Teste manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        550
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "8817cf84-105e-b584-6c9c-d6293a7852f6",
+      "name": "Escolher operação",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        550
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "operation",
+              "name": "operation",
+              "value": "tick",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "e3367604-3475-038c-2dc4-c63141959e9f",
+      "name": "Validar operação",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        450
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "if(![\"tick\",\"accounts\",\"prices\",\"weekly-review\"].includes($json.operation))throw new Error(\"Operação inválida\");return {json:{operation:$json.operation}};"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "9d8b2a48-d00a-0ccf-7fe8-da42ce327720",
+      "name": "Rotear operação",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1100,
+        450
+      ],
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "tick",
+                    "leftValue": "={{ $json.operation }}",
+                    "rightValue": "tick",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "tick"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "accounts",
+                    "leftValue": "={{ $json.operation }}",
+                    "rightValue": "accounts",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "accounts"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "prices",
+                    "leftValue": "={{ $json.operation }}",
+                    "rightValue": "prices",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "prices"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "weekly-review",
+                    "leftValue": "={{ $json.operation }}",
+                    "rightValue": "weekly-review",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "weekly-review"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "operação inválida",
+          "allMatchingOutputs": false
+        }
+      }
+    },
+    {
+      "id": "0cd79f14-2e99-5824-bdf0-8f553e22969b",
+      "name": "🔴 TRATAMENTO DE ERROS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4900,
+        2200
+      ],
+      "parameters": {
+        "content": "# 🔴 TRATAMENTO DE ERROS\n\nSaídas de erro por bloco descartam mensagem, headers, payload e tokens. Webhook recebe JSON genérico HTTP503. Falha do relógio/manual retorna ok:false e não cancela a outra operação. Para logs de produção, configurar/verificar CODE_ENABLE_STDOUT=true no host. Como a falha foi tratada, status global n8n pode ser concluído: conferir saída e log genérico. Sem Error Workflow externo ou retorno ao roteador.",
+        "color": 3,
+        "width": 1600,
+        "height": 3300
+      }
+    },
+    {
+      "id": "26d440a6-966f-828f-a9c3-2b57c252f5c5",
+      "name": "Falha · CONTROLE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5100,
+        2500
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {json:{ok:false,block:\"CONTROLE\",webhook:false,statusCode:503,error_code:\"ABELHA_CONTROLE_FAILED\"}};"
+      }
+    },
+    {
+      "id": "1d2ce46b-9041-888d-6a3e-f06a446dc787",
+      "name": "Falha · CAPTURA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5100,
+        2760
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {json:{ok:false,block:\"CAPTURA\",webhook:true,statusCode:503,error_code:\"ABELHA_CAPTURA_FAILED\"}};"
+      }
+    },
+    {
+      "id": "ad70b7d5-cb02-3a41-6877-d482893635f5",
+      "name": "Falha · BUSCA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5100,
+        3020
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {json:{ok:false,block:\"BUSCA\",webhook:true,statusCode:503,error_code:\"ABELHA_BUSCA_FAILED\"}};"
+      }
+    },
+    {
+      "id": "e13ef19c-6942-dddb-c23d-d4a73c1957ba",
+      "name": "Falha · FINANCEIRO",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5100,
+        3280
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {json:{ok:false,block:\"FINANCEIRO\",webhook:false,statusCode:503,error_code:\"ABELHA_FINANCEIRO_FAILED\"}};"
+      }
+    },
+    {
+      "id": "b02e6821-27d9-b395-d1bf-4a0eee3462d4",
+      "name": "Falha · CONTAS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5100,
+        3540
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {json:{ok:false,block:\"CONTAS\",webhook:false,statusCode:503,error_code:\"ABELHA_CONTAS_FAILED\"}};"
+      }
+    },
+    {
+      "id": "9d183942-bcca-8de4-e30c-4fa7b2481d93",
+      "name": "Falha · PREÇOS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5100,
+        3800
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {json:{ok:false,block:\"PREÇOS\",webhook:false,statusCode:503,error_code:\"ABELHA_PRECOS_FAILED\"}};"
+      }
+    },
+    {
+      "id": "f001c496-5cb9-7845-9bba-07b868f01a07",
+      "name": "Falha · PROJETOS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5100,
+        4060
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {json:{ok:false,block:\"PROJETOS\",webhook:true,statusCode:503,error_code:\"ABELHA_PROJETOS_FAILED\"}};"
+      }
+    },
+    {
+      "id": "dc83a2cf-168d-0a2d-8ac4-06bd98171969",
+      "name": "Falha · REVISÃO",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5100,
+        4320
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {json:{ok:false,block:\"REVISÃO\",webhook:false,statusCode:503,error_code:\"ABELHA_REVISAO_FAILED\"}};"
+      }
+    },
+    {
+      "id": "98ba2892-5e98-abc4-da2b-73c3f74a1fca",
+      "name": "Erro veio de webhook?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        5500,
+        3300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "webhook",
+              "leftValue": "={{ $json.webhook }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "5eeaa9c2-2664-b762-eb04-d9a3bfe8af0e",
+      "name": "Responder falha webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        5850,
+        3000
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {ok:false,error:$json.error_code,block:$json.block} }}",
+        "options": {
+          "responseCode": 503,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Cache-Control",
+                "value": "no-store"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "b7202997-d559-1df2-2213-94f11bfd471c",
+      "name": "Registrar falha sem payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5850,
+        3600
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "console.log(\"[Abelha] \"+$json.error_code+\" bloco=\"+$json.block);return {json:{ok:false,block:$json.block,error_code:$json.error_code}};"
+      }
+    },
+    {
+      "id": "c0c6380f-0fdc-63de-4f3e-8700231f3d61",
+      "name": "Responder webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        5100,
+        1500
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Cache-Control",
+                "value": "no-store"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "5379bc0b-9f5b-66a3-e73f-c9f06006d759",
+      "name": "🟡 CAPTURA DE LEADS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1000
+      ],
+      "parameters": {
+        "content": "# 🟡 CAPTURA DE LEADS\n\nWebhook protegido → extração/classificação por regras → candidato pendente. Nada nesta entrada aciona preços ou revisão.",
+        "color": 1,
+        "width": 1800,
+        "height": 750
+      }
+    },
+    {
+      "id": "e27e5910-8f2f-fe29-c995-32b8f06d04c2",
+      "name": "CAPTURA · Receber captura",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        150,
+        1300
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "abelha/v1/leads/capture",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "webhookId": "60a01329-730f-ee8e-401d-9a0e68545e29",
+      "notes": "Selecionar credencial Abelha — Entrada Webhook, separada do token do backend.",
+      "notesInFlow": true
+    },
+    {
+      "id": "55fddb1e-a8cc-e9d7-a7be-7cfbad86b06d",
+      "name": "CAPTURA · Extrair e classificar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        410,
+        1300
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Classificação determinística; não é uma classificação por IA.\nconst b = $json.body || $json;\nfunction text(value, max, label) {\n  if (typeof value !== 'string' || !value.trim() || value.trim().length > max) throw new Error('Entrada inválida: ' + label);\n  return value.trim();\n}\nconst event_id = text(b.event_id || b.message_id, 160, 'event_id estável obrigatório');\nconst name = text(b.name, 240, 'name');\nconst summary = text(b.summary || b.message || b.text, 10000, 'summary/message/text').replace(/<[^>]*>/g, ' ').replace(/\\s+/g, ' ').trim();\nconst source = b.source || 'form';\nif (!['email', 'form'].includes(source)) throw new Error('Fonte inválida: use email ou form');\nconst detectedEmail = summary.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/i)?.[0] || '';\nconst email = b.email || detectedEmail;\nif (typeof email !== 'string' || email.length > 255 || (email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email))) throw new Error('Email inválido');\nconst detectedPhone = summary.match(/(?:whatsapp|telefone|celular|tel)\\s*[:=-]?\\s*(\\+?\\d[\\d\\s().-]{7,24}\\d)/i)?.[1] || '';\nconst rawPhone = b.phone || detectedPhone;\nif (typeof rawPhone !== 'string' || rawPhone.length > 100) throw new Error('Telefone inválido');\nconst phone = rawPhone.replace(/\\D/g, '');\nif (phone && (phone.length < 8 || phone.length > 15)) throw new Error('Telefone inválido');\nconst normalized = summary.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();\nconst rules = [['landing', 'Landing page'], ['site institucional', 'Site institucional'], ['site', 'Site'], ['crm', 'CRM'], ['automacao', 'Automação'], ['whatsapp', 'WhatsApp']];\nconst classification = 'Regra local: ' + (rules.find(([word]) => normalized.includes(word))?.[1] || 'Revisar');\nconst evidence_reference = text(b.evidence_reference || source + '/' + event_id, 500, 'evidence_reference');\nreturn {json: {event_id, source, name, summary, phone, email: email.toLowerCase(), classification, evidence_reference}};\n"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "482ddccf-8611-e172-707d-b68a5a8f4474",
+      "name": "CAPTURA · Enviar captura para revisão",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        670,
+        1300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/leads/capture",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 60000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}"
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput",
+      "notes": "Selecionar Abelha — Backend (Header Auth). Backend precisa da migration e desta versão publicada antes de testar.",
+      "notesInFlow": true
+    },
+    {
+      "id": "f4233094-4d70-3645-205c-d818d721b971",
+      "name": "CAPTURA · Confirmar captura",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        930,
+        1300
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {json:{received:true,id:$json.id,reused:!!$json.reused,review_required:true}};"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "e2b959d6-c580-1fa7-b951-e3be6bc4cb16",
+      "name": "🟡 BUSCA DE LEADS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2200,
+        1000
+      ],
+      "parameters": {
+        "content": "# 🟡 BUSCA DE LEADS\n\nEntrada nicho/cidade/limite → Overpass → staging para revisão. Lote finito de até 50 candidatos, um por vez para preservar retries. Reset desligado; sem ciclo entre automações. Rate limit e deduplicação preservados.",
+        "color": 1,
+        "width": 2500,
+        "height": 1150
+      }
+    },
+    {
+      "id": "3d1ad10e-1b83-0cf0-a1c7-fa23b9ad5780",
+      "name": "BUSCA · Receber busca",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        2350,
+        1300
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "abelha/v1/leads/search",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "webhookId": "1fa41889-b469-d6e3-42b1-4477cce4f7a3",
+      "notes": "Selecionar credencial Abelha — Entrada Webhook, separada do token do backend.",
+      "notesInFlow": true
+    },
+    {
+      "id": "6672aff7-3c2d-b73d-9c56-cafa6df91e6a",
+      "name": "BUSCA · Validar busca",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2590,
+        1300
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const b = $json.body || $json;\nconst niches = ['dentists', 'clinics', 'restaurants', 'beauty', 'gyms', 'shops'];\nif (!niches.includes(b.niche)) throw new Error('Nicho inválido');\nif (typeof b.city !== 'string' || !b.city.trim() || b.city.length > 100 || /[\";\\\\\\n\\r\\[\\]{}()]/.test(b.city)) throw new Error('Cidade inválida');\nconst limit = b.limit === undefined ? 10 : Number(b.limit);\nif (!Number.isInteger(limit) || limit < 1 || limit > 50) throw new Error('Limite deve ser inteiro entre 1 e 50');\nreturn {json: {niche: b.niche, city: b.city.trim(), limit}};\n"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "d7d6dc50-1276-9387-5e25-81147caf3548",
+      "name": "BUSCA · Consultar Overpass pelo backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2830,
+        1300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/leads/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 35000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}"
+      },
+      "retryOnFail": false,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput",
+      "notes": "Selecionar Abelha — Backend (Header Auth). Backend precisa da migration e desta versão publicada antes de testar.",
+      "notesInFlow": true
+    },
+    {
+      "id": "d4f3d33e-de0d-198f-92f6-096fa28f0313",
+      "name": "BUSCA · Verificar resultados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3070,
+        1300
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "if(!Array.isArray($json.items))throw new Error(\"Resposta pública inválida\");return {json:{...$json,has_results:$json.items.length>0}};"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "a2c6e4fc-ac0b-2462-4657-d7f6e329d6e6",
+      "name": "BUSCA · Há resultados?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3310,
+        1300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-results",
+              "leftValue": "={{ $json.has_results }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "4dbba45b-0b0d-bab6-89e0-5a5019320169",
+      "name": "BUSCA · Separar resultados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3550,
+        1220
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "if (!Array.isArray($json.items) || $json.items.length > 50) throw new Error('Resposta OpenStreetMap inválida');\nreturn $json.items.map((lead, index) => {\n  if (lead.source !== 'OpenStreetMap' || !/^(node|way|relation)\\/\\d+$/.test(lead.source_key || '') || typeof lead.name !== 'string' || !lead.name.trim() || typeof lead.niche !== 'string' || typeof lead.queried_at !== 'string') throw new Error('Referência OpenStreetMap inválida');\n  return {json: {source_key: lead.source_key, name: lead.name, niche: lead.niche, address: lead.address || '', phone: lead.phone || '', website: lead.website || null, queried_at: lead.queried_at}, pairedItem: {item: 0}};\n});\n"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "ef57a005-4595-bed8-393e-05da7fc7438d",
+      "name": "BUSCA · Guardar candidato público",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3790,
+        1220
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/leads/stage",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 60000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}"
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput",
+      "notes": "Selecionar Abelha — Backend (Header Auth). Backend precisa da migration e desta versão publicada antes de testar.",
+      "notesInFlow": true
+    },
+    {
+      "id": "4320cfe3-000d-089b-791d-064c9facf913",
+      "name": "BUSCA · Confirmar busca",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4030,
+        1220
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const expected=$(\"BUSCA · Verificar resultados\").first().json.items.length;if($input.all().length!==expected||$input.all().some(item=>item.json.error))throw new Error(\"Busca incompleta: nem todos os candidatos foram persistidos\");\nreturn [{json:{received:true,staged:$input.all().length,review_required:true,attribution:\"© OpenStreetMap contributors — ODbL\"}}];"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "e571ba5c-f249-3f93-dfee-c3a7c65d0f5d",
+      "name": "BUSCA · Busca sem resultados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3550,
+        1440
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {json:{received:true,staged:0,review_required:true,attribution:\"© OpenStreetMap contributors — ODbL\"}};"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "5e7b27c6-df8f-c2d0-22d3-927108db9f81",
+      "name": "🔵 LEMBRETES FINANCEIROS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        2200
+      ],
+      "parameters": {
+        "content": "# 🔵 LEMBRETES FINANCEIROS\n\nTick único de 15 min. Backend verifica horários/fuso, contas, domingo e push. Janela de virada e chaves estáveis são mantidas.",
+        "color": 5,
+        "width": 1800,
+        "height": 650
+      }
+    },
+    {
+      "id": "4be92a9c-ddf5-8d7c-32a7-6b160026f231",
+      "name": "FINANCEIRO · Executar tick completo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        450,
+        2500
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/tick",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 120000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {} }}"
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput",
+      "notes": "Selecionar Abelha — Backend (Header Auth). Backend precisa da migration e desta versão publicada antes de testar.",
+      "notesInFlow": true
+    },
+    {
+      "id": "1f32faab-0390-01b9-536e-3c4eff01ac22",
+      "name": "🔵 CONTAS E ASSINATURAS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2200,
+        2200
+      ],
+      "parameters": {
+        "content": "# 🔵 CONTAS E ASSINATURAS\n\nAuxiliar manual accounts; usa o mesmo tick completo original. O relógio não faz esta chamada de novo. Nunca paga uma conta.",
+        "color": 5,
+        "width": 1800,
+        "height": 650
+      }
+    },
+    {
+      "id": "5a28bb78-37c6-76eb-acb0-f02c3938a9e0",
+      "name": "CONTAS · Conferir pendências pelo tick",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2650,
+        2500
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/tick",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 120000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {} }}"
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput",
+      "notes": "Selecionar Abelha — Backend (Header Auth). Backend precisa da migration e desta versão publicada antes de testar.",
+      "notesInFlow": true
+    },
+    {
+      "id": "4a60cb4a-3e03-c4db-8a04-b689ec691955",
+      "name": "🟢 MONITORAMENTO DE PREÇOS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        3300
+      ],
+      "parameters": {
+        "content": "# 🟢 MONITORAMENTO DE PREÇOS\n\nGET due respeita interval_minutes por produto. API/hosts/credencial própria pendentes. Lote finito de até 20 observações, gravação por item com retries/reset desligado. Sem link aguarda configuração; nenhuma cotação fictícia.",
+        "color": 4,
+        "width": 2100,
+        "height": 1400
+      }
+    },
+    {
+      "id": "2a2f9a30-9e33-0c63-fb2f-724cf37ea40c",
+      "name": "PREÇOS · Listar monitores devidos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        410,
+        3600
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/prices/due",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 60000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "retryOnFail": false,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput",
+      "notes": "Selecionar Abelha — Backend (Header Auth). Backend precisa da migration e desta versão publicada antes de testar.",
+      "notesInFlow": true
+    },
+    {
+      "id": "44cb810e-bb53-f0bd-4fec-51e5c54ceba7",
+      "name": "PREÇOS · Preparar consultas autorizadas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        650,
+        3600
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// CONFIGURAR no nó antes do teste. Nenhuma URL recebida escolhe o host da API.\nconst PROVIDER_URL = 'https://configure-authorized-price-api.invalid/quote';\nconst PRODUCT_HOSTS = [];\nfunction host(value) {\n  if (typeof value !== 'string' || /[\\\\\\s]/.test(value)) throw new Error('URL HTTPS inválida');\n  const match = value.match(/^https:\\/\\/([a-z0-9.-]+)(?:\\/[^#]*)?$/i);\n  if (!match) throw new Error('URL HTTPS inválida');\n  return match[1].toLowerCase();\n}\nif (host(PROVIDER_URL).endsWith('.invalid') || !PRODUCT_HOSTS.length) throw new Error('CONFIGURAR API autorizada e PRODUCT_HOSTS antes de executar');\nreturn $input.all().flatMap((item, index) => {\n  const watch = item.json;\n  if (typeof watch.id !== 'string' || !/^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(watch.id)) throw new Error('Monitor inválido');\n  // Desejos sem link continuam aguardando configuração; não inventar consulta.\n  if (watch.product_url === null || watch.product_url === '') return [];\n  if (!PRODUCT_HOSTS.includes(host(watch.product_url))) throw new Error('Produto fora da allowlist autorizada');\n  return [{json: {watch_id: watch.id, product_url: watch.product_url, provider_url: PROVIDER_URL}, pairedItem: {item: index}}];\n});\n"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "05a164e3-cade-d618-5a42-c84c7ea8f5c5",
+      "name": "PREÇOS · Consultar API autorizada",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        910,
+        3600
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.provider_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 60000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "fullResponse": true
+            }
+          },
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 1000
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {monitor_id:$json.watch_id,product_url:$json.product_url} }}"
+      },
+      "retryOnFail": false,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput",
+      "notes": "Selecionar Abelha — API de Preços (credencial própria da fonte). Nunca selecionar Abelha — Backend. Contrato de saída em docs/CLOUDFY-N8N.md; sem scraping e sem redirects.",
+      "notesInFlow": true
+    },
+    {
+      "id": "a626fa9a-d501-b422-2865-1de03465ce13",
+      "name": "PREÇOS · Validar cotação real",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1170,
+        3600
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "if (!Number.isInteger($json.statusCode) || $json.statusCode < 200 || $json.statusCode >= 300 || !$json.body || typeof $json.body !== 'object' || Array.isArray($json.body)) throw new Error('API não retornou um objeto de cotação válido');\nconst quote = $json.body;\nconst monitor = $('PREÇOS · Preparar consultas autorizadas').item.json;\nif (quote.currency !== 'BRL' || typeof quote.price !== 'number' || !Number.isFinite(quote.price) || quote.price <= 0 || quote.price > 999999999.99 || Math.abs(quote.price * 100 - Math.round(quote.price * 100)) > 0.00001) throw new Error('Cotação deve conter preço real em BRL com duas casas decimais');\nif (quote.product_url !== monitor.product_url) throw new Error('Cotação de outro produto/variação');\nif (typeof quote.event_id !== 'string' || !quote.event_id.trim() || quote.event_id.length > 160 || typeof quote.store !== 'string' || !quote.store.trim() || quote.store.length > 240) throw new Error('Cotação sem identificador estável ou loja');\nconst observed = Date.parse(quote.observed_at);\nif (typeof quote.observed_at !== 'string' || !Number.isFinite(observed) || observed > Date.now() + 60000 || observed < Date.now() - 7 * 86400000) throw new Error('Data real da cotação ausente ou inválida');\nreturn {json: {watch_id: monitor.watch_id, event_id: quote.event_id.trim(), store: quote.store.trim(), product_url: quote.product_url, price: quote.price, observed_at: quote.observed_at}};\n"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "bf20cee0-8f35-ccca-d8f3-fbc98c319d93",
+      "name": "PREÇOS · Registrar observação",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1430,
+        3600
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ \"https://abelha-gestor-api.onrender.com/api/v1/integrations/prices/\" + encodeURIComponent($json.watch_id) + \"/observations\" }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 60000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {event_id:$json.event_id,store:$json.store,product_url:$json.product_url,price:$json.price,observed_at:$json.observed_at} }}"
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput",
+      "notes": "Selecionar Abelha — Backend (Header Auth). Backend precisa da migration e desta versão publicada antes de testar.",
+      "notesInFlow": true
+    },
+    {
+      "id": "367e55cd-5500-e2f9-31aa-f57bcd0ebb46",
+      "name": "🟣 SINCRONIZAÇÃO DE PROJETOS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2400,
+        3300
+      ],
+      "parameters": {
+        "content": "# 🟣 SINCRONIZAÇÃO DE PROJETOS\n\nEntradas independentes Codex e GitHub. Relatório pendente e revisão humana. Raw Body/binário/HMAC preservados; nenhum marco é concluído automaticamente.",
+        "color": 6,
+        "width": 1800,
+        "height": 1400
+      }
+    },
+    {
+      "id": "72262e8f-2476-2d4d-d7e5-fbea2e93104d",
+      "name": "PROJETOS · Receber relatório Codex",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        2550,
+        3600
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "abelha/v1/projects/report",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "webhookId": "401b9b36-81f7-48a5-443d-caadff00bf80",
+      "notes": "Selecionar credencial Abelha — Entrada Webhook, separada do token do backend.",
+      "notesInFlow": true
+    },
+    {
+      "id": "9f3443f9-d152-3cc5-f79d-f8bddafd2cae",
+      "name": "PROJETOS · Validar projeto e relatório",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2810,
+        3600
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const b = $json.body || $json;\nif (typeof b.project_id !== 'string' || !/^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(b.project_id)) throw new Error('project_id deve ser UUID');\nif (!b.report || typeof b.report !== 'object' || Array.isArray(b.report) || b.report.schema_version !== 1) throw new Error('Relatório v1 obrigatório');\n// O backend verifica SHA, evidências do repositório e critérios; nunca conclui o marco.\nreturn {json: {project_id: b.project_id.toLowerCase(), report: b.report}};\n"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "b9079bfb-2f70-c87d-19ae-6a0bfe088789",
+      "name": "PROJETOS · Registrar relatório pendente",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3070,
+        3600
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ \"https://abelha-gestor-api.onrender.com/api/v1/integrations/projects/\" + encodeURIComponent($json.project_id) + \"/reports\" }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 60000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.report }}"
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput",
+      "notes": "Selecionar Abelha — Backend (Header Auth). Backend precisa da migration e desta versão publicada antes de testar.",
+      "notesInFlow": true
+    },
+    {
+      "id": "7109f535-aaa0-b0ec-d189-fef9ad2c2d59",
+      "name": "PROJETOS · Confirmar relatório",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3330,
+        3600
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {json:{received:true,id:$json.id,review_required:true,completed_milestones:0}};"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "0329481a-37ba-9007-0bd0-f69a5cacde94",
+      "name": "PROJETOS · Receber GitHub assinado",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        2550,
+        3880
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "abelha/v1/projects/github",
+        "authentication": "none",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "webhookId": "e57e26a9-2288-7fcb-c0bd-2ccd383f3658",
+      "notes": "HMAC obrigatório, validado no backend sobre bytes originais. Não selecionar Header Auth de outro projeto.",
+      "notesInFlow": true
+    },
+    {
+      "id": "67c7009e-ce20-8f65-e8b6-f3b39abadd0c",
+      "name": "PROJETOS · Conservar assinatura GitHub",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2810,
+        3880
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const headers = $json.headers || {};\nconst signature = headers['x-hub-signature-256'];\nconst event = headers['x-github-event'];\nconst delivery = headers['x-github-delivery'];\nif (typeof signature !== 'string' || !/^sha256=[a-f0-9]{64}$/.test(signature)) throw new Error('Formato de assinatura GitHub inválido');\nif (!['ping', 'push', 'pull_request', 'workflow_run'].includes(event) || typeof delivery !== 'string' || !/^[a-zA-Z0-9-]{1,100}$/.test(delivery)) throw new Error('Evento GitHub inválido');\nconst binary = $input.item.binary;\nif (!binary?.data || Number(headers['content-length'] || 0) > 2097152) throw new Error('Corpo GitHub original ausente ou acima de 2 MiB');\n// Sem parse/JSON.stringify: assinatura é validada criptograficamente pelo backend.\nreturn {json: {signature, event, delivery}, binary: {data: {...binary.data, mimeType: 'application/json'}}};\n"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "34818dac-e083-d0a6-fac9-b4859c71ff1c",
+      "name": "PROJETOS · Encaminhar GitHub assinado",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3070,
+        3880
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/github",
+        "authentication": "none",
+        "options": {
+          "timeout": 60000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Hub-Signature-256",
+              "value": "={{ $json.signature }}"
+            },
+            {
+              "name": "X-GitHub-Event",
+              "value": "={{ $json.event }}"
+            },
+            {
+              "name": "X-GitHub-Delivery",
+              "value": "={{ $json.delivery }}"
+            }
+          ]
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput",
+      "notes": "Não enviar credencial do backend a este nó.",
+      "notesInFlow": true
+    },
+    {
+      "id": "90933dff-bb8a-85f4-7b35-e0f5e6b75755",
+      "name": "PROJETOS · Confirmar evento GitHub",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3330,
+        3880
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {json:{received:!!$json.received,matched_projects:$json.matched_projects||0,recorded_updates:$json.recorded_updates||0,completed_milestones:0}};"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "030cf334-aed7-714e-2c8a-a227bf7c8ae8",
+      "name": "🟣 REVISÃO SEMANAL",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        5200
+      ],
+      "parameters": {
+        "content": "# 🟣 REVISÃO SEMANAL\n\nAuxiliar manual weekly-review gera parcial. Revisão final de domingo já pertence ao tick principal: nenhum cron redundante.",
+        "color": 6,
+        "width": 1800,
+        "height": 650
+      }
+    },
+    {
+      "id": "78ce2cd7-56eb-b09d-3d82-c02dbfd9673f",
+      "name": "REVISÃO · Gerar revisão parcial",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        450,
+        5500
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/weekly-review",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 60000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {} }}"
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput",
+      "notes": "Selecionar Abelha — Backend (Header Auth). Backend precisa da migration e desta versão publicada antes de testar.",
+      "notesInFlow": true
+    },
+    {
+      "id": "9d414232-84cf-4684-0341-47f106393be0",
+      "name": "BUSCA · Percorrer candidatos",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3450,
+        1600
+      ],
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": false
+        }
+      }
+    },
+    {
+      "id": "beb6ea88-6aa6-ccd0-a159-a8e6c1afb324",
+      "name": "BUSCA · Falha do candidato",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3750,
+        1850
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "console.log(\"[Abelha] BUSCA item não persistido após tentativas\");return {json:{error:true,error_code:\"ABELHA_ITEM_FAILED\"}};"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "55477d79-5d5b-ed7d-5a8a-3a2e30b3f594",
+      "name": "PREÇOS · Limitar lote de observações",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1350,
+        3950
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const items=$input.all();if(items.length>20)throw new Error(\"Lote de observações acima do limite\");return items;"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "7aac3e8f-4e06-e3a0-df47-da1d00f0549f",
+      "name": "PREÇOS · Resumir observações",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1750,
+        4300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const items=$input.all();const failed=items.filter(item=>item.json.error).length;return [{json:{ok:failed===0,processed:items.length-failed,failed}}];"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "a17919a9-29d0-6bc2-45cf-0aedd9296426",
+      "name": "PREÇOS · Percorrer observações",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1100,
+        4300
+      ],
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": false
+        }
+      }
+    },
+    {
+      "id": "09f68e33-46f4-3dcb-792f-a12018654684",
+      "name": "PREÇOS · Falha da observação",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1400,
+        4550
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "console.log(\"[Abelha] PREÇOS item não persistido após tentativas\");return {json:{error:true,error_code:\"ABELHA_ITEM_FAILED\"}};"
+      },
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "connections": {
+    "Relógio compartilhado": {
+      "main": [
+        [
+          {
+            "node": "Operações do relógio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Operações do relógio": {
+      "main": [
+        [
+          {
+            "node": "Validar operação",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · CONTROLE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Teste manual": {
+      "main": [
+        [
+          {
+            "node": "Escolher operação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escolher operação": {
+      "main": [
+        [
+          {
+            "node": "Validar operação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar operação": {
+      "main": [
+        [
+          {
+            "node": "Rotear operação",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · CONTROLE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Falha · CONTROLE": {
+      "main": [
+        [
+          {
+            "node": "Erro veio de webhook?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Falha · CAPTURA": {
+      "main": [
+        [
+          {
+            "node": "Erro veio de webhook?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Falha · BUSCA": {
+      "main": [
+        [
+          {
+            "node": "Erro veio de webhook?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Falha · FINANCEIRO": {
+      "main": [
+        [
+          {
+            "node": "Erro veio de webhook?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Falha · CONTAS": {
+      "main": [
+        [
+          {
+            "node": "Erro veio de webhook?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Falha · PREÇOS": {
+      "main": [
+        [
+          {
+            "node": "Erro veio de webhook?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Falha · PROJETOS": {
+      "main": [
+        [
+          {
+            "node": "Erro veio de webhook?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Falha · REVISÃO": {
+      "main": [
+        [
+          {
+            "node": "Erro veio de webhook?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Erro veio de webhook?": {
+      "main": [
+        [
+          {
+            "node": "Responder falha webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Registrar falha sem payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CAPTURA · Extrair e classificar": {
+      "main": [
+        [
+          {
+            "node": "CAPTURA · Enviar captura para revisão",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · CAPTURA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CAPTURA · Enviar captura para revisão": {
+      "main": [
+        [
+          {
+            "node": "CAPTURA · Confirmar captura",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · CAPTURA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CAPTURA · Confirmar captura": {
+      "main": [
+        [
+          {
+            "node": "Responder webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · CAPTURA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CAPTURA · Receber captura": {
+      "main": [
+        [
+          {
+            "node": "CAPTURA · Extrair e classificar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUSCA · Validar busca": {
+      "main": [
+        [
+          {
+            "node": "BUSCA · Consultar Overpass pelo backend",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · BUSCA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUSCA · Consultar Overpass pelo backend": {
+      "main": [
+        [
+          {
+            "node": "BUSCA · Verificar resultados",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · BUSCA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUSCA · Verificar resultados": {
+      "main": [
+        [
+          {
+            "node": "BUSCA · Há resultados?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · BUSCA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUSCA · Separar resultados": {
+      "main": [
+        [
+          {
+            "node": "BUSCA · Percorrer candidatos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · BUSCA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUSCA · Guardar candidato público": {
+      "main": [
+        [
+          {
+            "node": "BUSCA · Percorrer candidatos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "BUSCA · Falha do candidato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUSCA · Confirmar busca": {
+      "main": [
+        [
+          {
+            "node": "Responder webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · BUSCA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUSCA · Busca sem resultados": {
+      "main": [
+        [
+          {
+            "node": "Responder webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · BUSCA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUSCA · Receber busca": {
+      "main": [
+        [
+          {
+            "node": "BUSCA · Validar busca",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUSCA · Há resultados?": {
+      "main": [
+        [
+          {
+            "node": "BUSCA · Separar resultados",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "BUSCA · Busca sem resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FINANCEIRO · Executar tick completo": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Falha · FINANCEIRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CONTAS · Conferir pendências pelo tick": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Falha · CONTAS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PREÇOS · Listar monitores devidos": {
+      "main": [
+        [
+          {
+            "node": "PREÇOS · Preparar consultas autorizadas",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · PREÇOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PREÇOS · Preparar consultas autorizadas": {
+      "main": [
+        [
+          {
+            "node": "PREÇOS · Consultar API autorizada",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · PREÇOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PREÇOS · Consultar API autorizada": {
+      "main": [
+        [
+          {
+            "node": "PREÇOS · Validar cotação real",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · PREÇOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PREÇOS · Validar cotação real": {
+      "main": [
+        [
+          {
+            "node": "PREÇOS · Limitar lote de observações",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · PREÇOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PREÇOS · Registrar observação": {
+      "main": [
+        [
+          {
+            "node": "PREÇOS · Percorrer observações",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "PREÇOS · Falha da observação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PROJETOS · Validar projeto e relatório": {
+      "main": [
+        [
+          {
+            "node": "PROJETOS · Registrar relatório pendente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · PROJETOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PROJETOS · Registrar relatório pendente": {
+      "main": [
+        [
+          {
+            "node": "PROJETOS · Confirmar relatório",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · PROJETOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PROJETOS · Confirmar relatório": {
+      "main": [
+        [
+          {
+            "node": "Responder webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · PROJETOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PROJETOS · Conservar assinatura GitHub": {
+      "main": [
+        [
+          {
+            "node": "PROJETOS · Encaminhar GitHub assinado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · PROJETOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PROJETOS · Encaminhar GitHub assinado": {
+      "main": [
+        [
+          {
+            "node": "PROJETOS · Confirmar evento GitHub",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · PROJETOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PROJETOS · Confirmar evento GitHub": {
+      "main": [
+        [
+          {
+            "node": "Responder webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · PROJETOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PROJETOS · Receber relatório Codex": {
+      "main": [
+        [
+          {
+            "node": "PROJETOS · Validar projeto e relatório",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PROJETOS · Receber GitHub assinado": {
+      "main": [
+        [
+          {
+            "node": "PROJETOS · Conservar assinatura GitHub",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "REVISÃO · Gerar revisão parcial": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Falha · REVISÃO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUSCA · Percorrer candidatos": {
+      "main": [
+        [
+          {
+            "node": "BUSCA · Confirmar busca",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "BUSCA · Guardar candidato público",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUSCA · Falha do candidato": {
+      "main": [
+        [
+          {
+            "node": "BUSCA · Percorrer candidatos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · BUSCA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PREÇOS · Limitar lote de observações": {
+      "main": [
+        [
+          {
+            "node": "PREÇOS · Percorrer observações",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · PREÇOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PREÇOS · Resumir observações": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Falha · PREÇOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PREÇOS · Percorrer observações": {
+      "main": [
+        [
+          {
+            "node": "PREÇOS · Resumir observações",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "PREÇOS · Registrar observação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PREÇOS · Falha da observação": {
+      "main": [
+        [
+          {
+            "node": "PREÇOS · Percorrer observações",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · PREÇOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rotear operação": {
+      "main": [
+        [
+          {
+            "node": "FINANCEIRO · Executar tick completo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CONTAS · Conferir pendências pelo tick",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "PREÇOS · Listar monitores devidos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "REVISÃO · Gerar revisão parcial",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Falha · CONTROLE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Sao_Paulo",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false,
+    "saveExecutionProgress": false,
+    "executionTimeout": 900
+  },
+  "pinData": {},
+  "tags": []
+}

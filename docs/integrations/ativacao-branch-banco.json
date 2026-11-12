@@ -1,0 +1,148 @@
+{
+  "date": "2026-11-12",
+  "status": "neon-provisioned-main-awaiting-manual-commit",
+  "git": {
+    "localBranch": "main",
+    "baseCommit": "248569753b3c7a8fd78676524426c2ef1f0e2eac",
+    "initialChangedFiles": 31,
+    "publicationEvidence": "Alterações locais sem commit; conferir git status antes da revisão e publicação manual.",
+    "publicationMode": "manual-by-repository-owner",
+    "reviewCommand": "git status --short",
+    "commitCreatedInCurrentPreparation": false,
+    "pushPerformedInCurrentPreparation": false
+  },
+  "neon": {
+    "projectId": "curly-river-94350351",
+    "verifiedPlan": "free_v3",
+    "branchId": "br-hidden-night-ace956m0",
+    "endpointId": "ep-crimson-snow-acmuhqgp",
+    "host": "ep-crimson-snow-acmuhqgp.sa-east-1.aws.neon.tech",
+    "initialDisabled": true,
+    "initialState": "idle",
+    "minCU": 0.25,
+    "maxCU": 0.25,
+    "databaseToCreate": "abelha_homologacao",
+    "databaseOwner": "neondb_owner",
+    "appRoleToCreate": "abelha_hml_app",
+    "appRoleAccess": "read_write",
+    "appRoleSchemas": [
+      "public"
+    ],
+    "preserveExistingDatabase": "neondb",
+    "newCompute": false,
+    "newBranch": false,
+    "paidResourceAllowed": false,
+    "upgradeAllowed": false,
+    "restoreDisabledAndIdleAfterProvisioning": true,
+    "productionBranchForbidden": "br-square-sunset-acpb91u2",
+    "productionEndpointForbidden": "ep-wandering-pond-acitqqn8",
+    "requiredPermissionChecks": {
+      "appRoleFlagsAllFalse": [
+        "rolsuper",
+        "rolbypassrls",
+        "rolcreatedb",
+        "rolcreaterole"
+      ],
+      "privilegedMembershipAllowed": false,
+      "appDatabase": {
+        "schema": "public",
+        "selectInsertUpdateDelete": true,
+        "createSchemaObjects": false
+      },
+      "existingNeondb": {
+        "selectInsertUpdateDelete": false,
+        "createSchemaObjects": false
+      },
+      "onUnexpectedPrivileges": "Stop without broad REVOKE from PUBLIC or changing existing roles; present least-privilege correction for approval"
+    },
+    "databaseCreated": true,
+    "databaseId": 3074787,
+    "appRoleCreated": true,
+    "finalDisabled": true,
+    "finalState": "idle",
+    "authorizedByUser": true,
+    "syntheticIdentityCreated": true,
+    "permissionResults": {
+      "appTables": 35,
+      "allCrud": true,
+      "superuser": false,
+      "bypassRls": false,
+      "createDb": false,
+      "createRole": false,
+      "privilegedMember": false,
+      "schemaCreate": false,
+      "databaseCreate": false,
+      "neondbTables": 13,
+      "neondbAccessibleTables": 0,
+      "neondbSchemaCreate": false,
+      "neondbDatabaseCreate": false
+    }
+  },
+  "bootstrap": {
+    "path": "backend/src/db/homologation/bootstrap-empty.sql",
+    "sha256": "04a2f5f0ecb13bfc5fe67682e2d7913b3ce1d250a792767fc0c267ed4df86793",
+    "expectedTotalTables": 35,
+    "expectedPersonalTables": 18,
+    "expectedBusinessRows": 0,
+    "requiresEmptyDatabase": true,
+    "sources": [
+      {
+        "path": "backend/src/db/schema.sql",
+        "sha256": "eca0971fe7a91253b64b5999114f700580d949f598e929a81458c0887a10a89c"
+      },
+      {
+        "path": "backend/src/db/migrations/20261105_personal_crm.sql",
+        "sha256": "23465af517e20dc578f8fddfb05d5afb6ccc50c3a90ee68609131cc8f00d8e05"
+      },
+      {
+        "path": "backend/src/db/migrations/20261111_personal_platform.sql",
+        "sha256": "9812b2bd74acc1fb983318bab62590da6cf8e92a1536e85032fb8b604f84dcdb"
+      }
+    ]
+  },
+  "verification": {
+    "initialFilesPreserved": 31,
+    "secretScanPassed": true,
+    "privateFilesIgnored": true,
+    "backendTests": 53,
+    "frontendTests": 16,
+    "bootstrapRegressions": 4,
+    "remoteChanges": true,
+    "productionChanges": false,
+    "realAppConnectionVerified": true,
+    "crudSmokeRolledBack": true,
+    "syntheticOrganizations": 1,
+    "syntheticUsers": 1,
+    "businessRows": 0,
+    "passwordHashVerified": true,
+    "computeRestoredDisabledIdle": true,
+    "temporaryConnectionFileRemoved": true
+  },
+  "authorizedOperations": [
+    {
+      "id": "neon",
+      "actions": [
+        "Temporarily enable only existing test endpoint at fixed 0.25CU on Free",
+        "Create empty database abelha_homologacao without copying rows",
+        "Apply reviewed bootstrap in a transaction to that database only",
+        "Create app role abelha_hml_app with read_write restricted to that database/public, never admin",
+        "Verify no privileged memberships and no SELECT/INSERT/UPDATE/DELETE/CREATE access on neondb before releasing app credentials",
+        "Create one synthetic organization/user with fresh random password stored only in ignored private env",
+        "Store fresh app connection and synthetic login only in .abelha-homologacao, without overwriting backend/.env",
+        "Suspend and disable endpoint again at end; retain isolated database and app role as deliverables"
+      ],
+      "abortIf": [
+        "Plan is not Free or an upgrade/payment is required",
+        "Target database or app role already exists unexpectedly",
+        "Project/branch/endpoint mismatch",
+        "Source or bootstrap SHA differs from reviewed manifest"
+      ]
+    }
+  ],
+  "manualPublication": {
+    "branch": "main",
+    "commitPending": true,
+    "pushPending": true,
+    "automaticDeploymentsMayFollowPush": true
+  }
+}

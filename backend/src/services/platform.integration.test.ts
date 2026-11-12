@@ -2,9 +2,10 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { PGlite } from '@electric-sql/pglite'
+import {homologationFixture} from '../integration/homologation-fixture'
 
 test('incremental platform migration preserves CRM rows, reruns safely and enforces owner foreign keys', async () => {
-  const db=new PGlite()
+  const remote=await homologationFixture('migration');const db=remote?.fixture||new PGlite()
   try {
     await db.exec(`CREATE TABLE organizations(id uuid primary key); CREATE TABLE users(id uuid primary key,organization_id uuid not null references organizations(id)); CREATE TABLE clients(id uuid primary key,organization_id uuid not null references organizations(id),name text);
       INSERT INTO organizations VALUES ('10000000-0000-4000-8000-000000000001'),('10000000-0000-4000-8000-000000000002');
@@ -16,6 +17,8 @@ test('incremental platform migration preserves CRM rows, reruns safely and enfor
     const beforeReceivables=await db.query('SELECT * FROM receivables'),beforeExpenses=await db.query('SELECT * FROM expenses')
     const migration=readFileSync('src/db/migrations/20261111_personal_platform.sql','utf8')
     await db.exec(migration); await db.exec(migration)
+    const platformTables=await db.query<{count:number}>("SELECT count(*)::int AS count FROM pg_tables WHERE schemaname=current_schema() AND (tablename LIKE 'personal_%' OR tablename IN ('push_subscriptions','crm_lead_candidates','crm_service_drafts'))")
+    assert.equal(platformTables.rows[0].count,18)
     const row=await db.query('SELECT name FROM clients');assert.equal((row.rows[0] as any).name,'Cliente preservado')
     await assert.rejects(db.query(`INSERT INTO personal_projects(organization_id,user_id,name) VALUES('10000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000002','Outro usuário')`), /foreign key/)
     const org='10000000-0000-4000-8000-000000000001',owner='20000000-0000-4000-8000-000000000001',other='20000000-0000-4000-8000-000000000003',project='60000000-0000-4000-8000-000000000001',cycle='70000000-0000-4000-8000-000000000001',watch='80000000-0000-4000-8000-000000000001'

@@ -22,6 +22,8 @@ Neon consultado exclusivamente em leitura: projeto `curly-river-94350351`, branc
 
 ## Riscos e ativação
 
+Atualização12/11: ensaio PostgreSQL real na branch isolada aprovado com credencial/schema próprios, depois removidos; compute desativado/idle e public preservado. Render/Vercel já publicaram2485697. Guard de preview e runner de ensaio são alterações locais adicionais; configuração persistente e limites em [HOMOLOGACAO-INTEGRACAO.md](HOMOLOGACAO-INTEGRACAO.md). A migration Personal permanece ausente em produção; n8n segue desativado.
+
 Produção não possui as tabelas novas. APIs devem retornar 503 informativo até a aplicação autorizada das migrations. VAPID, token n8n, validação GitHub e agendamento dependem de configuração; não presumir credenciais. Testes locais não comprovam entrega push em aparelhos físicos nem workflows ativos.
 
 Revisão de ativação em 11/11/2026: Auth.js corrigido com compatibilidade de sessão sintética anterior comprovada; auditorias npm sem alertas nos lockfiles locais; timeout de busca frontend maior que o transporte Overpass; cache valida MIME; fila push por aparelho e janela de virada para agendamento. Isolamento de leitura permanece no backend, com integridade por FKs, sem RLS para acesso SQL externo. Evidências e limites em [AUDITORIA-ATIVACAO.md](AUDITORIA-ATIVACAO.md); sequência manual em [CHECKLIST-ATIVACAO.md](CHECKLIST-ATIVACAO.md).

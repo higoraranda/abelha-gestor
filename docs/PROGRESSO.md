@@ -1,20 +1,49 @@
 # Progresso — Abelha CRM + Personal
 
-## Estado atual — Cloudfy/n8n — 12/11/2026
+## Estado atual — homologação e integração — 12/11/2026
+
+**Ensaios aprovados; produção ainda não liberada para Personal/automações.** Relatório e instruções exatas: [HOMOLOGACAO-INTEGRACAO.md](HOMOLOGACAO-INTEGRACAO.md); [evidência estruturada](audits/homologation-20261112.json).
+
+- Base2485697 confirmada local/GitHub e já publicada pelo usuário em Render/Vercel. Diff anterior preservado. Rota nova preços agora503 sem integração;404 histórico superado. GET sem sessão Personal401; manifesto/sw/bundle corretos. Nenhum POST em produção, commit, push ou deploy nesta tarefa.
+- Após autorização explícita, compute Neon de teste existente habilitado apenas temporariamente em0,25CU Free. Dois suites HTTP/SQL passaram no PostgreSQL18.6 com role exclusiva e dois schemas vazios sintéticos:18 tabelas, reexecução, isolamento por organização/usuário, contratos de automações e preservação. Migration também ensaiada duas vezes no catálogo do public da **branch isolada**, com rollback obrigatório; contagens/fingerprints inalterados. Produção consultada só em catálogo:18 tabelas ainda ausentes.
+- Cleanup confirmado: zero schemas/roles temporários, arquivo privado removido, compute de teste **disabled=true/idle**, public com13 tabelas originais. A branch contém clone antigo, sem atualização CRM05/11; não usar seu public em testes de negócio ou tratá-lo como homologação pronta.
+- Corrigido localmente o proxy Preview que caía em produção: exige backend HTTPS explícito e recusa host de produção, inclusive ponto DNS final. Runner Neon impede carregar .env/segredos herdados e valida endpoint/role/schema. Regressões vermelho/verde e revisão independente sem bloqueadores restantes.
+- Verificação atual: **49 backend,16 frontend,2 suites Neon,11 cenários Chrome**; TypeScript/builds, ESLint sem warnings e npm audit0 nos dois projetos. Prévia PID12848 parada; portas43170/64354 livres e browser fechado.
+- Consolidado Cloudfy relido com62 nós, URLs/conexões/settings inalterados e desativado; sete backups confirmados inativos. Nenhuma credencial Abelha existe. Dez nós backend ainda usam produção e não foram apontados para host fictício. Preparado [manifesto de homologação](integrations/homologacao-config.json) com URLs/nós e [modelo sem segredos](integrations/homologacao.env.example). Não criar outro workflow nem reimportar backups.
+- Vercel: acesso à equipe aprovado; só VITE_API_URL em Production/Preview; BACKEND_URL ausente, sem preview publicado. Render: só serviço de produção, conector não lê nomes/valores de env; status não verificável foi distinguido de ausente. Faltam ambiente HTTPS persistente autorizado, conta sintética, token/headers, VAPID/GitHub, runtime n8n/stdout, fonte real de preços e push físico.
+
+Nenhum novo recurso pago, workflow, deploy, migration de produção, commit ou push. Permissão temporária do ensaio não autoriza manter compute ligado ou ativar produção.
+
+## Histórico — workflow único — 12/11/2026
+
+**Criado diretamente na Cloudfy/socialbaboon:** [🐝 ABELHA — AUTOMAÇÕES](https://socialbaboon-n8n.cloudfy.live/workflow/n20DNyb13Aaw3nq5), ID **n20DNyb13Aaw3nq5**, desativado, com62 nós. Todos os sete blocos e tratamento de erros estão dentro do workflow; não há Execute Workflow/subworkflows. Guia atual: [WORKFLOW-UNICO-N8N.md](WORKFLOW-UNICO-N8N.md).
+
+- Retomada sobre `main/2485697`, checkout limpo ao iniciar. Código e histórico existentes preservados; nenhum deploy, migration, commit, push ou PR.
+- Sete fontes remotas conferidas por nós/conexões/settings e preservadas como backups **desativados**. Já estavam inativas; nenhuma exclusão ou interrupção de outro projeto. Releitura confirmou equivalência da definição consolidada e estado inativo.
+- Um relógio compartilhado de15min em São Paulo roteia somente tick/preços. Contas e domingo continuam no tick original, sem chamadas redundantes; auxiliares manuais são escolhidos por operation. Quatro webhooks conservam paths, autenticação e binário/HMAC, sem passar pelo agendador ou acionar domínios alheios.
+- Áreas visuais com Sticky Notes coloridas/prefixos: captura, busca, finanças, contas, preços, projetos, revisão e erros. Nomes/IDs únicos; endpoints, validações e referências de credenciais originais preservados.
+- Regressões corrigidas antes de criar: busca parcial não responde200; log usa console.log e exige stdout do host; escritas em lotes finitos por item conservam retries, sem ciclos entre automações. Limites50 candidatos/20 observações, reset=false. Erros são redigidos e não cancelam o outro ramo do relógio. Status global pode ser concluído quando erro foi tratado: conferir ok:false/logs, conforme guia.
+- Testes atuais: **47 backend**, incluindo8 contratos do consolidado e Code nodes unificados → HTTP/postgres.js/PGlite; **13 frontend**, TypeScript/builds e ESLint sem warnings. SQL comprovou frequência por produto (59/61min para intervalo60min). Revisão independente verificou correções. Runtime n8n remoto e entrega física não foram executados, por falta de credenciais/fontes; não declarar integração ativa.
+- Pendências mantidas: credenciais de entrada/backend/provedor, URL/allowlists da API autorizada, configuração GitHub/VAPID, stdout/versão n8n, ambiente e publicação/migration autorizados, ensaios reais. O consolidado não foi ativado.
+- Relatório estruturado: [n8n-unification-20261112.json](audits/n8n-unification-20261112.json). Gerador/JSON local não fazem operações remotas automaticamente. Testes fecharam seus servidores/sockets em finally; nenhum serviço temporário foi mantido ativo.
+
+Sem nova infraestrutura ou serviço pago.
+
+## Histórico — sete workflows Cloudfy/n8n — 12/11/2026
 
 **Sete workflows criados diretamente na instância existente socialbaboon**, com autorização explícita, todos desativados e sem credenciais associadas. IDs/links/funções e passos manuais em [CLOUDFY-N8N.md](CLOUDFY-N8N.md); inventário persistente em [cloudfy-workflows.json](integrations/cloudfy-workflows.json). Não importar novamente.
 
 - Os três workflows anteriores foram conferidos por ID e funcionalidade, inclusive metadados agregados de parâmetros; nenhum referencia Abelha. Seus estados e updatedAt foram preservados. Não houve leitura de execuções/pacientes ou valores secretos; nenhuma credencial de outro projeto foi reutilizada.
 - Sete modelos completados: captura por webhook protegido com extração/classificação por regras; busca validada → Overpass no backend → candidato pendente; tick único agendado para finanças/contas/domingo/push; auxiliares contas/revisão manuais; monitor com HTTP de API autorizada configurável, validação e ingestão; relatórios Codex e relay GitHub com corpo binário/HMAC.
 - Novo endpoint autenticado `/api/v1/integrations/leads/stage`, reutilizando validação da importação manual. Idempotência por origem/organização; sem criação automática de cliente/contrato/cobrança. Sem mudança adicional de migration. Desejos sem URL não bloqueiam monitores configurados; fonte sem configuração não consulta nem fabrica preços.
-- Criação/releitura das definições no n8n comprovada: nós/conexões/settings conferidos, timezone America/Sao_Paulo, retenção privada desligada. Tipos compatíveis com os já usados na instância; versão exata não exposta pelo plugin. Execução no runtime real ainda precisa de credenciais e ensaio manual.
+- Criação/releitura das definições no n8n comprovada: nós/conexões/settings conferidos, timezone America/Sao_Paulo, retenção privada desligada. Tipos compatíveis com os já usados na instância; versão exata não exposta pela API. Execução no runtime real ainda precisa de credenciais e ensaio manual.
 - Consulta pública **somente leitura** ao backend: auth/session200, rota nova prices/due404. A versão publicada ainda não contém essas integrações; exige publicação autorizada. Nenhum POST ao backend real, migration Neon ou dado comercial alterado.
 - Verificações: **39 testes backend**, incluindo Code nodes exportados → HTTP real → postgres.js/PGlite; **13 testes frontend**, TypeScript/builds, ESLint sem warnings; **11 cenários Chrome** desktop/mobile/PWA; npm audit atualizado com **zero alertas** nos dois lockfiles. Regressões vistas falhar antes e passar após os fixes; revisão independente encontrou resposta `[]` da API de preços sendo omitida pelo HTTP node, corrigida com fullResponse e validação de body.
 - Migration revisada e repetida apenas no banco efêmero; SHA256 inalterado `9812B2BD74ACC1FB983318BAB62590DA6CF8E92A1536E85032FB8B604F84DCDB`. Login/CSRF/cookie/sessão legada, isolamento e push seguem cobertos. VAPID e entrega em aparelhos físicos continuam pendentes.
 - Prévia sintética PID21312 encerrada com confirmação; portas43170/59133 verificadas livres, browser fechado e testes fechando sockets em finally. Nenhum serviço temporário ativo; os workflows criados são entregáveis persistentes **desativados**, não processos em execução.
 - Restante: configurar ambiente e credenciais manualmente conforme guia; escolher fonte de preços/conector email, confirmar versão n8n, ensaiar runtime/push; autorizar ambiente isolado, migration de produção, publicação e ativação. Sem deploy, commit, push ou PR.
 
-Skills nesta continuação: Superpowers (planejamento, TDD, execução, verificação/revisão independente), Neon/Postgres para revisão da estratégia existente; plugin Cloudfy para inventário, criação e releitura. npm audit, Playwright/Chrome e documentação primária n8n complementaram a validação. Não foi provisionado serviço ou custo novo.
+Não foi provisionado serviço ou custo novo.
 
 ## Histórico — preparação da ativação — 11/11/2026
 
@@ -32,7 +61,7 @@ Continuação feita sobre o checkout já alterado, preservando todo o trabalho a
 
 **Evolução implementada localmente, com ativação externa pendente.** Base limpa ao iniciar: `main`, HEAD `96a5441`. Sem commit, push, PR, deploy ou migration em produção. Não houve gravações de teste na carteira Neon. Arquivo destrutivo schema.sql e seed não foram executados. Alterações e histórico da reformulação anterior foram preservados.
 
-Referências para retomada: [roadmap](ROADMAP-ABELHA.md), [arquitetura](ARQUITETURA-PERSONAL.md), [configuração](GUIA-CONFIGURACAO.md), [PWA](GUIA-PWA.md), [integrações n8n](INTEGRACOES-N8N.md), [plano](superpowers/plans/2026-11-11-crm-personal.md), ../DESIGN.md e ../UX-CONTRACT.md.
+Referências para retomada: [roadmap](ROADMAP-ABELHA.md), [arquitetura](ARQUITETURA-PERSONAL.md), [configuração](GUIA-CONFIGURACAO.md), [PWA](GUIA-PWA.md), [integrações n8n](INTEGRACOES-N8N.md), [plano](planos/2026-11-11-crm-personal.md), ../DESIGN.md e ../UX-CONTRACT.md.
 
 ### Resultado por fase
 
@@ -72,17 +101,11 @@ Prévias sintéticas iniciadas nesta execução: PID1360/43170; PID8292/43170 + 
 
 Conferência final: PIDs1360/8292/3668 ausentes. Bind/close em loopback confirmou **43170, 60183 e 61009 livres**. A inspeção global via Get-NetTCPConnection não tem permissão nesta sandbox; a verificação usou abertura/fechamento controlados das próprias portas. Processos Node/Chrome do usuário não foram encerrados. Nenhum serviço temporário desta implementação foi mantido ativo.
 
-Capturas sintéticas e browser-verification.json em `C:/Users/higor aranda/.codex/visualizations/2026/11/11/01a1cb6e-9819-7b11-be4e-df33f81e9dce/`. Não contêm dados reais da carteira.
+Capturas sintéticas e browser-verification.json em `diretório local de capturas (fora do repositório)`. Não contêm dados reais da carteira.
 
 ### Próxima etapa concreta
 
 Revisar a migration e os avisos de dependências; obter autorização específica para testar/ativar no ambiente Neon escolhido. Configurar VAPID, conta/token da integração, webhook GitHub e n8n. Escolher uma fonte autorizada de preços/classificação e testar os fluxos externos. Não fazer deploy/commit/push/PR sem autorização. Tudo que independe desses acessos foi implementado e verificado localmente; ativação externa não está concluída.
-
-### Skills e ferramentas
-
-Superpowers para leitura de contexto/planejamento, testes, depuração, verificação e revisão independente; Frontend Design + Premium para preservar identidade e contratos; Neon plugin/skills para inspeção estritamente de leitura; React Best Practices para hooks/tipagem/acessibilidade; Playwright/Chrome para fluxos reais sintéticos e mobile/offline; documentação primária MDN/Apple/Overpass/n8n/GitHub/Web Push para contratos externos. Sem novos serviços pagos.
-
----
 
 ## Histórico — 05/11/2026
 
@@ -90,7 +113,7 @@ Superpowers para leitura de contexto/planejamento, testes, depuração, verifica
 
 Base: main / 68647ab. Sem commit, push, PR ou publicação. Alterações anteriores de acesso pessoal preservadas. `.env` e conexão atual não foram alterados.
 
-Referências: briefing-aprovado.md, escopo-implementacao.md, ../DESIGN.md, BANCO-REFORMULACAO.md e superpowers/plans/2026-11-05-reformulacao-abelha.md.
+Referências: briefing-aprovado.md, escopo-implementacao.md, ../DESIGN.md, BANCO-REFORMULACAO.md e planos/2026-11-05-reformulacao-abelha.md.
 
 ## Implementado
 
@@ -106,7 +129,7 @@ Referências: briefing-aprovado.md, escopo-implementacao.md, ../DESIGN.md, BANCO
 
 - Neon disponível; PostgreSQL 18.6. Projeto do Abelha identificado pelo endpoint existente: MELAO CRM, curly-river-94350351.
 - Inicialmente existia só production. O usuário escolheu branch de teste existente e, após a inspeção, autorizou criar uma isolada.
-- Criada codex-abelha-reform-test-20261105, br-hidden-night-ace956m0, filha de production br-square-sunset-acpb91u2. Compute ep-crimson-snow-acmuhqgp limitado a 0,25 CU.
+- Criada ambiente de testes isolado, br-hidden-night-ace956m0, filha de production br-square-sunset-acpb91u2. Compute ep-crimson-snow-acmuhqgp limitado a 0,25 CU.
 - Testes de gravação ocorreram somente em schemas sintéticos da branch isolada, todos removidos. Após autorização específica, a migration incremental foi aplicada em transação no public de production. O public da branch de teste permaneceu intacto.
 - O item 3 do escopo foi atendido: autorizações separadas para branch de teste e migration em production, ambas recebidas antes das respectivas gravações.
 
@@ -139,18 +162,14 @@ Referências: briefing-aprovado.md, escopo-implementacao.md, ../DESIGN.md, BANCO
 - Portas3000/4173 sem listener; PIDs citados ausentes. Downloads sintéticos abelha-registros.json e abelha-clients.csv removidos após verificar conteúdo. Aba de inspeção fechada e viewport restaurado.
 - Compute da branch de teste desativado e idle. Branch preservada como referência da validação. Sem serviços temporários ativos.
 
-Capturas em C:/Users/higor aranda/.codex/visualizations/2026/11/05/01a1acaa-9bdc-7983-9a1a-5dc50dd63793/: abelha-test-pipeline.png, abelha-test-checklist.png, abelha-test-entregas.png, abelha-test-mobile-entregas.png, abelha-test-overview.png e abelha-test-pipeline-ganho.png. Arquivos com prefixo abelha-test mostram somente dados sintéticos de teste; capturas anteriores abelha-reform-* mostram a prévia antes da migration.
-
-## Skills utilizadas
-
-Superpowers (planejamento, execução, depuração, testes/verificação e revisão independente); Frontend Design + Premium (direção visual, acessibilidade e responsividade); Neon (branch e banco isolado); React Best Practices (estado/hooks/tipagem); Computer Use (navegador); Ponytail (solução individual sem infraestrutura extra desnecessária).
+Capturas em diretório local de capturas (fora do repositório) abelha-test-pipeline.png, abelha-test-checklist.png, abelha-test-entregas.png, abelha-test-mobile-entregas.png, abelha-test-overview.png e abelha-test-pipeline-ganho.png. Arquivos com prefixo abelha-test mostram somente dados sintéticos de teste; capturas anteriores abelha-reform-* mostram a prévia antes da migration.
 
 ## Encerramento do escopo
 
 Migration autorizada e aplicada; schema e consultas reais conferidos em leitura. Não há pendência de ativação do banco. Não foi solicitado nem realizado commit/push/PR/deploy. A próxima utilização local deve iniciar os serviços normalmente; nenhuma prévia foi deixada ativa.
 
 ## Ativação autorizada — 2026-11-05T22:33:12.4544902-03:00
-Usuário autorizou aplicar a migration em production. Transação concluída pelo plugin Neon no projeto curly-river-94350351, branch br-square-sunset-acpb91u2, compute ep-wandering-pond-acitqqn8. SHA256 23465af517e20dc578f8fddfb05d5afb6ccc50c3a90ee68609131cc8f00d8e05. Verificação transacional de fingerprints preservou clientes/lembretes/contratos/cobranças/despesas; novos registros de negócio não foram criados. Pós-verificação: 4 tabelas, 2 colunas, 6 índices e zero schemas temporários. Smoke da aplicação real em conexão read-only: 14 consultas aprovadas. Prévia de leitura iniciada: backend21544/3000, Vite5800/4173, sessão50225; encerrar ao finalizar.
+Usuário autorizou aplicar a migration em production. Transação concluída no Neon no projeto curly-river-94350351, branch br-square-sunset-acpb91u2, compute ep-wandering-pond-acitqqn8. SHA256 23465af517e20dc578f8fddfb05d5afb6ccc50c3a90ee68609131cc8f00d8e05. Verificação transacional de fingerprints preservou clientes/lembretes/contratos/cobranças/despesas; novos registros de negócio não foram criados. Pós-verificação: 4 tabelas, 2 colunas, 6 índices e zero schemas temporários. Smoke da aplicação real em conexão read-only: 14 consultas aprovadas. Prévia de leitura iniciada: backend21544/3000, Vite5800/4173, sessão50225; encerrar ao finalizar.
 
 ## Ativação final concluída
 
@@ -159,3 +178,14 @@ Migration 20261105_personal_crm aplicada em production com SHA-256 23465af517e20
 Smoke real em conexão PostgreSQL restrita a leitura: 14 consultas HTTP aprovadas, incluindo exportações inspecionadas apenas em memória. Navegador: visão geral, clientes e novos módulos consultados sem erro; console limpo. Captura final abelha-ativado-desktop.png.
 
 Prévia final encerrada: sessão50225; backend21544 e filho22428; Vite5800 e filho16540; auxiliar8256. Portas3000/4173 livres e aba fechada. Restrição read-only existiu apenas nas conexões temporárias, sem alterar banco global ou .env. Branch de teste segue com compute desativado/idle. Nenhum recurso temporário ativo desta execução.
+
+
+## Homologação preparada — 12/11/2026
+
+- Database abelha_homologacao, ID3074787, criado na branch de teste br-hidden-night-ace956m0 com35 tabelas,18 Personal e identidade sintética. Nenhum registro pessoal foi usado; neondb e produção preservados.
+- Role abelha_hml_app com CRUD somente no database novo/public, sem CREATE/admin/BYPASSRLS/membership privilegiada; zero acesso CRUD às13 tabelas do neondb. Conexão, bcrypt e CRUD sintético com rollback validados.
+- Conexão e segredos novos apenas em .abelha-homologacao/backend.env e credenciais-hml.json, ignorados pelo Git. backend/.env preservado. Sem registros de negócio no banco de teste.
+- Compute de teste ep-crimson-snow-acmuhqgp em0,25CU Free, restaurado disabled=true/idle. Banco/role conservados para homologação, sem processos temporários ativos.
+-53 testes backend,16 frontend, TypeScript/builds e lint aprovados. Relatório: [ATIVACAO-BRANCH-BANCO.md](ATIVACAO-BRANCH-BANCO.md).
+- Alterações preparadas na main local para revisão e commit manual pelo usuário. Nenhum novo commit, push ou reescrita de histórico nesta etapa.
+- Próximo: definir URLs e autorizar serviço Render Free separado/disponibilidade do compute. Publicação da main pode acionar os deploys de produção existentes e deve ser decidida manualmente.

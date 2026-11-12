@@ -1,5 +1,16 @@
 const BACKEND_URL = process.env.BACKEND_URL || 'https://abelha-gestor-api.onrender.com'
 
+function previewBackendIsSafe() {
+  if (process.env.VERCEL_ENV !== 'preview') return true
+  if (!process.env.BACKEND_URL) return false
+  try {
+    const url = new URL(BACKEND_URL)
+    return url.protocol === 'https:' && url.hostname.replace(/\.$/, '') !== 'abelha-gestor-api.onrender.com' && !url.username && !url.password
+  } catch {
+    return false
+  }
+}
+
 const REQUEST_HEADERS_TO_SKIP = new Set(['connection', 'content-length', 'host'])
 const RESPONSE_HEADERS_TO_SKIP = new Set(['connection', 'content-encoding', 'content-length', 'set-cookie', 'transfer-encoding'])
 
@@ -30,6 +41,12 @@ function createTargetUrl(request) {
 }
 
 export default async function handler(request, response) {
+  if (!previewBackendIsSafe()) {
+    response.statusCode = 503
+    response.setHeader('content-type', 'application/json; charset=utf-8')
+    response.end(JSON.stringify({ error: 'Backend de homologação não configurado para este preview' }))
+    return
+  }
   const targetUrl = createTargetUrl(request)
   const headers = new Headers()
 

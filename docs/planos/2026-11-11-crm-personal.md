@@ -1,6 +1,6 @@
 # Abelha CRM + Personal — plano de implementação
 
-> Execução local pelo agente nesta sessão, por fases; sem commit/push/PR/deploy ou migrations de produção. O pedido já autoriza decisões técnicas rotineiras e dispensa nova rodada de aprovação do plano.
+> Execução local nesta etapa, por fases; sem commit/push/PR/deploy ou migrations de produção. O pedido já autoriza decisões técnicas rotineiras e dispensa nova rodada de aprovação do plano.
 
 **Objetivo:** ampliar o Abelha preservando o CRM e oferecendo organização pessoal no mesmo produto.
 **Arquitetura:** frontend e backend existentes; APIs e tabelas Personal com organização/usuário; automações autenticadas e idempotentes. PWA armazena somente recursos públicos.

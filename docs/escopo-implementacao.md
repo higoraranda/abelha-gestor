@@ -11,10 +11,10 @@ C:/Users/higor aranda/Documents/Programações/SAAS/ABELHA
 - Verifique branch, HEAD e alterações atuais do Git. O briefing registrava main no commit 68647ab, mas confira o estado real sem retornar automaticamente a esse commit.
 - Preserve as alterações de acesso pessoal sem login na prévia local e quaisquer mudanças posteriores.
 - Considere o briefing aprovado como a referência atual de produto e direção visual. O DESIGN.md antigo, inspirado no Linear escuro, precisa ser atualizado para refletir as decisões aprovadas.
-- Verifique as ferramentas, skills e plugins disponíveis. Utilize os pertinentes a frontend, design, engenharia, depuração e verificação. Informe no resultado quais utilizou e para quê.
+- Utilize as ferramentas pertinentes e registre somente as verificações e decisões técnicas necessárias.
 - Não troque a stack nem introduza bibliotecas sem necessidade concreta.
 
-Esta execução será feita pelo Codex no projeto atual. Não dependa de alterações paralelas feitas por outro assistente.
+A execução usa o projeto atual e preserva as alterações existentes.
 
 ## 2. Objetivo e limites
 

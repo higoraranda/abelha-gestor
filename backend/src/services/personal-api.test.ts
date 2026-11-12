@@ -13,22 +13,26 @@ import { createHmac } from 'node:crypto'
 import webpush from 'web-push'
 import { sendPendingPush, weeklyReview, automationTick } from './personal-automation'
 import vm from 'node:vm'
+import {homologationFixture} from '../integration/homologation-fixture'
 
 function workflowNode(key:string,name:string,json:any,extra:Record<string,unknown>={}) {
-  const workflow=JSON.parse(readFileSync('../docs/integrations/n8n/abelha-'+key+'.json','utf8'))
-  const node=workflow.nodes.find((n:any)=>n.name===name)
+  const prefixes:Record<string,string>={'leads-capture':'CAPTURA','leads-search':'BUSCA','project-sync':'PROJETOS','price-monitor':'PREÇOS'}
+  const workflow=JSON.parse(readFileSync('../docs/integrations/n8n/abelha-automations.json','utf8'))
+  const node=workflow.nodes.find((n:any)=>n.name===prefixes[key]+' · '+name)
   return vm.runInNewContext('(function(){'+node.parameters.jsCode+'})()',{$json:json,$input:{item:{json},all:()=>[{json}]},...extra},{timeout:1000})
 }
 
 test('Personal API isolates users, validates mutations and keeps reports pending until human review',async()=>{
-  const pg=new PGlite();let server:ReturnType<express.Express['listen']>|undefined;let wire:PGLiteSocketServer|undefined;let sql:ReturnType<typeof postgres>|undefined
+  const remote=await homologationFixture('api');const pg=remote?.fixture||new PGlite();let server:ReturnType<express.Express['listen']>|undefined;let wire:PGLiteSocketServer|undefined;let sql:ReturnType<typeof postgres>|undefined
   const org='10000000-0000-4000-8000-000000000001',user='20000000-0000-4000-8000-000000000001',other='20000000-0000-4000-8000-000000000002'
   try {
     await pg.exec(`CREATE TABLE organizations(id uuid primary key);CREATE TABLE users(id uuid primary key,organization_id uuid not null references organizations(id));CREATE TABLE clients(id uuid primary key default gen_random_uuid(),organization_id uuid not null references organizations(id),name text,whatsapp text,email text,notes text);
       INSERT INTO organizations VALUES('${org}');INSERT INTO users VALUES('${user}','${org}'),('${other}','${org}');`)
     await pg.exec('CREATE TABLE reminders(id uuid primary key,organization_id uuid,title text,due_at timestamptz,completed boolean)')
     await pg.exec(readFileSync('src/db/migrations/20261111_personal_platform.sql','utf8'))
-    wire=new PGLiteSocketServer({db:pg,host:'127.0.0.1',port:0});await wire.start();sql=postgres('postgresql://postgres:postgres@'+wire.getServerConn()+'/postgres',{ssl:false,max:1});const database=postgresDatabase(sql)
+    if(remote)sql=remote.sql
+    else {wire=new PGLiteSocketServer({db:pg,host:'127.0.0.1',port:0});await wire.start();sql=postgres('postgresql://postgres:postgres@'+wire.getServerConn()+'/postgres',{ssl:false,max:1})}
+    const database=postgresDatabase(sql)
     const app=express();app.use('/api/v1/integrations/github',githubJsonParser);app.use(express.json());const auth:express.RequestHandler=(req,_res,next)=>{req.organizationId=org;req.user={userId:req.get('X-Test-User')||user,organizationId:org,role:'user'};next()};app.use('/api/v1/personal',createPersonalRouter(database,[auth]));app.use('/api/v1/prospecting',createProspectingRouter(database,[auth]));app.use('/api/v1/integrations',createIntegrationsRouter(database));app.use((error:any,_req:express.Request,res:express.Response,_next:express.NextFunction)=>{res.status(error.status||500).json({error:'Request rejected'})});server=app.listen(0,'127.0.0.1')
     await new Promise<void>(resolve=>server!.once('listening',resolve));const port=(server.address() as any).port
     async function request(path:string,method='GET',body?:unknown,as=user,guard=true){const response=await fetch(`http://127.0.0.1:${port}/api/v1/personal${path}`,{method,headers:{'Content-Type':'application/json','X-Test-User':as,...guard?{'X-Abelha-Client':'web'}:{}},body:body===undefined?undefined:JSON.stringify(body)});return {status:response.status,body:response.status===204?null:await response.json() as any}}
@@ -65,6 +69,10 @@ test('Personal API isolates users, validates mutations and keeps reports pending
     assert.match((await request('/subscriptions')).body.subscriptions[0].due_on,/^2026-02-28/)
     const watch=await request('/prices','POST',{name:'Produto sintético',interval_minutes:60,target:100});assert.equal(watch.status,201)
     process.env.ABELHA_INTEGRATION_TOKEN='integration-test-secret-with-at-least-32-chars';process.env.ABELHA_INTEGRATION_ORGANIZATION_ID=org;process.env.ABELHA_INTEGRATION_USER_ID=user;process.env.PRICE_ALLOWED_HOSTS='shop.example';process.env.GITHUB_WEBHOOK_SECRET='github-test-secret-with-at-least-32-chars'
+    async function due(){const response=await fetch(`http://127.0.0.1:${port}/api/v1/integrations/prices/due`,{headers:{Authorization:'Bearer '+process.env.ABELHA_INTEGRATION_TOKEN}});assert.equal(response.status,200);return await response.json() as any[]}
+    assert.equal((await due()).some(row=>row.id===watch.body.id),true)
+    await database.query("UPDATE personal_price_watches SET last_checked_at=now()-interval '59 minutes' WHERE id=$1",[watch.body.id]);assert.equal((await due()).some(row=>row.id===watch.body.id),false,'A 60-minute monitor must not run at 59 minutes')
+    await database.query("UPDATE personal_price_watches SET last_checked_at=now()-interval '61 minutes' WHERE id=$1",[watch.body.id]);assert.equal((await due()).some(row=>row.id===watch.body.id),true,'Individual monitor interval belongs to the backend, not every scheduler tick')
     async function integration(path:string,body:any,token=process.env.ABELHA_INTEGRATION_TOKEN){const response=await fetch(`http://127.0.0.1:${port}/api/v1/integrations${path}`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify(body)});const raw=await response.text();return {status:response.status,body:response.headers.get('content-type')?.includes('application/json')?JSON.parse(raw):raw}}
     assert.equal((await integration('/tick',{},'bad-token')).status,401)
     const observation=workflowNode('price-monitor','Validar cotação real',{statusCode:200,body:{event_id:'obs-1',store:'Loja teste',product_url:'https://shop.example/product',price:100,currency:'BRL',observed_at:new Date().toISOString()}},{$:()=>({item:{json:{watch_id:watch.body.id,product_url:'https://shop.example/product'}}})}).json
@@ -148,5 +156,5 @@ test('Personal API isolates users, validates mutations and keeps reports pending
     const expired=await sendPendingPush(database,{org,user},async()=>{throw Object.assign(new Error('expired'),{statusCode:410})})
     assert.equal(expired.sent,0,'Expired subscriptions must never be counted as successful deliveries')
     assert.equal((await database.query('SELECT count(*)::int AS count FROM push_subscriptions WHERE organization_id=$1 AND user_id=$2',[org,user]))[0].count,0)
-  } finally {if(server){server.closeAllConnections();await new Promise<void>(resolve=>server!.close(()=>resolve()))}if(sql)await sql.end({timeout:2});if(wire)await wire.stop();await pg.close()}
+  } finally {if(server){server.closeAllConnections();await new Promise<void>(resolve=>server!.close(()=>resolve()))}if(sql&&!remote)await sql.end({timeout:2});if(wire)await wire.stop();await pg.close()}
 })

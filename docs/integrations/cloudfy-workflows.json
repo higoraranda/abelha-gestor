@@ -1,5 +1,21 @@
 {
   "date": "2026-11-12",
+  "management_mode": "single-workflow",
+  "consolidated": {
+    "id": "n20DNyb13Aaw3nq5",
+    "name": "🐝 ABELHA — AUTOMAÇÕES",
+    "url": "https://socialbaboon-n8n.cloudfy.live/workflow/n20DNyb13Aaw3nq5",
+    "file": "n8n/abelha-automations.json",
+    "active": false,
+    "nodes": 62,
+    "schedule_triggers": 1,
+    "manual_triggers": 1,
+    "webhooks": 4,
+    "subworkflows": 0,
+    "remote_definition_verified": true,
+    "remote_runtime_tested": false
+  },
+  "legacy_workflows_role": "inactive-backups-not-called-by-consolidated",
   "infrastructure": {
     "id": "a1d393bd-e0ee-42f0-9408-37b9f5a49cff",
     "name": "socialbaboon",
@@ -11,7 +27,11 @@
   "remote_runtime_tested": false,
   "credentials_configured": false,
   "production_migration_applied": false,
-  "backend_deployed": false,
+  "backend_deployed": true,
+  "backend_deployed_commit": "248569753b3c7a8fd78676524426c2ef1f0e2eac",
+  "homologation_report": "../HOMOLOGACAO-INTEGRACAO.md",
+  "homologation_backend_available": false,
+  "neon_synthetic_rehearsal_passed": true,
   "existing_workflows_preserved": [
     "shDnJzDKrgyfnkIp",
     "HKqYD9ssB5pFIEqh",

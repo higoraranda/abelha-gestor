@@ -75,4 +75,4 @@ No `.env` local, DATABASE_URL, AUTH_SECRET, AUTH_URL e FRONTEND_URL existem; AUT
 
 Continuam pendentes: ensaio autorizado no Neon isolado, migration em produção, configuração remota, webhook/cron real, consulta de preços/captura externa, entrega push física e deploy. A revisão local não autoriza essas operações.
 
-Skills aplicadas nesta continuação: Superpowers (planejamento, depuração, testes, verificação e revisão independente) e Neon/Postgres. Plugins: Neon (catálogo somente leitura), Cloudfy (metadados n8n somente leitura). Playwright/Chrome, npm audit e documentação primária complementaram a validação. Nenhum serviço pago foi criado.
+Nenhum serviço pago foi criado.

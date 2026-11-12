@@ -11,3 +11,4 @@ backend/test-auth.mjs
 backend/reset-password.mjs
 CLAUDE.md
 .claude/
+.abelha-homologacao/

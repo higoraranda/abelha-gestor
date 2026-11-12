@@ -419,5 +419,5 @@ A análise e a entrevista foram concluídas. Não houve implementação da refor
 
 Os processos temporários iniciados para API e frontend foram encerrados, suas sessões terminaram e não há serviços escutando nas portas temporárias 3000 e 4173. As abas temporárias criadas para a inspeção foram fechadas. Os processos e programas do usuário foram preservados.
 
-Preferência permanente do usuário: em trabalhos futuros, registrar e encerrar todos os serviços/processos temporários criados pelo agente ao final, mantendo apenas recursos que o usuário pedir expressamente para deixar ativos.
+Preferência permanente do usuário: em trabalhos futuros, registrar e encerrar todos os serviços/processos temporários temporários da tarefa ao final, mantendo apenas recursos que o usuário pedir expressamente para deixar ativos.
 

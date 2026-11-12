@@ -1,10 +1,12 @@
 # Abelha no n8n Cloudfy — configuração e ativação
 
-Estado em **12/11/2026**: sete workflows criados diretamente pelo plugin Cloudfy na infraestrutura existente **socialbaboon** (`a1d393bd-e0ee-42f0-9408-37b9f5a49cff`). Todos permanecem **desativados**, sem credenciais associadas e sem execução remota. Não foi criada instância, servidor ou banco.
+**Estado atual após unificação:** administrar somente [🐝 ABELHA — AUTOMAÇÕES / n20DNyb13Aaw3nq5](https://socialbaboon-n8n.cloudfy.live/workflow/n20DNyb13Aaw3nq5), criado desativado com62 nós. Guia atual: [WORKFLOW-UNICO-N8N.md](WORKFLOW-UNICO-N8N.md). Os sete abaixo são backups inativos, não subworkflows. As instruções restantes desta página conservam o histórico anterior; configurar somente os nós prefixados no consolidado, conforme o novo guia. Não ativar/importar os backups.
 
-Os três workflows preexistentes foram conferidos por ID, tipo de nós e referências funcionais; nenhum referencia Abelha nos parâmetros. Permaneceram com os mesmos IDs, estados e datas de alteração. O maior JSON veio truncado pelo plugin; a conferência complementar usou apenas agregados de metadados em SQL READ ONLY, sem ler execuções/pacientes ou segredos.
+Estado em **12/11/2026**: sete workflows criados diretamente na Cloudfy na infraestrutura existente **socialbaboon** (`a1d393bd-e0ee-42f0-9408-37b9f5a49cff`). Todos permanecem **desativados**, sem credenciais associadas e sem execução remota. Não foi criada instância, servidor ou banco.
 
-## Inventário real
+Os três workflows preexistentes foram conferidos por ID, tipo de nós e referências funcionais; nenhum referencia Abelha nos parâmetros. Permaneceram com os mesmos IDs, estados e datas de alteração. O maior JSON veio truncado pela API; a conferência complementar usou apenas agregados de metadados em SQL READ ONLY, sem ler execuções/pacientes ou segredos.
+
+## Inventário anterior — backups desativados
 
 | Nome no n8n | ID / editor | Função | Estado |
 |---|---|---|---|
@@ -21,7 +23,7 @@ IDs e configurações conferidas em [integrations/cloudfy-workflows.json](integr
 ## O que foi efetivamente verificado
 
 - Criação aceita pela API n8n e releitura dos sete workflows: igualdade de nós, conexões e settings; `active:false`, fuso `America/Sao_Paulo`, timeout 900s e retenção de payloads desligada.
-- Tipos já presentes na instância: HTTP Request 4.2, Webhook 2, Schedule Trigger 1.2 e Code 2. IF 2 foi conferido contra a implementação oficial. A versão exata do servidor não é exposta pelo plugin; `/types/nodes.json` exige sessão administrativa. Não foi solicitada/extraída chave de acesso. Confirmar a versão em **Help/About** e executar os testes manuais abaixo antes de ativar; importação aceita não comprova runtime completo.
+- Tipos já presentes na instância: HTTP Request 4.2, Webhook 2, Schedule Trigger 1.2 e Code 2. IF 2 foi conferido contra a implementação oficial. A versão exata do servidor não é exposta pela API; `/types/nodes.json` exige sessão administrativa. Não foi solicitada/extraída chave de acesso. Confirmar a versão em **Help/About** e executar os testes manuais abaixo antes de ativar; importação aceita não comprova runtime completo.
 - Backend local: **39 testes**, incluindo execução dos Code nodes exportados → HTTP real → postgres.js → PGlite efêmero. Foram comprovados captura, staging público, relatório, bytes HMAC, observação de preço e reenvios, com dados sintéticos. Os Code nodes também recusam identificadores/cidades inválidos, fonte sem configuração, moeda errada, outro produto, preço zero e resposta `[]`/nula.
 - Frontend: **13 testes**, TypeScript, lint sem warnings e build; navegador Chrome: **11 cenários** desktop/mobile/offline, sem erros JavaScript. npm audit backend/frontend em 12/11: **zero alertas** nos lockfiles atuais.
 - Consulta HTTP pública somente leitura: backend canônico `/api/auth/session` respondeu 200; `/api/v1/integrations/prices/due` respondeu **404**. Portanto o backend publicado **ainda não disponibiliza esta versão das integrações**. Inserir tokens não resolve esse 404: é necessário ensaio e publicação autorizados do código/migration.

@@ -1,0 +1,136 @@
+{
+  "date": "2026-11-12",
+  "base_commit": "2485697",
+  "initial_git_clean": true,
+  "infrastructure": "socialbaboon",
+  "consolidated": {
+    "id": "n20DNyb13Aaw3nq5",
+    "name": "🐝 ABELHA — AUTOMAÇÕES",
+    "url": "https://socialbaboon-n8n.cloudfy.live/workflow/n20DNyb13Aaw3nq5",
+    "active": false,
+    "nodes": 62,
+    "standalone": true,
+    "schedule_triggers": 1,
+    "manual_triggers": 1,
+    "webhooks": 4,
+    "definition_matches": true,
+    "credential_references": []
+  },
+  "source_equivalence": [
+    {
+      "id": "Sb4LGFXnX2q8QQVO",
+      "key": "leads-capture",
+      "equivalent": true,
+      "credentials": 0
+    },
+    {
+      "id": "3glUHHeETfeQzJbr",
+      "key": "leads-search",
+      "equivalent": true,
+      "credentials": 0
+    },
+    {
+      "id": "RIUNsrZPnldxps8j",
+      "key": "finance-reminder",
+      "equivalent": true,
+      "credentials": 0
+    },
+    {
+      "id": "U9xr0ZokbZeXDaAb",
+      "key": "subscriptions-alerts",
+      "equivalent": true,
+      "credentials": 0
+    },
+    {
+      "id": "KQ29tKdXsT4seDHN",
+      "key": "price-monitor",
+      "equivalent": true,
+      "credentials": 0
+    },
+    {
+      "id": "vHpvCObsiu5fRXWe",
+      "key": "project-sync",
+      "equivalent": true,
+      "credentials": 0
+    },
+    {
+      "id": "RnE5lBhUY3k0hoAV",
+      "key": "weekly-review",
+      "equivalent": true,
+      "credentials": 0
+    }
+  ],
+  "backups": [
+    {
+      "id": "RIUNsrZPnldxps8j",
+      "name": "Abelha — Lembretes Financeiros",
+      "active": false,
+      "already_inactive": true,
+      "updatedAt": "2026-11-12T03:29:12.742Z"
+    },
+    {
+      "id": "Sb4LGFXnX2q8QQVO",
+      "name": "Abelha — Captura de Leads",
+      "active": false,
+      "already_inactive": true,
+      "updatedAt": "2026-11-12T03:29:15.907Z"
+    },
+    {
+      "id": "3glUHHeETfeQzJbr",
+      "name": "Abelha — Busca de Leads",
+      "active": false,
+      "already_inactive": true,
+      "updatedAt": "2026-11-12T03:29:19.280Z"
+    },
+    {
+      "id": "KQ29tKdXsT4seDHN",
+      "name": "Abelha — Monitor de Preços",
+      "active": false,
+      "already_inactive": true,
+      "updatedAt": "2026-11-12T03:33:42.651Z"
+    },
+    {
+      "id": "vHpvCObsiu5fRXWe",
+      "name": "Abelha — Sincronização de Projetos",
+      "active": false,
+      "already_inactive": true,
+      "updatedAt": "2026-11-12T03:29:29.861Z"
+    },
+    {
+      "id": "U9xr0ZokbZeXDaAb",
+      "name": "Abelha — Contas e Assinaturas",
+      "active": false,
+      "already_inactive": true,
+      "updatedAt": "2026-11-12T03:29:32.922Z"
+    },
+    {
+      "id": "RnE5lBhUY3k0hoAV",
+      "name": "Abelha — Revisão Semanal",
+      "active": false,
+      "already_inactive": true,
+      "updatedAt": "2026-11-12T03:29:38.773Z"
+    }
+  ],
+  "unrelated_workflows_unchanged": true,
+  "verification": {
+    "backend_tests": 47,
+    "frontend_tests": 13,
+    "backend_build": true,
+    "frontend_build": true,
+    "frontend_lint": true,
+    "synthetic_http_sql": true,
+    "n8n_runtime_executed": false
+  },
+  "limits": {
+    "credentials_pending": true,
+    "source_api_pending": true,
+    "physical_push_pending": true,
+    "stdout_logging_requires_host_configuration": true,
+    "automatic_workflow_activation": false
+  },
+  "production_migration_applied": false,
+  "deployed": false,
+  "committed": false,
+  "pushed": false,
+  "temporary_services_left_running": false
+}

@@ -37,7 +37,7 @@ backend/src/db/schema.sql: ele apaga tabelas.
 
 A implementação local acrescenta ambientes separados, instalação PWA, central de projetos com revisão de evidências, busca pública de leads e templates, faturas/metas pessoais, recorrências, monitores de preço e revisão semanal. Mantém o CRM e suas regras financeiras.
 
-**Ativação pendente:** a migration `20261111_personal_platform.sql` não foi aplicada ao Neon e não houve deploy. Push, GitHub/n8n, captura por IA e consultas automáticas de preço dependem de configuração e testes reais. Nenhum preço ou status de projeto ilustrativo foi importado na carteira.
+**Ativação pendente:** Render/Vercel já publicaram a base2485697. A migration `20261111_personal_platform.sql` passou no ensaio Neon isolado e continua ausente em produção. Push, GitHub/n8n e consultas automáticas de preço dependem de configuração e testes reais; captura usa regras, sem IA conectada. [Homologação, credenciais e passos manuais](docs/HOMOLOGACAO-INTEGRACAO.md). Nenhum preço ou status de projeto ilustrativo foi importado na carteira.
 
 - [Estado atual e validações](docs/PROGRESSO.md)
 - [Roadmap](docs/ROADMAP-ABELHA.md)
@@ -46,6 +46,7 @@ A implementação local acrescenta ambientes separados, instalação PWA, centra
 - [Instalação PWA](docs/GUIA-PWA.md)
 - [Integrações e workflows n8n](docs/INTEGRACOES-N8N.md)
 - [Workflows criados na Cloudfy: IDs, configuração e ativação](docs/CLOUDFY-N8N.md)
+- [Workflow único 🐝 ABELHA — AUTOMAÇÕES](docs/WORKFLOW-UNICO-N8N.md)
 
 ## Arquitetura original
 

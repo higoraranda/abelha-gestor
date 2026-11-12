@@ -15,7 +15,9 @@ Cada fase exige TypeScript, testes de comportamento, lint/build frontend e docum
 
 ## Ponto de retomada
 
-Em 12/11/2026, os sete workflows foram completados e criados **desativados** na Cloudfy/socialbaboon, sem duplicar o tick ou a infraestrutura. Retomar pelos IDs e configuração de [CLOUDFY-N8N.md](CLOUDFY-N8N.md), sem reimportação. Permanecem pendentes credenciais/fontes externas, ensaio no runtime, migration e publicação autorizadas; o backend publicado ainda não contém a nova rota de preços.
+Estado após unificação em12/11: um único workflow remoto **🐝 ABELHA — AUTOMAÇÕES / n20DNyb13Aaw3nq5**, com62 nós e todos os blocos internos, desativado. Sete originais mantidos como backup inativo. Retomar pelo [guia único](WORKFLOW-UNICO-N8N.md); configurar e testar em homologação antes de qualquer autorização de ativação.
+
+Homologação em12/11: migration aprovada no Neon isolado,18 tabelas/isolamento/preservação, rollback e cleanup completos; compute voltou a disabled/idle. Render/Vercel já em2485697; rota nova existe e retorna503 por integração não configurada. **49 testes backend,16 frontend e11 cenários de navegador aprovados.** Próxima etapa: [ambiente persistente, credenciais e runtime n8n](HOMOLOGACAO-INTEGRACAO.md). A migration de produção, guard de preview ainda local e ativação do consolidado dependem de autorização; preços reais e push físico pendentes.
 
 Em 11/11/2026, todas as seis fases receberam implementação local e testes das partes independentes. A revisão de ativação corrigiu as dependências vulneráveis, timeout e falhas concretas de PWA/push/GitHub; a migration foi revisada e permanece sem aplicação no Neon. Consulte PROGRESSO.md e AUDITORIA-ATIVACAO.md para evidências. A próxima etapa segue [CHECKLIST-ATIVACAO.md](CHECKLIST-ATIVACAO.md): autorização do ambiente e configuração de VAPID/n8n/GitHub/provedor de preços/classificador, seguida de ensaio externo e publicação autorizada.
 

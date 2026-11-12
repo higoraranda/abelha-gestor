@@ -6,7 +6,7 @@ A reformulação passou nos testes de integração e na interface usando uma bra
 
 Projeto existente: MELAO CRM (`curly-river-94350351`). Produção: `br-square-sunset-acpb91u2`, endpoint original `ep-wandering-pond-acitqqn8`.
 
-Branch criada após autorização explícita: `codex-abelha-reform-test-20261105` (`br-hidden-night-ace956m0`), filha de production. Endpoint de teste: `ep-crimson-snow-acmuhqgp.sa-east-1.aws.neon.tech`, compute limitado a 0,25 CU.
+Branch criada após autorização explícita: `ambiente de testes isolado` (`br-hidden-night-ace956m0`), filha de production. Endpoint de teste: `ep-crimson-snow-acmuhqgp.sa-east-1.aws.neon.tech`, compute limitado a 0,25 CU.
 
 ## Verificação concluída
 

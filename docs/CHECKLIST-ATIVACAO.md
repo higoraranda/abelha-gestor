@@ -1,20 +1,24 @@
 # Checklist de ativação — Abelha CRM + Personal
 
-Estado: preparação local. **Nada foi ativado em produção.** Este documento é uma sequência para revisão/autorização, não uma instrução para executar mudanças automaticamente.
+Estado em12/11: **ensaios locais/Neon aprovados, integrações externas ainda não ativadas**. Render/Vercel já publicaram a base2485697; migration Personal de produção continua pendente. Resultado, matriz de credenciais e passos manuais exatos em [HOMOLOGACAO-INTEGRACAO.md](HOMOLOGACAO-INTEGRACAO.md). Este checklist não autoriza executar mudanças automaticamente.
+
+Ação A posteriormente autorizada/concluída: banco vazio separado abelha_homologacao,35 tabelas/18 Personal, role restrita sem acesso ao neondb e identidade sintética. Compute teste voltou a disabled/idle. Alterações na main local para revisão e commit manual, sem nova publicação nesta etapa. Próximo passo: [configuração do Render de homologação](ATIVACAO-BRANCH-BANCO.md), ainda sem criação de serviço autorizada.
 
 Atualização de 12/11: os sete workflows já foram criados **desativados** na Cloudfy/socialbaboon. Não importar de novo. [CLOUDFY-N8N.md](CLOUDFY-N8N.md) contém IDs, nós, credenciais, URLs e passos de teste.
+
+Consolidação posterior concluída: administrar somente **🐝 ABELHA — AUTOMAÇÕES / n20DNyb13Aaw3nq5**, também desativado. Os sete anteriores são backups. Procedimento atual: [WORKFLOW-UNICO-N8N.md](WORKFLOW-UNICO-N8N.md).
 
 ## 1. Escolher e autorizar o ambiente
 
 - [ ] Revisar `AUDITORIA-ATIVACAO.md`, os relatórios de dependências e o diff local. Conservar os lockfiles revisados.
 - [ ] Confirmar Node 22.12+ e URLs distintas de teste/produção. O proxy da prévia deve apontar para o backend de teste; nunca deixar `BACKEND_URL` cair no endereço de produção durante testes de gravação.
-- [ ] Autorizar separadamente o ambiente isolado Neon. A branch antiga existe, mas seu compute não foi reativado por esta execução. Não criar compute/plano/custos automaticamente.
+- [x] Ensaio temporário Neon autorizado em12/11: compute existente0,25CU Free, dois schemas/role sintéticos já removidos, compute restaurado disabled/idle. A autorização não cobre mantê-lo ligado para serviço persistente; ambiente contínuo ainda requer aprovação.
 - [ ] Confirmar backup/ponto de restauração do ambiente que receberá a migration e procedimento de recuperação. Conservar o schema e as contagens/fingerprints dos registros comerciais antes da alteração.
 - [ ] Confirmar qual `organization_id` e qual `users.id` existente pertencem à mesma conta. A integração recebe esses IDs no servidor; nunca do payload externo.
 
 ## 2. Migration — ensaio antes de produção
 
-Arquivo único: `backend/src/db/migrations/20261111_personal_platform.sql`. Não executar schema.sql, reset ou seed. A migration nova continua pendente no Neon.
+Arquivo único: `backend/src/db/migrations/20261111_personal_platform.sql`. Não executar schema.sql, reset ou seed. Ensaio sintético Neon aprovado; migration nova continua pendente **na produção**. Revalidar pré-condições no ambiente que receberá a ativação.
 
 - [ ] Conferir `SELECT current_database(), current_schema(), version();` e o endpoint/branch escolhido, usando conexão direta, sem `-pooler`.
 - [ ] Conferir tipos `uuid` de organizations.id, users.id/organization_id e clients.id/organization_id; PKs/FKs existentes e definições dos índices `users_org_identity` / `clients_org_identity`.
@@ -71,10 +75,11 @@ No `.env` local inspecionado, DATABASE_URL, AUTH_SECRET, AUTH_URL e FRONTEND_URL
 
 ## 6. n8n — ativar somente o que está pronto
 
-- [x] Instância `socialbaboon` confirmada; workflows existentes conferidos por ID/funcionalidade, preservados. Sete novos workflows criados e relidos, todos desativados. Inventário em `integrations/cloudfy-workflows.json`.
-- [ ] Abrir os IDs existentes e confirmar a versão n8n em Help/About. Não trocar `N8N_ENCRYPTION_KEY`. Conferir o backend de homologação em todos os nós; a URL canônica já está preparada, mas o host publicado ainda respondeu 404 para a rota nova de preços.
+- [x] Instância `socialbaboon` confirmada; fontes conferidas e consolidado criado/relido, com62 nós, sem subworkflows. Sete backups mantidos existentes/desativados. Inventário em `integrations/cloudfy-workflows.json`.
+- [ ] Abrir **somente n20DNyb13Aaw3nq5** e confirmar versão n8n em Help/About. Não trocar `N8N_ENCRYPTION_KEY`. Conferir os dez nós backend pelo manifesto de homologação; host publicado já contém a rota nova, respondendo503 sem integração. Não testar gravações nele. Nenhum backend HTTPS de homologação está disponível ainda.
 - [ ] Criar **Abelha — Backend** (Header Auth: `Authorization`, valor `Bearer <ABELHA_INTEGRATION_TOKEN>`) e selecioná-la somente nos nós backend listados no guia. Criar **Abelha — Entrada Webhook** com `X-Abelha-Webhook-Token` e segredo distinto nos três webhooks protegidos. Não colocar segredo em formulário público, JSON exportado, URL ou logs.
-- [ ] Manter apenas **Lembretes Financeiros** como agendador do tick a cada 15 minutos, America/Sao_Paulo. Contas/Revisão são auxiliares manuais sem cron. Configurar horários no Personal antes de habilitar.
+- [ ] Manter o único relógio do consolidado a cada15min, America/Sao_Paulo; ele roteia tick/preços e o backend verifica o que está devido. Configurar horários no Personal. Não ativar nenhum backup. Testes manuais escolhem uma operation por vez.
+- [ ] Conferir saída ok:false e configurar/verificar CODE_ENABLE_STDOUT=true no host n8n para logs genéricos, sem payloads/secrets. Falhas tratadas não devem ser interpretadas como aprovação de todos os blocos pelo status global concluído.
 - [ ] O tick implementa lembretes, contas, revisão e envio push. Horários no fim do dia têm tolerância de 30 minutos para o tick após a virada. Interrupções prolongadas ainda exigem revisar avisos/revisões manualmente; não há promessa de recuperação irrestrita de agendamentos perdidos.
 - [ ] Para busca, conectar entrada real `niche,city,limit` ao webhook protegido; a fonte pública pode estar indisponível. Respeitar um minuto entre consultas e atribuição OpenStreetMap. O staging novo mantém revisão antes de cadastro.
 - [ ] Para captura, conectar email/formulário autorizado ao webhook com `event_id/message_id` estável. Extração e classificação por regras já estão implementadas; nenhum LLM foi conectado ou cobrado.
