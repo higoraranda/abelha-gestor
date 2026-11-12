@@ -1,0 +1,99 @@
+{
+  "date": "2026-11-12",
+  "infrastructure": "socialbaboon",
+  "existing_workflows_unchanged": true,
+  "workflows": [
+    {
+      "id": "RIUNsrZPnldxps8j",
+      "name": "Abelha — Lembretes Financeiros",
+      "active": false,
+      "nodes": 4,
+      "definition_matches": true,
+      "credentials_referenced": 0
+    },
+    {
+      "id": "Sb4LGFXnX2q8QQVO",
+      "name": "Abelha — Captura de Leads",
+      "active": false,
+      "nodes": 5,
+      "definition_matches": true,
+      "credentials_referenced": 0
+    },
+    {
+      "id": "3glUHHeETfeQzJbr",
+      "name": "Abelha — Busca de Leads",
+      "active": false,
+      "nodes": 10,
+      "definition_matches": true,
+      "credentials_referenced": 0
+    },
+    {
+      "id": "KQ29tKdXsT4seDHN",
+      "name": "Abelha — Monitor de Preços",
+      "active": false,
+      "nodes": 8,
+      "definition_matches": true,
+      "credentials_referenced": 0
+    },
+    {
+      "id": "vHpvCObsiu5fRXWe",
+      "name": "Abelha — Sincronização de Projetos",
+      "active": false,
+      "nodes": 9,
+      "definition_matches": true,
+      "credentials_referenced": 0
+    },
+    {
+      "id": "U9xr0ZokbZeXDaAb",
+      "name": "Abelha — Contas e Assinaturas",
+      "active": false,
+      "nodes": 3,
+      "definition_matches": true,
+      "credentials_referenced": 0
+    },
+    {
+      "id": "RnE5lBhUY3k0hoAV",
+      "name": "Abelha — Revisão Semanal",
+      "active": false,
+      "nodes": 3,
+      "definition_matches": true,
+      "credentials_referenced": 0
+    }
+  ],
+  "remote_runtime_executed": false,
+  "credentials_reused_from_other_projects": false,
+  "backend_tests": {
+    "passed": 39,
+    "failed": 0,
+    "synthetic_only": true
+  },
+  "frontend_tests": {
+    "passed": 13,
+    "failed": 0
+  },
+  "browser_scenarios": {
+    "passed": 11,
+    "failed": 0
+  },
+  "dependency_audit": {
+    "backend": 0,
+    "frontend": 0
+  },
+  "production_probe": {
+    "method": "GET",
+    "path": "/api/v1/integrations/prices/due",
+    "status": 404
+  },
+  "migration_sha256": "9812B2BD74ACC1FB983318BAB62590DA6CF8E92A1536E85032FB8B604F84DCDB",
+  "production_migration_applied": false,
+  "deployed": false,
+  "temporary_resources": {
+    "preview_pid": 21312,
+    "preview_stopped": true,
+    "ports_verified_free": [
+      43170,
+      59133
+    ],
+    "browser_closed": true
+  }
+}

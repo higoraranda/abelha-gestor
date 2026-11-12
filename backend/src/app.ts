@@ -13,6 +13,9 @@ import contractsRouter from "./routes/contracts"
 import financeRouter from "./routes/finance"
 import webhooksRouter from "./routes/webhooks"
 import crmRouter from "./routes/crm"
+import { createPersonalRouter } from "./routes/personal"
+import { createProspectingRouter } from "./routes/prospecting"
+import { createIntegrationsRouter, githubJsonParser } from "./routes/integrations"
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -24,6 +27,7 @@ app.use(
   })
 )
 
+app.use('/api/v1/integrations/github',githubJsonParser)
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use("/api/v1", (_req, res, next) => { res.set("Cache-Control", "no-store"); next() })
@@ -38,6 +42,9 @@ app.use("/api/v1/catalog", catalogRouter)
 app.use("/api/v1/contracts", contractsRouter)
 app.use("/api/v1/finance", financeRouter)
 app.use("/api/v1/crm", crmRouter)
+app.use("/api/v1/personal", createPersonalRouter())
+app.use("/api/v1/prospecting", createProspectingRouter())
+app.use("/api/v1/integrations", createIntegrationsRouter())
 app.use("/api/events", eventsRouter)
 app.use("/webhooks", webhooksRouter)
 

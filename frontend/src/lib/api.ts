@@ -1,8 +1,10 @@
 import { API_BASE_URL } from '@/lib/apiBase'
+import { requestTimeout } from './requestTimeout'
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
+    'X-Abelha-Client': 'web',
     ...options.headers,
   }
 
@@ -10,7 +12,8 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     ...options,
     headers,
     credentials: 'include',
-    signal: options.signal ? AbortSignal.any([options.signal,AbortSignal.timeout(20000)]) : AbortSignal.timeout(20000),
+    cache: 'no-store',
+    signal: options.signal ? AbortSignal.any([options.signal,AbortSignal.timeout(requestTimeout(path))]) : AbortSignal.timeout(requestTimeout(path)),
   })
 
   if (!response.ok) {
@@ -35,5 +38,5 @@ export const api = {
     request<T>(path, { method: 'POST', body: JSON.stringify(body) }),
   patch: <T>(path: string, body: unknown) =>
     request<T>(path, { method: 'PATCH', body: JSON.stringify(body) }),
-  delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
+  delete: <T>(path: string, body?: unknown) => request<T>(path, { method: 'DELETE', ...(body===undefined?{}:{body:JSON.stringify(body)}) }),
 }

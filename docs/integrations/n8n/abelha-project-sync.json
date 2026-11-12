@@ -1,0 +1,292 @@
+{
+  "name": "Abelha — Sincronização de Projetos",
+  "active": false,
+  "nodes": [
+    {
+      "id": "c671d0ed-4920-d6a3-2622-033cffc1f25a",
+      "name": "Configuração e limites",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ],
+      "parameters": {
+        "content": "# Sincronização de Projetos\nDois caminhos: relatório Codex autenticado com project_id UUID/report v1; GitHub recebe corpo binário original e encaminha HMAC/delivery/event ao backend. Secret HMAC fica apenas no GitHub/backend. O caminho GitHub não usa Header Auth, pois o GitHub não o envia; backend rejeita assinatura inválida antes de persistir. SHA/testes/etapas são evidências pendentes; conclusão exige ação humana.\n\nDESATIVADO: configurar credenciais e testar com dados sintéticos antes de ativar. URL canônica do backend preparada; se usar homologação, alterar todos os nós HTTP de backend. Não testar gravações em produção. Retenção de payloads desligada; erros interrompem o fluxo, sem continueOnFail. Não duplicar a instância ou o banco.",
+        "height": 330,
+        "width": 900
+      }
+    },
+    {
+      "id": "fbdc2ec9-dab4-594f-cbb5-e697b0b061fc",
+      "name": "Receber relatório Codex",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "abelha/v1/projects/report",
+        "authentication": "headerAuth",
+        "responseMode": "lastNode",
+        "responseData": "firstEntryJson",
+        "options": {}
+      },
+      "webhookId": "8dc26b75-f6c9-3189-cba5-42bc33ccf624",
+      "notes": "Selecionar credencial Abelha — Entrada Webhook, separada do token do backend.",
+      "notesInFlow": true
+    },
+    {
+      "id": "10fbbb82-07c9-6df3-d350-8cfef090f570",
+      "name": "Validar projeto e relatório",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const b = $json.body || $json;\nif (typeof b.project_id !== 'string' || !/^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(b.project_id)) throw new Error('project_id deve ser UUID');\nif (!b.report || typeof b.report !== 'object' || Array.isArray(b.report) || b.report.schema_version !== 1) throw new Error('Relatório v1 obrigatório');\n// O backend verifica SHA, evidências do repositório e critérios; nunca conclui o marco.\nreturn {json: {project_id: b.project_id.toLowerCase(), report: b.report}};\n"
+      }
+    },
+    {
+      "id": "78f608e2-1363-26fb-ac20-73a9b0508c49",
+      "name": "Registrar relatório pendente",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        520,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ \"https://abelha-gestor-api.onrender.com/api/v1/integrations/projects/\" + encodeURIComponent($json.project_id) + \"/reports\" }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 60000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.report }}"
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "stopWorkflow",
+      "notes": "Selecionar Abelha — Backend (Header Auth). Backend precisa da migration e desta versão publicada antes de testar.",
+      "notesInFlow": true
+    },
+    {
+      "id": "b57c42e4-d7f9-6ab6-e01c-b7a5008cf4fb",
+      "name": "Confirmar relatório",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {json:{received:true,id:$json.id,review_required:true,completed_milestones:0}};"
+      }
+    },
+    {
+      "id": "bd10ad1f-1ee4-5c43-8b44-f5b7005eafd6",
+      "name": "Receber GitHub assinado",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        280
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "abelha/v1/projects/github",
+        "authentication": "none",
+        "responseMode": "lastNode",
+        "responseData": "firstEntryJson",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "webhookId": "69c4dae5-60b8-742b-69ec-71ab2b3b6b06",
+      "notes": "HMAC obrigatório, validado no backend sobre bytes originais. Não selecionar Header Auth de outro projeto.",
+      "notesInFlow": true
+    },
+    {
+      "id": "0f756b11-0ddf-be3d-80a4-2125cc909b3b",
+      "name": "Conservar assinatura GitHub",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        280
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const headers = $json.headers || {};\nconst signature = headers['x-hub-signature-256'];\nconst event = headers['x-github-event'];\nconst delivery = headers['x-github-delivery'];\nif (typeof signature !== 'string' || !/^sha256=[a-f0-9]{64}$/.test(signature)) throw new Error('Formato de assinatura GitHub inválido');\nif (!['ping', 'push', 'pull_request', 'workflow_run'].includes(event) || typeof delivery !== 'string' || !/^[a-zA-Z0-9-]{1,100}$/.test(delivery)) throw new Error('Evento GitHub inválido');\nconst binary = $input.item.binary;\nif (!binary?.data || Number(headers['content-length'] || 0) > 2097152) throw new Error('Corpo GitHub original ausente ou acima de 2 MiB');\n// Sem parse/JSON.stringify: assinatura é validada criptograficamente pelo backend.\nreturn {json: {signature, event, delivery}, binary: {data: {...binary.data, mimeType: 'application/json'}}};\n"
+      }
+    },
+    {
+      "id": "1ebc3e05-e5b8-6143-68f3-6c9caa7d2c85",
+      "name": "Encaminhar GitHub assinado",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        520,
+        280
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/github",
+        "authentication": "none",
+        "options": {
+          "timeout": 60000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Hub-Signature-256",
+              "value": "={{ $json.signature }}"
+            },
+            {
+              "name": "X-GitHub-Event",
+              "value": "={{ $json.event }}"
+            },
+            {
+              "name": "X-GitHub-Delivery",
+              "value": "={{ $json.delivery }}"
+            }
+          ]
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "stopWorkflow",
+      "notes": "Não enviar credencial do backend a este nó.",
+      "notesInFlow": true
+    },
+    {
+      "id": "57cf0b59-34a8-30bb-edf9-d550d529fc8f",
+      "name": "Confirmar evento GitHub",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        280
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {json:{received:!!$json.received,matched_projects:$json.matched_projects||0,recorded_updates:$json.recorded_updates||0,completed_milestones:0}};"
+      }
+    }
+  ],
+  "connections": {
+    "Receber relatório Codex": {
+      "main": [
+        [
+          {
+            "node": "Validar projeto e relatório",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar projeto e relatório": {
+      "main": [
+        [
+          {
+            "node": "Registrar relatório pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar relatório pendente": {
+      "main": [
+        [
+          {
+            "node": "Confirmar relatório",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Receber GitHub assinado": {
+      "main": [
+        [
+          {
+            "node": "Conservar assinatura GitHub",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conservar assinatura GitHub": {
+      "main": [
+        [
+          {
+            "node": "Encaminhar GitHub assinado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Encaminhar GitHub assinado": {
+      "main": [
+        [
+          {
+            "node": "Confirmar evento GitHub",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Sao_Paulo",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false,
+    "saveExecutionProgress": false,
+    "executionTimeout": 900
+  },
+  "pinData": {},
+  "tags": []
+}

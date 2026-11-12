@@ -1,0 +1,94 @@
+{
+  "name": "Abelha — Revisão Semanal",
+  "active": false,
+  "nodes": [
+    {
+      "id": "c671d0ed-4920-d6a3-2622-033cffc1f25a",
+      "name": "Configuração e limites",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ],
+      "parameters": {
+        "content": "# Revisão Semanal\nAUXILIAR MANUAL: gera fotografia parcial desta semana com registros existentes. Revisão final de domingo pertence ao tick principal. Não conectar IA nem afirmar conclusão de marcos automaticamente.\n\nDESATIVADO: configurar credenciais e testar com dados sintéticos antes de ativar. URL canônica do backend preparada; se usar homologação, alterar todos os nós HTTP de backend. Não testar gravações em produção. Retenção de payloads desligada; erros interrompem o fluxo, sem continueOnFail. Não duplicar a instância ou o banco.",
+        "height": 330,
+        "width": 900
+      }
+    },
+    {
+      "id": "695499ed-080b-83d5-50de-1c3437483fd9",
+      "name": "Executar manualmente",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "51a83388-a1d7-c2fd-b0df-fdfdf3062884",
+      "name": "Gerar revisão parcial",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/weekly-review",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 60000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {} }}"
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "stopWorkflow",
+      "notes": "Selecionar Abelha — Backend (Header Auth). Backend precisa da migration e desta versão publicada antes de testar.",
+      "notesInFlow": true
+    }
+  ],
+  "connections": {
+    "Executar manualmente": {
+      "main": [
+        [
+          {
+            "node": "Gerar revisão parcial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Sao_Paulo",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false,
+    "saveExecutionProgress": false,
+    "executionTimeout": 900
+  },
+  "pinData": {},
+  "tags": []
+}

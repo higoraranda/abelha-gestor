@@ -1,12 +1,13 @@
-# Design do Abelha — carteira pessoal
+# Design do Abelha — CRM + Personal
 
 Referência aprovada: Rapport. Este documento substitui a antiga referência Linear escura, conforme briefing e escopo em docs/.
 
 ## Produto e identidade
-CRM pessoal em pt-BR, valores em reais, fuso America/Sao_Paulo. Preservar a marca da abelha e o amarelo. Nada de equipes, metas de vendedores ou decoração empresarial.
+CRM individual e organização pessoal em ambientes separados, em pt-BR, valores em reais, fuso America/Sao_Paulo. Preservar a marca da abelha e o amarelo. Nada de equipes, metas de vendedores ou decoração empresarial.
 
 ## Cores e superfícies
 Fonte de verdade: frontend/src/workspace.css, carregado após o CSS histórico por main.tsx.
+Extensões de composição em frontend/src/personal.css, carregadas por último; usam os mesmos tokens. Não há um tema paralelo para o Personal.
 - Fundo: #EBE8E1, com campos suaves de amarelo quente e verde dessaturado.
 - Texto: #17191A; secundário #62635E.
 - Ação principal: amarelo #F4D22F com texto quase preto.
@@ -20,6 +21,7 @@ Urbanist com fallback system-ui. Títulos 30–43px, peso 600, tracking discreto
 
 ## Navegação e composição
 Navegação superior: Visão geral, Clientes, Entregas, Pipeline, Financeiro, Agenda, Conversas e Relatórios. Rail de ações: busca, novo contato, agenda, exportações e calculadora externa. Notificações no cabeçalho. URL guarda área e registro selecionado para links de busca/notificações.
+O seletor CRM/Personal fica junto à marca. CRM acrescenta Buscar leads e Templates. Personal: Meu dia, Projetos, Faturas e metas, Contas, Preços, Revisão semanal e Preferências. Trocar ambiente limpa o registro anterior e troca menu, ações e central de avisos; links antigos continuam CRM. O gesto característico do Personal é o ritual da fatura no painel verde já usado nos próximos passos do CRM.
 Em celular: navegação rolável no topo, rail inferior, cards empilhados e quadros com rolagem própria. Não ocultar rolagem de formulários para fazer tabelas caberem.
 
 ## Padrões reutilizados

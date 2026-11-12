@@ -1,0 +1,277 @@
+{
+  "name": "Abelha — Monitor de Preços",
+  "active": false,
+  "nodes": [
+    {
+      "id": "c671d0ed-4920-d6a3-2622-033cffc1f25a",
+      "name": "Configuração e limites",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ],
+      "parameters": {
+        "content": "# Monitor de Preços\nPREPARADO para API HTTPS autorizada. Configurar PROVIDER_URL/PRODUCT_HOSTS no nó de preparação e selecionar credencial própria do provedor. API deve devolver event_id estável, store, product_url idêntica (mesma variação), price numérico BRL, currency:BRL, observed_at real. Código bloqueia sem configuração; nenhuma cotação é fabricada. Backend guarda histórico/notifica queda; push sai no tick.\n\nDESATIVADO: configurar credenciais e testar com dados sintéticos antes de ativar. URL canônica do backend preparada; se usar homologação, alterar todos os nós HTTP de backend. Não testar gravações em produção. Retenção de payloads desligada; erros interrompem o fluxo, sem continueOnFail. Não duplicar a instância ou o banco.",
+        "height": 330,
+        "width": 900
+      }
+    },
+    {
+      "id": "2cc3402b-81cc-62b6-f907-fb088464abd7",
+      "name": "A cada 15 minutos",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "695499ed-080b-83d5-50de-1c3437483fd9",
+      "name": "Executar manualmente",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        180
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "042d2e5d-4f65-1aae-db86-ec246613cd6d",
+      "name": "Listar monitores devidos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/prices/due",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 60000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "retryOnFail": false,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "stopWorkflow",
+      "notes": "Selecionar Abelha — Backend (Header Auth). Backend precisa da migration e desta versão publicada antes de testar.",
+      "notesInFlow": true
+    },
+    {
+      "id": "766e70c0-1cf3-690c-8745-2e2af55f891e",
+      "name": "Preparar consultas autorizadas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// CONFIGURAR no nó antes do teste. Nenhuma URL recebida escolhe o host da API.\nconst PROVIDER_URL = 'https://configure-authorized-price-api.invalid/quote';\nconst PRODUCT_HOSTS = [];\nfunction host(value) {\n  if (typeof value !== 'string' || /[\\\\\\s]/.test(value)) throw new Error('URL HTTPS inválida');\n  const match = value.match(/^https:\\/\\/([a-z0-9.-]+)(?:\\/[^#]*)?$/i);\n  if (!match) throw new Error('URL HTTPS inválida');\n  return match[1].toLowerCase();\n}\nif (host(PROVIDER_URL).endsWith('.invalid') || !PRODUCT_HOSTS.length) throw new Error('CONFIGURAR API autorizada e PRODUCT_HOSTS antes de executar');\nreturn $input.all().flatMap((item, index) => {\n  const watch = item.json;\n  if (typeof watch.id !== 'string' || !/^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(watch.id)) throw new Error('Monitor inválido');\n  // Desejos sem link continuam aguardando configuração; não inventar consulta.\n  if (watch.product_url === null || watch.product_url === '') return [];\n  if (!PRODUCT_HOSTS.includes(host(watch.product_url))) throw new Error('Produto fora da allowlist autorizada');\n  return [{json: {watch_id: watch.id, product_url: watch.product_url, provider_url: PROVIDER_URL}, pairedItem: {item: index}}];\n});\n"
+      }
+    },
+    {
+      "id": "09b86386-856d-a88f-f922-dea70e93c528",
+      "name": "Consultar API autorizada",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.provider_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 60000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "fullResponse": true
+            }
+          },
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 1000
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {monitor_id:$json.watch_id,product_url:$json.product_url} }}"
+      },
+      "retryOnFail": false,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "stopWorkflow",
+      "notes": "Selecionar Abelha — API de Preços (credencial própria da fonte). Nunca selecionar Abelha — Backend. Contrato de saída em docs/CLOUDFY-N8N.md; sem scraping e sem redirects.",
+      "notesInFlow": true
+    },
+    {
+      "id": "d142c624-3931-b73a-620c-571428990257",
+      "name": "Validar cotação real",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "if (!Number.isInteger($json.statusCode) || $json.statusCode < 200 || $json.statusCode >= 300 || !$json.body || typeof $json.body !== 'object' || Array.isArray($json.body)) throw new Error('API não retornou um objeto de cotação válido');\nconst quote = $json.body;\nconst monitor = $('Preparar consultas autorizadas').item.json;\nif (quote.currency !== 'BRL' || typeof quote.price !== 'number' || !Number.isFinite(quote.price) || quote.price <= 0 || quote.price > 999999999.99 || Math.abs(quote.price * 100 - Math.round(quote.price * 100)) > 0.00001) throw new Error('Cotação deve conter preço real em BRL com duas casas decimais');\nif (quote.product_url !== monitor.product_url) throw new Error('Cotação de outro produto/variação');\nif (typeof quote.event_id !== 'string' || !quote.event_id.trim() || quote.event_id.length > 160 || typeof quote.store !== 'string' || !quote.store.trim() || quote.store.length > 240) throw new Error('Cotação sem identificador estável ou loja');\nconst observed = Date.parse(quote.observed_at);\nif (typeof quote.observed_at !== 'string' || !Number.isFinite(observed) || observed > Date.now() + 60000 || observed < Date.now() - 7 * 86400000) throw new Error('Data real da cotação ausente ou inválida');\nreturn {json: {watch_id: monitor.watch_id, event_id: quote.event_id.trim(), store: quote.store.trim(), product_url: quote.product_url, price: quote.price, observed_at: quote.observed_at}};\n"
+      }
+    },
+    {
+      "id": "409a7f50-d931-1c39-7658-56ef8620b150",
+      "name": "Registrar observação",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1280,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ \"https://abelha-gestor-api.onrender.com/api/v1/integrations/prices/\" + encodeURIComponent($json.watch_id) + \"/observations\" }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 60000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {event_id:$json.event_id,store:$json.store,product_url:$json.product_url,price:$json.price,observed_at:$json.observed_at} }}"
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "stopWorkflow",
+      "notes": "Selecionar Abelha — Backend (Header Auth). Backend precisa da migration e desta versão publicada antes de testar.",
+      "notesInFlow": true
+    }
+  ],
+  "connections": {
+    "A cada 15 minutos": {
+      "main": [
+        [
+          {
+            "node": "Listar monitores devidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Executar manualmente": {
+      "main": [
+        [
+          {
+            "node": "Listar monitores devidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Listar monitores devidos": {
+      "main": [
+        [
+          {
+            "node": "Preparar consultas autorizadas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar consultas autorizadas": {
+      "main": [
+        [
+          {
+            "node": "Consultar API autorizada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar API autorizada": {
+      "main": [
+        [
+          {
+            "node": "Validar cotação real",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar cotação real": {
+      "main": [
+        [
+          {
+            "node": "Registrar observação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Sao_Paulo",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false,
+    "saveExecutionProgress": false,
+    "executionTimeout": 900
+  },
+  "pinData": {},
+  "tags": []
+}

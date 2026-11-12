@@ -1,0 +1,14 @@
+{
+  "description": "Public synthetic compatibility vector; generated with Auth Core 0.35.0, never a real credential.",
+  "secret": "abelha-synthetic-session-compatibility-not-a-real-secret",
+  "salt": "__Secure-authjs.session-token",
+  "token": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwia2lkIjoidmh3Q0xRRHVZUUNtdTRGand2cHZ0MVlrQWplWDEyYVRoWkZueVRlZ0wwUTZBcjZiWFlTM0JObFVWdnpvYTNiQndDdmRtd2Q2Umx0aG04WmNwTUswUVEifQ..aUbE4-hrcRb-1f2n9yhjcw.SBjwWZoSgqDFW1DCF_FPyehPI7ATDMik-vvtO5T6wabkHw5t-rzQYMpRAKOBrQDIldnbs_ll3rb0lU8eucjR7tb_Az7O3uz6VvuTw1YiFonaw48N3dXYEiPGqC45V_uzB_w3uKOY3w4aTm88jzfYCs_UhTh1uE3zeZrp2rC9KWH14Wbsck8Sd-ACBVwvxASui1wC5xy1JZ-3P1N7aE6Z_O2TamJ9JX3LI709-eCXzVbZHo8Wwsa_KxKcfcTGa58OqRIZ5Hh2dnqh4gQbSeqM5Te9tPQDgWSTDgZeO0OybuPxj3De-V3RX27FUC_zewu3SkVgu73lHoFDJUAAwGIhDNzUeNoh3FH6STTAD7WOJlzGKInzZl479WnWpg3ZbMS8DNsHaerPl7DYFuANar35VdkWFq1r4nSNvkAccFec-zQ.TmioQB8Gq7SM8zHhY6dTD6UbHqSAe_Yf9XQBCVYKbUQ",
+  "payload": {
+    "sub": "20000000-0000-4000-8000-000000000001",
+    "userId": "20000000-0000-4000-8000-000000000001",
+    "organizationId": "10000000-0000-4000-8000-000000000001",
+    "role": "owner",
+    "name": "Synthetic legacy session",
+    "email": "synthetic@example.invalid"
+  }
+}

@@ -33,6 +33,20 @@ foram preservados e as consultas reais foram conferidas em leitura. Para outro
 ambiente, consulte o procedimento de migration na documentação. Não execute
 backend/src/db/schema.sql: ele apaga tabelas.
 
+## CRM + Personal — evolução de 11/11/2026
+
+A implementação local acrescenta ambientes separados, instalação PWA, central de projetos com revisão de evidências, busca pública de leads e templates, faturas/metas pessoais, recorrências, monitores de preço e revisão semanal. Mantém o CRM e suas regras financeiras.
+
+**Ativação pendente:** a migration `20261111_personal_platform.sql` não foi aplicada ao Neon e não houve deploy. Push, GitHub/n8n, captura por IA e consultas automáticas de preço dependem de configuração e testes reais. Nenhum preço ou status de projeto ilustrativo foi importado na carteira.
+
+- [Estado atual e validações](docs/PROGRESSO.md)
+- [Roadmap](docs/ROADMAP-ABELHA.md)
+- [Arquitetura](docs/ARQUITETURA-PERSONAL.md)
+- [Configuração e migration revisável](docs/GUIA-CONFIGURACAO.md)
+- [Instalação PWA](docs/GUIA-PWA.md)
+- [Integrações e workflows n8n](docs/INTEGRACOES-N8N.md)
+- [Workflows criados na Cloudfy: IDs, configuração e ativação](docs/CLOUDFY-N8N.md)
+
 ## Arquitetura original
 
 CRM web integrado ao WhatsApp, distribuído como SaaS multi-tenant. Permite que profissionais autônomos e pequenas empresas gerenciem conversas de WhatsApp, contatos e relacionamento comercial em um único painel — sem depender do WhatsApp Web.
@@ -313,11 +327,10 @@ npm run dev
 ### Banco de dados
 
 ```bash
-# Rodar o schema
-psql $DATABASE_URL < backend/src/db/schema.sql
-
-# Criar organização e usuário inicial
-cd backend && npx ts-node src/db/seed.ts
+# Em uma carteira existente, use somente migrations incrementais
+# após revisão e autorização do ambiente. Veja docs/GUIA-CONFIGURACAO.md.
+# NÃO executar backend/src/db/schema.sql: ele contém reset destrutivo.
+# NÃO executar seed automaticamente em uma carteira existente.
 ```
 
 ---

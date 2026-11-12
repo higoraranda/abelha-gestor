@@ -1,0 +1,178 @@
+{
+  "date": "2026-11-12",
+  "infrastructure": {
+    "id": "a1d393bd-e0ee-42f0-9408-37b9f5a49cff",
+    "name": "socialbaboon",
+    "n8n_url": "https://socialbaboon-n8n.cloudfy.live/"
+  },
+  "backend_url": "https://abelha-gestor-api.onrender.com",
+  "remote_definitions_verified": true,
+  "price_update_snapshot_id": "688e38ee-57ee-41e1-8f2b-fc988dacf556",
+  "remote_runtime_tested": false,
+  "credentials_configured": false,
+  "production_migration_applied": false,
+  "backend_deployed": false,
+  "existing_workflows_preserved": [
+    "shDnJzDKrgyfnkIp",
+    "HKqYD9ssB5pFIEqh",
+    "WHuoRTvAPIkzTlAP"
+  ],
+  "workflows": [
+    {
+      "file": "abelha-finance-reminder.json",
+      "id": "RIUNsrZPnldxps8j",
+      "name": "Abelha — Lembretes Financeiros",
+      "active": false,
+      "url": "https://socialbaboon-n8n.cloudfy.live/workflow/RIUNsrZPnldxps8j",
+      "nodes": 4,
+      "mismatches": [],
+      "webhooks": [],
+      "settings": {
+        "executionOrder": "v1",
+        "timezone": "America/Sao_Paulo",
+        "saveDataSuccessExecution": "none",
+        "saveDataErrorExecution": "none",
+        "saveManualExecutions": false,
+        "saveExecutionProgress": false,
+        "executionTimeout": 900
+      }
+    },
+    {
+      "file": "abelha-leads-capture.json",
+      "id": "Sb4LGFXnX2q8QQVO",
+      "name": "Abelha — Captura de Leads",
+      "active": false,
+      "url": "https://socialbaboon-n8n.cloudfy.live/workflow/Sb4LGFXnX2q8QQVO",
+      "nodes": 5,
+      "mismatches": [],
+      "webhooks": [
+        {
+          "name": "Receber captura",
+          "path": "abelha/v1/leads/capture",
+          "authentication": "headerAuth"
+        }
+      ],
+      "settings": {
+        "executionOrder": "v1",
+        "timezone": "America/Sao_Paulo",
+        "saveDataSuccessExecution": "none",
+        "saveDataErrorExecution": "none",
+        "saveManualExecutions": false,
+        "saveExecutionProgress": false,
+        "executionTimeout": 900
+      }
+    },
+    {
+      "file": "abelha-leads-search.json",
+      "id": "3glUHHeETfeQzJbr",
+      "name": "Abelha — Busca de Leads",
+      "active": false,
+      "url": "https://socialbaboon-n8n.cloudfy.live/workflow/3glUHHeETfeQzJbr",
+      "nodes": 10,
+      "mismatches": [],
+      "webhooks": [
+        {
+          "name": "Receber busca",
+          "path": "abelha/v1/leads/search",
+          "authentication": "headerAuth"
+        }
+      ],
+      "settings": {
+        "executionOrder": "v1",
+        "timezone": "America/Sao_Paulo",
+        "saveDataSuccessExecution": "none",
+        "saveDataErrorExecution": "none",
+        "saveManualExecutions": false,
+        "saveExecutionProgress": false,
+        "executionTimeout": 900
+      }
+    },
+    {
+      "file": "abelha-price-monitor.json",
+      "id": "KQ29tKdXsT4seDHN",
+      "name": "Abelha — Monitor de Preços",
+      "active": false,
+      "url": "https://socialbaboon-n8n.cloudfy.live/workflow/KQ29tKdXsT4seDHN",
+      "nodes": 8,
+      "mismatches": [],
+      "webhooks": [],
+      "settings": {
+        "executionOrder": "v1",
+        "timezone": "America/Sao_Paulo",
+        "saveDataSuccessExecution": "none",
+        "saveDataErrorExecution": "none",
+        "saveManualExecutions": false,
+        "saveExecutionProgress": false,
+        "executionTimeout": 900
+      }
+    },
+    {
+      "file": "abelha-project-sync.json",
+      "id": "vHpvCObsiu5fRXWe",
+      "name": "Abelha — Sincronização de Projetos",
+      "active": false,
+      "url": "https://socialbaboon-n8n.cloudfy.live/workflow/vHpvCObsiu5fRXWe",
+      "nodes": 9,
+      "mismatches": [],
+      "webhooks": [
+        {
+          "name": "Receber relatório Codex",
+          "path": "abelha/v1/projects/report",
+          "authentication": "headerAuth"
+        },
+        {
+          "name": "Receber GitHub assinado",
+          "path": "abelha/v1/projects/github",
+          "authentication": "none"
+        }
+      ],
+      "settings": {
+        "executionOrder": "v1",
+        "timezone": "America/Sao_Paulo",
+        "saveDataSuccessExecution": "none",
+        "saveDataErrorExecution": "none",
+        "saveManualExecutions": false,
+        "saveExecutionProgress": false,
+        "executionTimeout": 900
+      }
+    },
+    {
+      "file": "abelha-subscriptions-alerts.json",
+      "id": "U9xr0ZokbZeXDaAb",
+      "name": "Abelha — Contas e Assinaturas",
+      "active": false,
+      "url": "https://socialbaboon-n8n.cloudfy.live/workflow/U9xr0ZokbZeXDaAb",
+      "nodes": 3,
+      "mismatches": [],
+      "webhooks": [],
+      "settings": {
+        "executionOrder": "v1",
+        "timezone": "America/Sao_Paulo",
+        "saveDataSuccessExecution": "none",
+        "saveDataErrorExecution": "none",
+        "saveManualExecutions": false,
+        "saveExecutionProgress": false,
+        "executionTimeout": 900
+      }
+    },
+    {
+      "file": "abelha-weekly-review.json",
+      "id": "RnE5lBhUY3k0hoAV",
+      "name": "Abelha — Revisão Semanal",
+      "active": false,
+      "url": "https://socialbaboon-n8n.cloudfy.live/workflow/RnE5lBhUY3k0hoAV",
+      "nodes": 3,
+      "mismatches": [],
+      "webhooks": [],
+      "settings": {
+        "executionOrder": "v1",
+        "timezone": "America/Sao_Paulo",
+        "saveDataSuccessExecution": "none",
+        "saveDataErrorExecution": "none",
+        "saveManualExecutions": false,
+        "saveExecutionProgress": false,
+        "executionTimeout": 900
+      }
+    }
+  ]
+}

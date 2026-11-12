@@ -1,0 +1,125 @@
+{
+  "name": "Abelha — Lembretes Financeiros",
+  "active": false,
+  "nodes": [
+    {
+      "id": "c671d0ed-4920-d6a3-2622-033cffc1f25a",
+      "name": "Configuração e limites",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ],
+      "parameters": {
+        "content": "# Lembretes Financeiros\nÚNICO tick agendado do Abelha: fatura, contas, revisão de domingo e fila push. Configurar horários no Personal; VAPID no backend. Janela de 30 minutos após a virada. Repetições têm chaves estáveis no banco. Não ativar agendadores auxiliares duplicados.\n\nDESATIVADO: configurar credenciais e testar com dados sintéticos antes de ativar. URL canônica do backend preparada; se usar homologação, alterar todos os nós HTTP de backend. Não testar gravações em produção. Retenção de payloads desligada; erros interrompem o fluxo, sem continueOnFail. Não duplicar a instância ou o banco.",
+        "height": 330,
+        "width": 900
+      }
+    },
+    {
+      "id": "2cc3402b-81cc-62b6-f907-fb088464abd7",
+      "name": "A cada 15 minutos",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "695499ed-080b-83d5-50de-1c3437483fd9",
+      "name": "Executar manualmente",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        180
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "25aaa642-94b0-3637-129c-f81e131d25ea",
+      "name": "Executar tick completo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/tick",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 120000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {} }}"
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "stopWorkflow",
+      "notes": "Selecionar Abelha — Backend (Header Auth). Backend precisa da migration e desta versão publicada antes de testar.",
+      "notesInFlow": true
+    }
+  ],
+  "connections": {
+    "A cada 15 minutos": {
+      "main": [
+        [
+          {
+            "node": "Executar tick completo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Executar manualmente": {
+      "main": [
+        [
+          {
+            "node": "Executar tick completo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Sao_Paulo",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false,
+    "saveExecutionProgress": false,
+    "executionTimeout": 900
+  },
+  "pinData": {},
+  "tags": []
+}

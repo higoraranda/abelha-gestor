@@ -1,0 +1,19 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://abelha.example/schemas/development-report-v1.json",
+  "title":"Abelha Development Report v1",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["schema_version","event_id","summary","commit","tests","acceptance","next_step"],
+  "properties":{
+    "schema_version":{"const":1},
+    "event_id":{"type":"string","minLength":1,"maxLength":160},
+    "summary":{"type":"string","minLength":1,"maxLength":10000},
+    "commit":{"type":"string","pattern":"^[a-fA-F0-9]{40}$"},
+    "pull_request":{"type":"string","format":"uri"},
+    "tests":{"type":"array","minItems":1,"maxItems":30,"items":{"type":"object","additionalProperties":false,"required":["name","command","result","evidence_url"],"properties":{"name":{"type":"string","minLength":1,"maxLength":240},"command":{"type":"string","minLength":1,"maxLength":500},"result":{"const":"passed"},"evidence_url":{"type":"string","format":"uri"}}}},
+    "acceptance":{"type":"array","minItems":1,"maxItems":50,"items":{"type":"string","minLength":1,"maxLength":1000}},
+    "next_step":{"type":"string","minLength":1,"maxLength":2000},
+    "blockers":{"type":"array","maxItems":30,"items":{"type":"string","minLength":1,"maxLength":1000}}
+  }
+}

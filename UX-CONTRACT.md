@@ -1,0 +1,22 @@
+# Contratos de interface — Abelha
+
+Fonte de produto: docs/ROADMAP-ABELHA.md, docs/ARQUITETURA-PERSONAL.md, docs/briefing-aprovado.md. Valores visuais: DESIGN.md; tokens executáveis: frontend/src/workspace.css.
+
+| Capability | Canonical owner | Source of truth | Allowed variants | Verification |
+|---|---|---|---|---|
+| Select/Listbox | select nativo + workspace.css | DESIGN.md | Opções curtas, rótulo acessível, teclado do sistema | Browser: seleção/teclado |
+| Date | input date/time nativo + lib/time.ts | docs/ARQUITETURA-PERSONAL.md | Datas civis; horários America/Sao_Paulo | Testes de fuso e browser |
+| Form | crm-form + Modal.tsx + API | Fluxos existentes CRM e pedido de preservação | Validação nativa de required/min/max + servidor; bloqueio de envio duplicado e rascunho mantido | Browser e API real sintética |
+| Scrollbar | workspace.css | DESIGN.md | Rolagem visível; quadros/tabelas com rolagem interna | Browser em 390px |
+| Toast | feedback inline role=status/alert | Fluxos existentes CRM | Sucesso junto à ação; erro persistente | Browser/erros API |
+| CRUD | useRemote.ts + lib/api.ts | docs/ARQUITETURA-PERSONAL.md | Consultas canceláveis; atualizar após salvar; cancelar não grava | Testes HTTP/SQL e browser |
+| Modal | components/ui/Modal.tsx | DESIGN.md | Radix, Escape, foco/restauração, conteúdo rolável | Browser/teclado |
+| Navegação | lib/navigation.ts + AppSidebar/AppPage | docs/ROADMAP-ABELHA.md | Ambiente/tela na URL e histórico | Testes e browser |
+
+Decisão de compatibilidade: manter validação nativa dos formulários, com validação de autoridade no servidor, e textareas redimensionáveis verticalmente como no CRM existente. O auditor da skill exige `noValidate` e `resize:none` independentemente do contrato: esses achados serão registrados como divergências conhecidas, sem reescrever os formulários comerciais para atender uma preferência genérica da ferramenta. Isso não representa aprovação integral na auditoria estática.
+
+## PWA e dados privados
+Offline mostra aviso e exige reconexão para consultar/salvar dados. Não disponibilizar último financeiro por cache. Atualização manual não recarrega uma tela silenciosamente. Permissão push apenas após clique; negar permissão não impede uso normal. Notificações na tela bloqueada têm texto genérico.
+
+## Projetos e integrações
+Sem status/progresso fictício em vazio. Marco só conclui após critérios e evidência revisados; relatório recebido permanece pendente. Reexecução conserva o mesmo registro. APIs sem configuração explicam a ação necessária.

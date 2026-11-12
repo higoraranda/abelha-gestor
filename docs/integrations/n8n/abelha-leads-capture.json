@@ -1,0 +1,154 @@
+{
+  "name": "Abelha — Captura de Leads",
+  "active": false,
+  "nodes": [
+    {
+      "id": "c671d0ed-4920-d6a3-2622-033cffc1f25a",
+      "name": "Configuração e limites",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ],
+      "parameters": {
+        "content": "# Captura de Leads\nWebhook autenticado de email/formulário. event_id/message_id estável, name e message/summary/text obrigatórios. Classificação por regras, sem IA ou custo. Backend deduplica e aguarda revisão humana; nunca cria contato automaticamente.\n\nDESATIVADO: configurar credenciais e testar com dados sintéticos antes de ativar. URL canônica do backend preparada; se usar homologação, alterar todos os nós HTTP de backend. Não testar gravações em produção. Retenção de payloads desligada; erros interrompem o fluxo, sem continueOnFail. Não duplicar a instância ou o banco.",
+        "height": 330,
+        "width": 900
+      }
+    },
+    {
+      "id": "4bab896f-ce3f-8a4d-6fdb-cb1e9e26c3df",
+      "name": "Receber captura",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "abelha/v1/leads/capture",
+        "authentication": "headerAuth",
+        "responseMode": "lastNode",
+        "responseData": "firstEntryJson",
+        "options": {}
+      },
+      "webhookId": "d22e4849-dd62-4f29-cd30-4697c00f7ec8",
+      "notes": "Selecionar credencial Abelha — Entrada Webhook, separada do token do backend.",
+      "notesInFlow": true
+    },
+    {
+      "id": "ce37d1d1-edab-9211-5f98-9a47e7ab8a4d",
+      "name": "Extrair e classificar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Classificação determinística; não é uma classificação por IA.\nconst b = $json.body || $json;\nfunction text(value, max, label) {\n  if (typeof value !== 'string' || !value.trim() || value.trim().length > max) throw new Error('Entrada inválida: ' + label);\n  return value.trim();\n}\nconst event_id = text(b.event_id || b.message_id, 160, 'event_id estável obrigatório');\nconst name = text(b.name, 240, 'name');\nconst summary = text(b.summary || b.message || b.text, 10000, 'summary/message/text').replace(/<[^>]*>/g, ' ').replace(/\\s+/g, ' ').trim();\nconst source = b.source || 'form';\nif (!['email', 'form'].includes(source)) throw new Error('Fonte inválida: use email ou form');\nconst detectedEmail = summary.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/i)?.[0] || '';\nconst email = b.email || detectedEmail;\nif (typeof email !== 'string' || email.length > 255 || (email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email))) throw new Error('Email inválido');\nconst detectedPhone = summary.match(/(?:whatsapp|telefone|celular|tel)\\s*[:=-]?\\s*(\\+?\\d[\\d\\s().-]{7,24}\\d)/i)?.[1] || '';\nconst rawPhone = b.phone || detectedPhone;\nif (typeof rawPhone !== 'string' || rawPhone.length > 100) throw new Error('Telefone inválido');\nconst phone = rawPhone.replace(/\\D/g, '');\nif (phone && (phone.length < 8 || phone.length > 15)) throw new Error('Telefone inválido');\nconst normalized = summary.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();\nconst rules = [['landing', 'Landing page'], ['site institucional', 'Site institucional'], ['site', 'Site'], ['crm', 'CRM'], ['automacao', 'Automação'], ['whatsapp', 'WhatsApp']];\nconst classification = 'Regra local: ' + (rules.find(([word]) => normalized.includes(word))?.[1] || 'Revisar');\nconst evidence_reference = text(b.evidence_reference || source + '/' + event_id, 500, 'evidence_reference');\nreturn {json: {event_id, source, name, summary, phone, email: email.toLowerCase(), classification, evidence_reference}};\n"
+      }
+    },
+    {
+      "id": "0236c85f-e8cc-52ec-a48a-a7834e39a3a8",
+      "name": "Enviar captura para revisão",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        520,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/leads/capture",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 60000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}"
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "stopWorkflow",
+      "notes": "Selecionar Abelha — Backend (Header Auth). Backend precisa da migration e desta versão publicada antes de testar.",
+      "notesInFlow": true
+    },
+    {
+      "id": "a5b4cf77-e209-2e13-40fa-b3c4dad89a26",
+      "name": "Confirmar captura",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {json:{received:true,id:$json.id,reused:!!$json.reused,review_required:true}};"
+      }
+    }
+  ],
+  "connections": {
+    "Receber captura": {
+      "main": [
+        [
+          {
+            "node": "Extrair e classificar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair e classificar": {
+      "main": [
+        [
+          {
+            "node": "Enviar captura para revisão",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar captura para revisão": {
+      "main": [
+        [
+          {
+            "node": "Confirmar captura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Sao_Paulo",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false,
+    "saveExecutionProgress": false,
+    "executionTimeout": 900
+  },
+  "pinData": {},
+  "tags": []
+}

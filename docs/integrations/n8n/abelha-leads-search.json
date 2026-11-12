@@ -1,0 +1,318 @@
+{
+  "name": "Abelha — Busca de Leads",
+  "active": false,
+  "nodes": [
+    {
+      "id": "c671d0ed-4920-d6a3-2622-033cffc1f25a",
+      "name": "Configuração e limites",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -420
+      ],
+      "parameters": {
+        "content": "# Busca de Leads\nWebhook autenticado: niche (dentists/clinics/restaurants/beauty/gyms/shops), city, limit 1–50. Consulta Overpass e normalização já pertencem ao backend; não duplicar consulta. Intervalo mínimo de um minuto por conta. Resultados são candidatos OpenStreetMap com atribuição para revisão.\n\nDESATIVADO: configurar credenciais e testar com dados sintéticos antes de ativar. URL canônica do backend preparada; se usar homologação, alterar todos os nós HTTP de backend. Não testar gravações em produção. Retenção de payloads desligada; erros interrompem o fluxo, sem continueOnFail. Não duplicar a instância ou o banco.",
+        "height": 330,
+        "width": 900
+      }
+    },
+    {
+      "id": "06b7f04e-37cb-12e6-5f8d-be90e6f4615f",
+      "name": "Receber busca",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "abelha/v1/leads/search",
+        "authentication": "headerAuth",
+        "responseMode": "lastNode",
+        "responseData": "firstEntryJson",
+        "options": {}
+      },
+      "webhookId": "26391fe9-7239-7e03-90b8-29ea26dfedd2",
+      "notes": "Selecionar credencial Abelha — Entrada Webhook, separada do token do backend.",
+      "notesInFlow": true
+    },
+    {
+      "id": "3e7d9b9a-657a-13a7-fa9d-879dbc818885",
+      "name": "Validar busca",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const b = $json.body || $json;\nconst niches = ['dentists', 'clinics', 'restaurants', 'beauty', 'gyms', 'shops'];\nif (!niches.includes(b.niche)) throw new Error('Nicho inválido');\nif (typeof b.city !== 'string' || !b.city.trim() || b.city.length > 100 || /[\";\\\\\\n\\r\\[\\]{}()]/.test(b.city)) throw new Error('Cidade inválida');\nconst limit = b.limit === undefined ? 10 : Number(b.limit);\nif (!Number.isInteger(limit) || limit < 1 || limit > 50) throw new Error('Limite deve ser inteiro entre 1 e 50');\nreturn {json: {niche: b.niche, city: b.city.trim(), limit}};\n"
+      }
+    },
+    {
+      "id": "726cd6cf-556f-76b5-6a5f-4224136fd031",
+      "name": "Consultar Overpass pelo backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/leads/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 35000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}"
+      },
+      "retryOnFail": false,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "stopWorkflow",
+      "notes": "Selecionar Abelha — Backend (Header Auth). Backend precisa da migration e desta versão publicada antes de testar.",
+      "notesInFlow": true
+    },
+    {
+      "id": "1fb478e4-1a3a-17ca-fd1f-d1c31a8ae63c",
+      "name": "Verificar resultados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "if(!Array.isArray($json.items))throw new Error(\"Resposta pública inválida\");return {json:{...$json,has_results:$json.items.length>0}};"
+      }
+    },
+    {
+      "id": "dd99a14f-c62b-9c80-bb71-406e5e27cec0",
+      "name": "Há resultados?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        960,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-results",
+              "leftValue": "={{ $json.has_results }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "b09b73c9-cf07-66e7-a8fb-04cf02eca2de",
+      "name": "Separar resultados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        -80
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "if (!Array.isArray($json.items) || $json.items.length > 50) throw new Error('Resposta OpenStreetMap inválida');\nreturn $json.items.map((lead, index) => {\n  if (lead.source !== 'OpenStreetMap' || !/^(node|way|relation)\\/\\d+$/.test(lead.source_key || '') || typeof lead.name !== 'string' || !lead.name.trim() || typeof lead.niche !== 'string' || typeof lead.queried_at !== 'string') throw new Error('Referência OpenStreetMap inválida');\n  return {json: {source_key: lead.source_key, name: lead.name, niche: lead.niche, address: lead.address || '', phone: lead.phone || '', website: lead.website || null, queried_at: lead.queried_at}, pairedItem: {item: 0}};\n});\n"
+      }
+    },
+    {
+      "id": "c9ccdcb7-8910-9d27-a194-ae357c691b9c",
+      "name": "Guardar candidato público",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1440,
+        -80
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/leads/stage",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 60000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}"
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "stopWorkflow",
+      "notes": "Selecionar Abelha — Backend (Header Auth). Backend precisa da migration e desta versão publicada antes de testar.",
+      "notesInFlow": true
+    },
+    {
+      "id": "aec8a847-364f-39a4-62eb-175121e54832",
+      "name": "Confirmar busca",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        -80
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "return [{json:{received:true,staged:$input.all().length,review_required:true,attribution:\"© OpenStreetMap contributors — ODbL\"}}];"
+      }
+    },
+    {
+      "id": "d30c73df-8cfd-0b68-3573-39019b278136",
+      "name": "Busca sem resultados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        140
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {json:{received:true,staged:0,review_required:true,attribution:\"© OpenStreetMap contributors — ODbL\"}};"
+      }
+    }
+  ],
+  "connections": {
+    "Receber busca": {
+      "main": [
+        [
+          {
+            "node": "Validar busca",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar busca": {
+      "main": [
+        [
+          {
+            "node": "Consultar Overpass pelo backend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Overpass pelo backend": {
+      "main": [
+        [
+          {
+            "node": "Verificar resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar resultados": {
+      "main": [
+        [
+          {
+            "node": "Há resultados?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Há resultados?": {
+      "main": [
+        [
+          {
+            "node": "Separar resultados",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Busca sem resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separar resultados": {
+      "main": [
+        [
+          {
+            "node": "Guardar candidato público",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar candidato público": {
+      "main": [
+        [
+          {
+            "node": "Confirmar busca",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Sao_Paulo",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false,
+    "saveExecutionProgress": false,
+    "executionTimeout": 900
+  },
+  "pinData": {},
+  "tags": []
+}

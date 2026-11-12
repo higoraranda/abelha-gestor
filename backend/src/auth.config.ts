@@ -5,9 +5,9 @@ import type { Session, User } from "@auth/core/types"
 import bcrypt from "bcryptjs"
 import { db } from "./db/index"
 
-const isProduction = process.env.NODE_ENV === "production"
-
-export const authConfig: ExpressAuthConfig = {
+// Dependency injection keeps the production configuration unchanged while exercising
+// the real credential flow against an isolated database in compatibility tests.
+export function createAuthConfig(database:typeof db=db,isProduction=process.env.NODE_ENV === "production"):ExpressAuthConfig { return {
   providers: [
     Credentials({
       credentials: {
@@ -21,7 +21,7 @@ export const authConfig: ExpressAuthConfig = {
 
           if (!email || !password) return null
 
-          const users = await db`
+          const users = await database`
             SELECT id, organization_id, name, email, password_hash
             FROM users
             WHERE email = ${email}
@@ -85,4 +85,6 @@ export const authConfig: ExpressAuthConfig = {
   },
   // Necessário para funcionar sem HTTPS em desenvolvimento
   trustHost: true,
-}
+} }
+
+export const authConfig = createAuthConfig()

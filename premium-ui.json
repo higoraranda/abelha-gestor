@@ -1,0 +1,11 @@
+{
+  "profile":"product-admin",
+  "sourceRoots":["frontend/src"],
+  "locale":"pt-BR",
+  "canonicalMap":"UX-CONTRACT.md",
+  "requiredCapabilities":["Select/Listbox","Date","Form","Scrollbar","Toast","CRUD"],
+  "ownership":{"Select/Listbox":"native","Date":"native"},
+  "requiredCommands":["unit","lint","build"],
+  "commands":{"unit":"cd frontend && npm test","lint":"cd frontend && npm run lint","build":"cd frontend && npm run build"},
+  "evidence":{"crudFullFlow":"frontend/scripts/verify-personal.cjs","failurePaths":"backend/src/services/personal-api.test.ts"}
+}
