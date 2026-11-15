@@ -1,5 +1,7 @@
 # Configuração e ativação revisável
 
+Estado13/11: [Vercel Preview conectado ao backend HML](VERCEL-PREVIEW-HOMOLOGACAO.md), com Dark Mode e BACKEND_URL somente em Preview. Render HML usa main/40c179c, Auto-Deploy desligado e FRONTEND_URL do novo Preview. Sem mudanças na produção; offline remoto depende de acesso estático compatível com a proteção Vercel. Os detalhes de12/11 abaixo conservam o histórico anterior.
+
 ## Desenvolvimento
 
 Backend de homologação **ativo no Render Free**: https://abelha-gestor-api-hml.onrender.com, branch codex/homologacao-abelha, Auto-Deploy desligado. Database **abelha_homologacao**, role própria e compute Neon existente habilitado em0,25CU. AUTH_URL, FRONTEND_URL e VAPID foram configurados com os destinos de homologação. Conexão/secrets somente em `.abelha-homologacao/backend.env`, fora do Git; backend/.env de produção preservado. Resultado e próximo passo Preview: [RENDER-HOMOLOGACAO.md](RENDER-HOMOLOGACAO.md).

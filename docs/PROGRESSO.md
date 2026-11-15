@@ -1,5 +1,49 @@
 # Progresso — Abelha CRM + Personal
 
+## Estabilização prioritária — 14/11/2026
+
+**Produção ainda incompatível com o Personal: faltam 18 tabelas.** Diagnóstico, matriz de 17 telas e alternativas seguras: [DIAGNOSTICO-ESTABILIZACAO.md](DIAGNOSTICO-ESTABILIZACAO.md). Testes n8n e novas funcionalidades suspensos.
+
+- Neon produção:17 tabelas CRM; HML:35, com SELECT permitido à role própria. As sete áreas Personal, candidatos de leads e rascunhos de templates mostram a mensagem de atualização de banco pendente. As outras oito áreas CRM abriram sem alertas, apenas em leitura.
+- Vercel produção/Preview40c179c; Render produção4f78117/HML40c179c. O diff backend entre esses commits é vazio; republicar somente a API não resolve a ausência de schema. Nenhum aviso Auth.js foi tratado como causa principal sem evidência.
+- Corrigido localmente getSession(): sessão anônima200/null passa a retornar null, evitando TypeError e a tela incorreta de reconexão. Quatro regressões novas, com reprodução vermelho/verde; correção ainda não publicada.
+-53 testes backend e20 frontend, TypeScript, lint e builds aprovados.40 requisições HML aprovadas, incluindo25 rotas de leitura200, login/CSRF/cookies, CORS, rejeições401/403, preços sem configuração503 e logout.35 contagens/fingerprints e estado privado de listener preservados.
+- Build local contra HML confirmou sessão anônima→login no navegador. Usuário decidiu fazer a entrada sintética depois; navegação autenticada corrigida permanece pendente. Preview atual conserva o código anterior e precisa de publicação autorizada para validar a correção.
+- Overpass: um diagnóstico /api/status respondeu406; não comprova a causa do503 anterior. Sem buscas repetidas/importação real. Fonte de preços, WhatsApp, push físico e offline no Preview protegido continuam pendências próprias.
+- Main40c179c e todas as alterações anteriores, README e imagens preservados. Sem commit, push, deploy, migration, mudanças de produção, credenciais ou n8n. Publicação/migration coordenada ou rollback previamente ensaiado exigem autorização específica. Servidor e aba locais encerrados; PIDs13704/1956 ausentes e porta43651 livre. Recursos persistentes HML mantidos.
+
+## Tentativa de ensaio no motor n8n — 13/11/2026
+
+**Prepare e cleanup aprovados; nenhum teste do motor executado.** O helper existente confirmou banco/role HML e baseline sintética, criou o projeto de apoio e o removeu ao terminar. Cleanup confirmou as35 contagens/fingerprints restauradas e removeu o estado privado.
+
+- Chrome estava aberto no n8n, mas Computer Use interrompeu a sessão ao não conseguir determinar a URL atual no Windows com confiança suficiente para aplicar a política de segurança. Nenhum listener foi armado, nó executado ou operação manual disparada. Não houve tentativa de contornar esse bloqueio.
+- Workflow relido antes do ensaio:62 nós, desativado, dez destinos HML e settings de retenção preservados. Credenciais/configurações não foram alteradas. Git e todas as mudanças anteriores foram mantidos; sem deploy, commit, push ou migration.
+- Captura/deduplicação, busca, GitHub/HMAC, relatórios e tick/accounts/weekly-review continuam pendentes **no motor n8n**. Os resultados VM/HTTP/SQL anteriores não equivalem a esta validação.
+- O503 anterior do Overpass não recebeu nova consulta/diagnóstico nesta tentativa. Relatório Codex positivo continua dependendo de uma evidência Actions real; não foi fabricada execução ou URL de CI.
+- Ações manuais exatas e comandos existentes: [N8N-HOMOLOGACAO.md](N8N-HOMOLOGACAO.md), seção de ensaio manual. Executar prepare novamente, armar cada Test URL, executar os helpers e ramos manuais separadamente e encerrar com cleanup. Não ativar o workflow.
+
+## Estado atual — workflow único conectado à HML — 13/11/2026
+
+**n20DNyb13Aaw3nq5 configurado e testável em homologação, ainda desativado.** Procedimento e limites: [N8N-HOMOLOGACAO.md](N8N-HOMOLOGACAO.md); [relatório](audits/n8n-homologacao-20261113.json).
+
+- Cloudfy/socialbaboon: dez destinos backend alterados para https://abelha-gestor-api-hml.onrender.com, com paths/expressões preservados. Credenciais Abelha — Backend Homologação (nove saídas) e Abelha — Entrada Homologação (três entradas) criadas com segredos HML privados. GitHub conserva binário/HMAC, sem Header Auth.
+- Releitura integral:62 nós, posições/Sticky Notes, Code nodes, conexões, gatilhos e settings preservados; nenhum host de produção nos nós. Sete backups inativos com IDs/updatedAt inalterados. Snapshot anterior registrado, sem reimportação ou novo workflow.
+-53 testes backend/build aprovados;10 grupos sobre a definição/Code nodes remotos em VM e10 grupos VM→HTTP Render HML→PostgreSQL HML passaram. Captura/staging/reenvios, avisos financeiros/contas, GitHub HMAC/replay, revisão e falhas verificados.35 contagens/fingerprints restaurados; conexões fechadas, sem servidores/listeners temporários iniciados.
+- Motor n8n ainda não executado: plugin não registra listener manual/inicia o ensaio. Helper local e passos exatos preparados. Overpass respondeu503 na única busca de cidade sintética; relatório Codex positivo remoto depende de evidência Actions real (consulta retornou0 execuções). Relatório sem evidências foi rejeitado400. Não foram inventadas URLs de CI ou cotações.
+- Accounts continua alias do tick completo, com horários/deduplicação originais; não paga contas. Fonte de preços/allowlist/credencial, stdout e push físico continuam pendentes. Não ativar o relógio completo enquanto o ramo preços não estiver resolvido.
+- Alterações prévias do Preview/Dark Mode e checkout main/40c179c preservados. Sem commit, push, merge, deploy, migration, upgrade, mudança de produção ou da proteção Vercel nesta etapa.
+
+## Estado atual — Vercel Preview — 13/11/2026
+
+**Preview READY com Dark Mode**, usando o commit já publicado da main/40c179c. URL, configuração, testes e limites: [VERCEL-PREVIEW-HOMOLOGACAO.md](VERCEL-PREVIEW-HOMOLOGACAO.md). Os estados de12/11 abaixo são históricos.
+
+- Commits manuais somente na main, conforme preferência confirmada. Nenhuma branch criada/sincronizada, commit, push, merge ou PR nesta etapa; arquivos existentes preservados.
+- BACKEND_URL exclusivamente em Preview. Somente FRONTEND_URL do Render HML foi atualizada, com redeploy manual Free. Frontend/backend usam40c179c; Neon mantém banco/role HML e limites0,25CU. Sem migration ou alteração de produção.
+- Verificação local:53 backend,16 frontend, builds/TypeScript, lint,77 capturas e11 cenários funcionais aprovados.12 testes diretos HML passaram; CORS permite o novo Preview e recusa a origem de produção. Resultado remoto e limpeza: [evidência](audits/vercel-preview-20261113.json).
+- Uso online do Preview validado. Instalação offline remota bloqueada pela autenticação Vercel: precache sem credenciais não recebe o shell público. Proteção mantida; offline/atualização passaram localmente. Instalação e push físico continuam pendentes.
+- Cloudfy relido: workflow n20DNyb13Aaw3nq5,62 nós, inativo, sem credenciais referenciadas e dez destinos backend ainda na produção. Próximo passo é configurar HML; não ativar. Preços reais dependem de fonte autorizada.
+- Preview fixado em SHA; futuros pushes da main continuam sujeitos aos gatilhos de produção existentes. Não há necessidade de novo commit para usar o Preview atual.
+
 ## Estado atual — homologação e integração — 12/11/2026
 
 **Ensaios aprovados; produção ainda não liberada para Personal/automações.** Relatório e instruções exatas: [HOMOLOGACAO-INTEGRACAO.md](HOMOLOGACAO-INTEGRACAO.md); [evidência estruturada](audits/homologation-20261112.json).

@@ -1,5 +1,7 @@
 # Integrações e continuidade dos projetos
 
+**Configuração atual13/11:** workflow único conectado exclusivamente ao backend HML, com nove saídas Header Auth, três entradas protegidas e relay GitHub/HMAC preservado. Continua desativado. Credenciais já configuradas; testes reais, pendências e instruções de listener em [N8N-HOMOLOGACAO.md](N8N-HOMOLOGACAO.md). Os modelos locais originais mantêm destinos históricos e não devem ser reimportados sobre a configuração remota.
+
 ## Estado e limites
 
 **Após unificação:** usar somente [🐝 ABELHA — AUTOMAÇÕES / n20DNyb13Aaw3nq5](https://socialbaboon-n8n.cloudfy.live/workflow/n20DNyb13Aaw3nq5), desativado, com todos os blocos internos e um único relógio. Os sete fluxos anteriores permanecem backups inativos. Configuração/testes/limitações atuais em [WORKFLOW-UNICO-N8N.md](WORKFLOW-UNICO-N8N.md). Não ativar os modelos antigos; os nomes de nós a seguir recebem prefixos do bloco no consolidado.

@@ -39,8 +39,8 @@ export async function getSession(): Promise<LoginResult['user'] | null> {
   const response = await fetch(`${API_BASE_URL}/api/auth/session`, { credentials: 'include',cache:'no-store',signal:AbortSignal.timeout(20000) })
   if ([401,403].includes(response.status)) return null
   if (!response.ok) throw new Error('Não foi possível verificar a sessão. Tente novamente quando o servidor estiver disponível.')
-  const session = await response.json() as { user?: LoginResult['user'] }
-  return session.user?.id ? session.user : null
+  const session = await response.json() as { user?: LoginResult['user'] } | null
+  return session?.user?.id ? session.user : null
 }
 
 export async function logout(): Promise<void> {

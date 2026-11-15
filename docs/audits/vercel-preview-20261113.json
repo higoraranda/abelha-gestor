@@ -1,0 +1,204 @@
+{
+  "date": "2026-11-13",
+  "scope": "homologacao-preview",
+  "status": "online_validated_pwa_offline_pending",
+  "preview": {
+    "url": "https://abelha-gestor-bzjtcg3ka-higoraranda-gmailcoms-projects.vercel.app",
+    "projectId": "prj_Cd3vrf5gNVRmT3CjBJeX8saUrVVv",
+    "deploymentId": "dpl_2Mv23jgB9JZdrMGAdNxxLEHEPPpu",
+    "state": "READY",
+    "environment": "preview",
+    "sourceBranch": "main",
+    "sourceReference": "40c179cc2f976deb8f312e4ec3559e284d1a5924",
+    "deployedCommit": "40c179cc2f976deb8f312e4ec3559e284d1a5924",
+    "darkMode": true,
+    "backendUrlVariable": {
+      "name": "BACKEND_URL",
+      "target": [
+        "preview"
+      ],
+      "branchOverride": null,
+      "value": "https://abelha-gestor-api-hml.onrender.com"
+    },
+    "deploymentProtectionMaintained": true,
+    "temporaryTestShareRevoked": true
+  },
+  "render": {
+    "serviceId": "srv-dbr3if3tqb8s73cr2jn0",
+    "url": "https://abelha-gestor-api-hml.onrender.com",
+    "branch": "main",
+    "plan": "free",
+    "autoDeploy": false,
+    "deployId": "dep-dbrfscdbedkc73dg79gg",
+    "state": "live",
+    "commit": "40c179cc2f976deb8f312e4ec3559e284d1a5924",
+    "updatedEnvironmentNames": [
+      "FRONTEND_URL"
+    ]
+  },
+  "neon": {
+    "projectId": "curly-river-94350351",
+    "branchId": "br-hidden-night-ace956m0",
+    "endpointId": "ep-crimson-snow-acmuhqgp",
+    "enabled": true,
+    "minCU": 0.25,
+    "maxCU": 0.25,
+    "database": "abelha_homologacao",
+    "role": "abelha_hml_app",
+    "tables": 35,
+    "personalTables": 18,
+    "newMigrations": 0
+  },
+  "tests": {
+    "backendLocal": 53,
+    "frontendLocal": 16,
+    "backendBuild": true,
+    "frontendBuild": true,
+    "typescript": true,
+    "eslintWarnings": 0,
+    "localVisual": {
+      "captures": 77,
+      "views": 17,
+      "widths": [
+        320,
+        390,
+        768,
+        1440
+      ],
+      "failures": 0,
+      "checks": [
+        "error retry restores populated board",
+        "17 routes reflow at 320px and 768px",
+        "statement dark on screen, light on paper",
+        "native date and select keyboard; dark color-scheme",
+        "reduced motion and yellow keyboard focus",
+        "PWA metadata and manifest match dark canvas",
+        "dark remains default under system light preference"
+      ]
+    },
+    "localPersonal": {
+      "scenarios": 11,
+      "checks": [
+        "projects: create/milestone/report pending/human review",
+        "GitHub: signed event renders without treating metadata as a Codex report",
+        "finance: cycle, daily delta, plan and saved amount separate",
+        "subscriptions: forecast, cancel and manual payment",
+        "prices: no simulated quote when unconfigured",
+        "weekly: report from real synthetic records",
+        "templates: create and edit draft without financial side effects",
+        "leads: invalid public query rejected without remote request",
+        "mobile: reflow, dialog and Escape",
+        "PWA: static shell offline, session retry without logout, no private API cached, reconnect",
+        "PWA: waiting update does not reload draft; explicit activation"
+      ]
+    },
+    "backendRemote": {
+      "backend": "https://abelha-gestor-api-hml.onrender.com",
+      "passed": true,
+      "checks": 12,
+      "results": [
+        "Database/role/schema e baseline sintética confirmados",
+        "GET /health 200",
+        "Personal sem sessão retorna401",
+        "Login CSRF/sessão sintética e cookie Secure/HttpOnly/SameSite=Lax",
+        "7 endpoints Personal 200; VAPID pública corresponde à chave de homologação",
+        "CORS credenciado permite somente a origem Preview configurada",
+        "Mutação sem header403; projeto HTTP confirmado exclusivamente no banco de homologação",
+        "Token n8n inválido401; tick autenticado200; preços sem fonte503; nenhum push enviado",
+        "Captura autenticada e replay idempotente confirmados no banco isolado",
+        "GitHub ping HMAC válido200 sem evento de negócio",
+        "Logout revoga sessão no cliente de teste",
+        "Fixtures removidas e35 contagens/fingerprints restaurados"
+      ],
+      "syntheticOnly": true,
+      "database": "abelha_homologacao",
+      "role": "abelha_hml_app",
+      "cleanupVerified": true,
+      "sessionsAndConnectionsClosed": true
+    },
+    "previewRemote": {
+      "preview": "https://abelha-gestor-bzjtcg3ka-higoraranda-gmailcoms-projects.vercel.app",
+      "syntheticOnly": true,
+      "passed": true,
+      "checks": [
+        "Preview protegido acessível com sessão temporária; API privada anônima401",
+        "Login real pelo proxy; sessão sintética e cookie Secure/HttpOnly/SameSite=Lax no Preview",
+        "7 endpoints Personal respondem200 pelo proxy",
+        "Projeto criado pela UI e confirmado exclusivamente no banco/usuário de homologação",
+        "Ciclo e registro diário da fatura pela UI persistidos no banco isolado",
+        "Conta sintética criada; cancelar confirmação não registra pagamento",
+        "Revisão semanal gerada a partir dos registros sintéticos",
+        "17 áreas CRM/Personal navegáveis em1440px e390px, tema escuro e sem overflow",
+        "Manifesto/SW remotos corretos; nenhum dado privado em cache; instalação falha de forma segura no Preview protegido",
+        "Aviso offline, reconexão com sessão preservada e rascunho no Preview",
+        "Logout pelo proxy invalida acesso às rotas privadas",
+        "Nenhuma conexão do navegador à produção e nenhuma exceção JavaScript"
+      ],
+      "pending": [
+        "PWA offline remota: instalação do Service Worker bloqueada pela autenticação da Vercel, pois o precache usa credentials:omit; proteção mantida"
+      ],
+      "cleanupVerified": true,
+      "browserAndConnectionsClosed": true
+    },
+    "cors": {
+      "newPreviewAllowed": true,
+      "credentials": true,
+      "productionOriginAllowed": false
+    },
+    "runtimeLogs": {
+      "uncaughtDetected": false,
+      "knownAuthWarning": "env-url-basepath-redundant"
+    }
+  },
+  "cloudfy": {
+    "workflowId": "n20DNyb13Aaw3nq5",
+    "active": false,
+    "nodes": 62,
+    "credentialReferences": 0,
+    "backendTargetsStillProduction": 10,
+    "changed": false
+  },
+  "pending": [
+    "PWA offline remota: instalação do Service Worker bloqueada pela autenticação da Vercel, pois o precache usa credentials:omit; proteção mantida",
+    "Instalação em dispositivo e entrega push física",
+    "Credenciais e dez destinos HML do workflow único; execução real ainda pendente",
+    "Fonte/API e allowlist de preços autorizadas; integração Evolution opcional"
+  ],
+  "production": {
+    "changed": false,
+    "vercelDeploymentId": "dpl_6roGRoZHCXA4YvkRibqBfYommVZ3",
+    "vercelCommit": "40c179cc2f976deb8f312e4ec3559e284d1a5924",
+    "aliasesUnchanged": true,
+    "environmentVariablesUnchanged": true,
+    "renderServiceId": "srv-daldd0142hec73c3ltt0",
+    "renderDeployId": "dep-dbqv5bajnfac73de6lvg",
+    "renderCommit": "4f78117b308f71b08fcb55dc9e102e7d3e3c9acd",
+    "renderConfigAndDeployUnchanged": true
+  },
+  "git": {
+    "checkout": "main",
+    "head": "40c179cc2f976deb8f312e4ec3559e284d1a5924",
+    "commitsCreated": 0,
+    "pushes": 0,
+    "branchesCreated": 0,
+    "merges": 0,
+    "pullRequests": 0
+  },
+  "cleanup": {
+    "syntheticRowsRemoved": true,
+    "tableCountsAndFingerprintsRestored": true,
+    "temporaryBrowserClosed": true,
+    "temporaryVerifierTreeStopped": true,
+    "localPreviewStopped": true,
+    "localPortsReleased": [
+      43170,
+      52902
+    ],
+    "temporaryTestAccessRevoked": true,
+    "persistentRequestedResources": [
+      "Render HML Free",
+      "Neon HML existente0,25CU"
+    ]
+  },
+  "productionReady": false
+}

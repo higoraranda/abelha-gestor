@@ -1,5 +1,7 @@
 # 🐝 ABELHA — AUTOMAÇÕES
 
+**Atualização13/11 — homologação conectada:** os dez destinos agora usam o backend HML; credenciais **Abelha — Backend Homologação** e **Abelha — Entrada Homologação** criadas/vinculadas.62 nós e estado desativado preservados. Configuração vigente, resultados e ensaio manual em [N8N-HOMOLOGACAO.md](N8N-HOMOLOGACAO.md). As instruções de configuração inicial abaixo registram12/11; não recriar credenciais nem reimportar os JSONs originais sobre o remoto configurado.
+
 **Workflow único criado na Cloudfy/socialbaboon:** [n20DNyb13Aaw3nq5](https://socialbaboon-n8n.cloudfy.live/workflow/n20DNyb13Aaw3nq5). Estado conferido: **desativado**. São **62 nós**, com todas as ações dentro do mesmo workflow, sem Execute Workflow, subworkflows externos ou Error Workflow separado.
 
 Base da continuação: `main/2485697`, checkout limpo ao iniciar. Não foi feito commit/push, deploy, migration ou teste de gravação no backend real. Instância, banco e serviços existentes foram preservados.

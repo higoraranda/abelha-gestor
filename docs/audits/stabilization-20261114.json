@@ -1,0 +1,411 @@
+{
+  "date": "2026-11-14",
+  "scope": "stabilization",
+  "git": {
+    "branch": "main",
+    "head": "40c179cc2f976deb8f312e4ec3559e284d1a5924",
+    "priorLocalChangesPreserved": true,
+    "commit": false,
+    "push": false
+  },
+  "environments": {
+    "production": {
+      "frontend": "https://abelha-gestor.vercel.app",
+      "frontendSha": "40c179c",
+      "backend": "https://abelha-gestor-api.onrender.com",
+      "backendSha": "4f78117",
+      "renderDeploy": "dep-dbqv5bajnfac73de6lvg",
+      "database": "neondb",
+      "neonBranch": "br-square-sunset-acpb91u2",
+      "tables": 17
+    },
+    "homologation": {
+      "frontend": "https://abelha-gestor-bzjtcg3ka-higoraranda-gmailcoms-projects.vercel.app",
+      "frontendSha": "40c179c",
+      "previewState": "READY",
+      "backend": "https://abelha-gestor-api-hml.onrender.com",
+      "backendSha": "40c179c",
+      "renderDeploy": "dep-dbrfscdbedkc73dg79gg",
+      "database": "abelha_homologacao",
+      "role": "abelha_hml_app",
+      "neonBranch": "br-hidden-night-ace956m0",
+      "tables": 35
+    }
+  },
+  "diagnosis": {
+    "mainCause": "Production lacks the 18 platform migration tables, including CRM candidates and service drafts.",
+    "backendDiffBetweenPublishedShas": [],
+    "productionAffectedViews": [
+      "personal-overview",
+      "personal-projects",
+      "personal-finance",
+      "personal-subscriptions",
+      "personal-prices",
+      "personal-review",
+      "personal-settings",
+      "leads",
+      "templates"
+    ],
+    "productionViewsWithoutAlerts": [
+      "overview",
+      "clients",
+      "deliveries",
+      "pipeline",
+      "finance",
+      "agenda",
+      "inbox",
+      "reports"
+    ],
+    "productionStatusProvenance": "UI message plus deployed handler and read-only schema; authenticated browser Network status not captured",
+    "databaseErrorHandlerStatus": 503,
+    "authBug": "Anonymous 200/null session throws when accessing session.user in the published frontend.",
+    "localFix": "Accept nullable session and use session?.user?.id.",
+    "fixPublished": false,
+    "authWarningProvenAsCause": false
+  },
+  "validation": {
+    "backendTests": {
+      "passed": 53,
+      "failed": 0
+    },
+    "frontendTests": {
+      "passed": 20,
+      "failed": 0,
+      "addedAuthRegressions": 4,
+      "redGreenVerified": true
+    },
+    "typescript": true,
+    "eslintNoWarnings": true,
+    "builds": true,
+    "productionReadOnlyViews": 17,
+    "hmlHttp": [
+      {
+        "path": "/health",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/auth/session",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/projects",
+        "method": "GET",
+        "status": 401,
+        "error": "Não autorizado"
+      },
+      {
+        "path": "/api/auth/csrf",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/auth/callback/credentials",
+        "method": "POST",
+        "status": 200
+      },
+      {
+        "path": "/api/auth/session",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/preferences",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/notifications",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/projects",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/finance",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/subscriptions",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/prices",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/reviews",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/prospecting/leads/candidates",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/prospecting/leads/niches",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/prospecting/templates",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/prospecting/drafts",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/crm/overview",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/crm/tasks",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/crm/contracts",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/crm/opportunities",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/crm/notifications",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/crm/reports",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/clients",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/conversations",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/reminders",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/finance/summary",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/finance/clients",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/finance/expenses",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/finance/receivables",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/catalog",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/projects",
+        "method": "OPTIONS",
+        "status": 204
+      },
+      {
+        "path": "/api/v1/personal/projects",
+        "method": "OPTIONS",
+        "status": 204
+      },
+      {
+        "path": "/api/v1/personal/projects",
+        "method": "POST",
+        "status": 403,
+        "error": "Origem da operação não reconhecida."
+      },
+      {
+        "path": "/api/v1/integrations/prices/due",
+        "method": "GET",
+        "status": 401,
+        "error": "Token de integração inválido."
+      },
+      {
+        "path": "/api/v1/integrations/prices/due",
+        "method": "GET",
+        "status": 503,
+        "error": "Configure uma fonte autorizada de preços antes de ativar consultas."
+      },
+      {
+        "path": "/api/auth/csrf",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/auth/signout",
+        "method": "POST",
+        "status": 200
+      },
+      {
+        "path": "/api/auth/session",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/projects",
+        "method": "GET",
+        "status": 401,
+        "error": "Não autorizado"
+      }
+    ],
+    "hmlBusinessSnapshotsEqual": true,
+    "hmlTablesCompared": 35,
+    "existingListenerStatePreserved": true,
+    "localProxyRequests": [
+      {
+        "method": "GET",
+        "path": "/api/auth/session",
+        "status": 200,
+        "error": null
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/session",
+        "status": 200,
+        "error": null
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/session",
+        "status": 200,
+        "error": null
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/csrf",
+        "status": 200,
+        "error": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/callback/credentials",
+        "status": 200,
+        "error": null
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/session",
+        "status": 200,
+        "error": null
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/csrf",
+        "status": 200,
+        "error": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/callback/credentials",
+        "status": 200,
+        "error": null
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/session",
+        "status": 200,
+        "error": null
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/csrf",
+        "status": 200,
+        "error": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/callback/credentials",
+        "status": 200,
+        "error": null
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/session",
+        "status": 200,
+        "error": null
+      }
+    ],
+    "localAnonymousLoginRedirectObserved": true,
+    "authenticatedCorrectedBrowserNavigation": "pending-user-deferred",
+    "correctedPublishedPreview": "pending-authorized-publication"
+  },
+  "optionalIntegrations": {
+    "overpass": {
+      "priorSearchStatus": 503,
+      "currentSingleStatusProbe": 406,
+      "newSearches": 0,
+      "causeOfPrior503Established": false
+    },
+    "priceProvider": {
+      "moduleReadStatus": 200,
+      "integrationStatus": 503,
+      "configured": false
+    },
+    "whatsapp": "not-tested-no-message-sent",
+    "physicalPush": "pending",
+    "protectedPreviewOffline": "pending-no-security-reduction",
+    "n8n": "paused-no-remote-changes-or-engine-tests"
+  },
+  "restrictions": {
+    "productionWrites": false,
+    "migrations": false,
+    "deploy": false,
+    "credentialChanges": false,
+    "n8nChanges": false,
+    "productionBrowsing": "read-only"
+  },
+  "cleanup": {
+    "localServerStopped": true,
+    "localServerPidsAbsent": [
+      13704,
+      1956
+    ],
+    "localPort43651Free": true,
+    "localTabClosed": true,
+    "userProductionTabPreserved": true,
+    "newBusinessFixtures": 0,
+    "persistentHmlServicesPreserved": true
+  },
+  "productionReady": false,
+  "authorizationsNeeded": [
+    "Publish local session fix to Preview for authenticated validation.",
+    "Explicitly approve coordinated production migration and publication, or a previously rehearsed CRM-only rollback."
+  ]
+}

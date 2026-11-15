@@ -1,5 +1,9 @@
 # Checklist de ativação — Abelha CRM + Personal
 
+Atualização13/11 — **workflow único conectado à HML e desativado**: dez destinos atualizados, duas credenciais HML configuradas; faltam ensaio no motor com listener, disponibilidade Overpass, evidência CI real para relatório positivo, fonte autorizada de preços e testes físicos/stdout. [Procedimento atual](N8N-HOMOLOGACAO.md). Nenhum deploy, migration ou alteração de produção nesta etapa.
+
+Atualização13/11: **Preview READY com Dark Mode**, usando o commit existente da main, BACKEND_URL exclusiva de Preview e FRONTEND_URL HML atualizada. Nenhum commit, push, migration ou alteração de produção. Uso online e integrações sintéticas validados; instalação offline remota bloqueada pela proteção Vercel. Instruções atuais: [VERCEL-PREVIEW-HOMOLOGACAO.md](VERCEL-PREVIEW-HOMOLOGACAO.md). Os registros de12/11 abaixo são históricos; o workflow continua desativado.
+
 Atualização12/11: **backend de homologação live no Render Free**, Neon habilitado em0,25CU e12 verificações remotas sintéticas aprovadas. Produção preservada e workflow n8n desativado. Configuração real, variáveis e limites em [RENDER-HOMOLOGACAO.md](RENDER-HOMOLOGACAO.md). Próximo passo é BACKEND_URL somente no Vercel Preview; nada foi alterado no frontend publicado nesta etapa.
 
 Estado em12/11: **ensaios locais/Neon aprovados, integrações externas ainda não ativadas**. Render/Vercel já publicaram a base2485697; migration Personal de produção continua pendente. Resultado, matriz de credenciais e passos manuais exatos em [HOMOLOGACAO-INTEGRACAO.md](HOMOLOGACAO-INTEGRACAO.md). Este checklist não autoriza executar mudanças automaticamente.

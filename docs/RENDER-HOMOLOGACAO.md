@@ -1,5 +1,7 @@
 # Backend de homologação — Render
 
+Atualização13/11: serviço HML relido na branch **main**, Auto-Deploy desligado. FRONTEND_URL atualizada somente no HML; deploy manual dep-dbrfscdbedkc73dg79gg está live com40c179c. Preview real, testes e limites atuais: [VERCEL-PREVIEW-HOMOLOGACAO.md](VERCEL-PREVIEW-HOMOLOGACAO.md). As tabelas e resultados de12/11 abaixo são o histórico da ativação inicial.
+
 Estado verificado em12/11/2026: **ativo, deploy live, integração sintética aprovada**. Nenhum commit, push, merge, PR, migration ou alteração de produção nesta etapa.
 
 ## Serviço e origem

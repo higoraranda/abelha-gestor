@@ -1,10 +1,13 @@
 {
-  "date": "2026-11-12",
+  "date": "2026-11-13",
   "workflow": {
     "id": "n20DNyb13Aaw3nq5",
     "name": "🐝 ABELHA — AUTOMAÇÕES",
     "expectedActive": false,
-    "expectedNodes": 62
+    "expectedNodes": 62,
+    "observedActive": false,
+    "verifiedAt": "2026-11-13",
+    "observedUpdatedAt": "2026-11-13T12:38:22.344Z"
   },
   "homologationBackendUrl": "https://abelha-gestor-api-hml.onrender.com",
   "render": {
@@ -20,7 +23,7 @@
     "autoDeploy": false,
     "proposedPlan": "free",
     "requiresAuthorizationForPersistentEnvironment": false,
-    "branch": "codex/homologacao-abelha",
+    "branch": "main",
     "requiresManuallyPublishedRevision": false,
     "serviceId": "srv-dbr3if3tqb8s73cr2jn0",
     "name": "abelha-gestor-api-hml",
@@ -29,10 +32,10 @@
     "healthCheckMode": "tcp",
     "verifiedHttpHealthPath": "/health",
     "live": true,
-    "deployId": "dep-dbr3in49v7es73ekeq6g",
+    "deployId": "dep-dbrfscdbedkc73dg79gg",
     "persistentEnvironmentAuthorized": true,
     "created": true,
-    "deployedCommit": "37f989809041aff6150b3ec3405bdda65622adf8"
+    "deployedCommit": "40c179cc2f976deb8f312e4ec3559e284d1a5924"
   },
   "vercel": {
     "projectId": "prj_Cd3vrf5gNVRmT3CjBJeX8saUrVVv",
@@ -40,77 +43,108 @@
     "target": "preview",
     "serverEnvironmentVariable": "BACKEND_URL",
     "productionEnvironmentChanged": false,
-    "backendUrlConfigured": false
+    "backendUrlConfigured": true,
+    "sourceBranch": "main",
+    "sourceReference": "40c179cc2f976deb8f312e4ec3559e284d1a5924",
+    "deploymentId": "dpl_2Mv23jgB9JZdrMGAdNxxLEHEPPpu",
+    "url": "https://abelha-gestor-bzjtcg3ka-higoraranda-gmailcoms-projects.vercel.app",
+    "state": "READY",
+    "onlineValidated": true,
+    "pwaOfflineValidated": false
   },
   "nodes": [
     {
       "id": "482ddccf-8611-e172-707d-b68a5a8f4474",
       "name": "CAPTURA · Enviar captura para revisão",
-      "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/leads/capture",
-      "credentialTypes": [],
+      "url": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/leads/capture",
+      "credentialTypes": [
+        "httpHeaderAuth"
+      ],
       "requiresBackendHeaderAuth": true,
-      "homologationUrlTemplate": "${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/leads/capture"
+      "homologationUrlTemplate": "${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/leads/capture",
+      "credentialId": "8grkf0DNvjMOO0UB"
     },
     {
       "id": "d7d6dc50-1276-9387-5e25-81147caf3548",
       "name": "BUSCA · Consultar Overpass pelo backend",
-      "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/leads/search",
-      "credentialTypes": [],
+      "url": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/leads/search",
+      "credentialTypes": [
+        "httpHeaderAuth"
+      ],
       "requiresBackendHeaderAuth": true,
-      "homologationUrlTemplate": "${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/leads/search"
+      "homologationUrlTemplate": "${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/leads/search",
+      "credentialId": "8grkf0DNvjMOO0UB"
     },
     {
       "id": "ef57a005-4595-bed8-393e-05da7fc7438d",
       "name": "BUSCA · Guardar candidato público",
-      "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/leads/stage",
-      "credentialTypes": [],
+      "url": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/leads/stage",
+      "credentialTypes": [
+        "httpHeaderAuth"
+      ],
       "requiresBackendHeaderAuth": true,
-      "homologationUrlTemplate": "${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/leads/stage"
+      "homologationUrlTemplate": "${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/leads/stage",
+      "credentialId": "8grkf0DNvjMOO0UB"
     },
     {
       "id": "4be92a9c-ddf5-8d7c-32a7-6b160026f231",
       "name": "FINANCEIRO · Executar tick completo",
-      "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/tick",
-      "credentialTypes": [],
+      "url": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/tick",
+      "credentialTypes": [
+        "httpHeaderAuth"
+      ],
       "requiresBackendHeaderAuth": true,
-      "homologationUrlTemplate": "${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/tick"
+      "homologationUrlTemplate": "${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/tick",
+      "credentialId": "8grkf0DNvjMOO0UB"
     },
     {
       "id": "5a28bb78-37c6-76eb-acb0-f02c3938a9e0",
       "name": "CONTAS · Conferir pendências pelo tick",
-      "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/tick",
-      "credentialTypes": [],
+      "url": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/tick",
+      "credentialTypes": [
+        "httpHeaderAuth"
+      ],
       "requiresBackendHeaderAuth": true,
-      "homologationUrlTemplate": "${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/tick"
+      "homologationUrlTemplate": "${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/tick",
+      "credentialId": "8grkf0DNvjMOO0UB"
     },
     {
       "id": "2a2f9a30-9e33-0c63-fb2f-724cf37ea40c",
       "name": "PREÇOS · Listar monitores devidos",
-      "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/prices/due",
-      "credentialTypes": [],
+      "url": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/prices/due",
+      "credentialTypes": [
+        "httpHeaderAuth"
+      ],
       "requiresBackendHeaderAuth": true,
-      "homologationUrlTemplate": "${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/prices/due"
+      "homologationUrlTemplate": "${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/prices/due",
+      "credentialId": "8grkf0DNvjMOO0UB"
     },
     {
       "id": "bf20cee0-8f35-ccca-d8f3-fbc98c319d93",
       "name": "PREÇOS · Registrar observação",
-      "url": "={{ \"https://abelha-gestor-api.onrender.com/api/v1/integrations/prices/\" + encodeURIComponent($json.watch_id) + \"/observations\" }}",
-      "credentialTypes": [],
+      "url": "={{ \"https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/prices/\" + encodeURIComponent($json.watch_id) + \"/observations\" }}",
+      "credentialTypes": [
+        "httpHeaderAuth"
+      ],
       "requiresBackendHeaderAuth": true,
-      "homologationUrlTemplate": "={{ \"${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/prices/\" + encodeURIComponent($json.watch_id) + \"/observations\" }}"
+      "homologationUrlTemplate": "={{ \"${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/prices/\" + encodeURIComponent($json.watch_id) + \"/observations\" }}",
+      "credentialId": "8grkf0DNvjMOO0UB"
     },
     {
       "id": "b9079bfb-2f70-c87d-19ae-6a0bfe088789",
       "name": "PROJETOS · Registrar relatório pendente",
-      "url": "={{ \"https://abelha-gestor-api.onrender.com/api/v1/integrations/projects/\" + encodeURIComponent($json.project_id) + \"/reports\" }}",
-      "credentialTypes": [],
+      "url": "={{ \"https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/projects/\" + encodeURIComponent($json.project_id) + \"/reports\" }}",
+      "credentialTypes": [
+        "httpHeaderAuth"
+      ],
       "requiresBackendHeaderAuth": true,
-      "homologationUrlTemplate": "={{ \"${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/projects/\" + encodeURIComponent($json.project_id) + \"/reports\" }}"
+      "homologationUrlTemplate": "={{ \"${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/projects/\" + encodeURIComponent($json.project_id) + \"/reports\" }}",
+      "credentialId": "8grkf0DNvjMOO0UB"
     },
     {
       "id": "34818dac-e083-d0a6-fac9-b4859c71ff1c",
       "name": "PROJETOS · Encaminhar GitHub assinado",
-      "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/github",
+      "url": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/github",
       "credentialTypes": [],
       "requiresBackendHeaderAuth": false,
       "homologationUrlTemplate": "${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/github"
@@ -118,22 +152,33 @@
     {
       "id": "78ce2cd7-56eb-b09d-3d82-c02dbfd9673f",
       "name": "REVISÃO · Gerar revisão parcial",
-      "url": "https://abelha-gestor-api.onrender.com/api/v1/integrations/weekly-review",
-      "credentialTypes": [],
+      "url": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/weekly-review",
+      "credentialTypes": [
+        "httpHeaderAuth"
+      ],
       "requiresBackendHeaderAuth": true,
-      "homologationUrlTemplate": "${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/weekly-review"
+      "homologationUrlTemplate": "${HOMOLOGATION_BACKEND_URL}/api/v1/integrations/weekly-review",
+      "credentialId": "8grkf0DNvjMOO0UB"
     }
   ],
   "credentials": {
     "backend": {
       "type": "httpHeaderAuth",
       "header": "Authorization",
-      "value": "Bearer <token exclusivo da homologação>"
+      "value": "Bearer <token exclusivo da homologação>",
+      "id": "8grkf0DNvjMOO0UB",
+      "name": "Abelha — Backend Homologação",
+      "configured": true,
+      "attachedNodes": 9
     },
     "incoming": {
       "type": "httpHeaderAuth",
       "header": "X-Abelha-Webhook-Token",
-      "value": "<segredo de entrada exclusivo da homologação>"
+      "value": "<segredo de entrada exclusivo da homologação>",
+      "id": "CeqLKV97ExiedyRT",
+      "name": "Abelha — Entrada Homologação",
+      "configured": true,
+      "attachedNodes": 3
     }
   },
   "guards": [
@@ -158,5 +203,7 @@
     "minCU": 0.25,
     "maxCU": 0.25
   },
-  "n8nRemoteChanged": false
+  "n8nRemoteChanged": true,
+  "n8nEngineValidated": false,
+  "n8nHomologationReport": "docs/audits/n8n-homologacao-20261113.json"
 }
