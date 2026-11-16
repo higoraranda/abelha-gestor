@@ -1,5 +1,7 @@
 # Backend de homologação — Render
 
+**Release final16/11:** srv-dbr3if3tqb8s73cr2jn0/Free/main, Auto-Deploy desligado, dep-dbtobdd6e07s73an88cg/live em94ccaa03b24f402f1519b3654219f54070c77bec. Somente FRONTEND_URL HML foi ajustada para https://abelha-gestor-alg3cyiwj-higoraranda-gmailcoms-projects.vercel.app; o merge já iniciou o deploy, sem trigger duplicado. DATABASE_URL/AUTH_SECRET/VAPID/integration secrets HML preservados.8 checks de sessão/CORS e cleanup35/35 passaram, além da validação visual autenticada pelo usuário. Production foi publicada separadamente no mesmo SHA e restaurada para On Commit. [Resultado](SPRINT-LANCAMENTO-20261116.md). Os estados40c179c/12–13 de novembro abaixo são históricos.
+
 Atualização13/11: serviço HML relido na branch **main**, Auto-Deploy desligado. FRONTEND_URL atualizada somente no HML; deploy manual dep-dbrfscdbedkc73dg79gg está live com40c179c. Preview real, testes e limites atuais: [VERCEL-PREVIEW-HOMOLOGACAO.md](VERCEL-PREVIEW-HOMOLOGACAO.md). As tabelas e resultados de12/11 abaixo são o histórico da ativação inicial.
 
 Estado verificado em12/11/2026: **ativo, deploy live, integração sintética aprovada**. Nenhum commit, push, merge, PR, migration ou alteração de produção nesta etapa.

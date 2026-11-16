@@ -1,5 +1,7 @@
 # Workflow único — integração à homologação
 
+**Estado final16/11:** backend/frontend HML e Production em94ccaa0, com testes e confirmação visual concluídos. Consolidado continua inativo,62 nós, dez destinos HML, credenciais/settings/conexões iguais à etapa A e somente tick automático. Nenhum ensaio de listener/clock foi repetido nesta publicação. [Transição Production preparada, não autorizada](releases/n8n-production-transition-20261116.json); [resultado](SPRINT-LANCAMENTO-20261116.md). Não apontar Production ou ativar a partir dos relatos históricos.
+
 **Execução autorizada16/11 — etapa A aplicada e conferida:** somente jsCode de Operações do relógio alterado para PRICE_MONITOR_ENABLED=false/somente tick. Após HTTP400 do plugin por compatibilidade de settings, edição feita pelo usuário no editor e comparação integral pelo plugin:62 nós, IDs, posições, credenciais, conexões, settings (binaryMode incluído) e dez destinos HML preservados, inativo. UpdatedAt2026-11-16T21:53:41.207Z. Apenas metadados de salvamento e o campo aprovado mudaram. Backup privado/snapshot mws_hfTw59hbiJx3 preservados. Não ativar/redirecionar; fase4 continua não autorizada. Estados de patch local/rejeição anteriores abaixo são históricos. [Release atual](SPRINT-LANCAMENTO-20261116.md).
 
 ## Preparação final16/11 — preços automáticos opt-in, ainda local

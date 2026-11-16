@@ -1,14 +1,18 @@
 {
   "date": "2026-11-16",
-  "status": "HML-critical-loader-failed-local-fix-awaiting-new-user-SHA",
+  "status": "release94-production-complete-controls-restored-phase4-pending",
   "branch": "main",
   "baseSha": "23c06ebd5a9ab9d2954fb16a9ae145bc91fe1fd6",
-  "publishedReleaseSha": "f7efda682180b4c89d1bc721e3f7f0aa97fbf090",
+  "publishedReleaseSha": "94ccaa03b24f402f1519b3654219f54070c77bec",
   "hashFormat": "SHA-256 of current working-tree bytes; Git may normalize EOL",
   "files": [
     {
       "file": "DESIGN.md",
       "sha256": "8c7f7446d6f6081e021a3231aa4266747ca613d23f6eb8e3926a55dcae8a40cd"
+    },
+    {
+      "file": "README.md",
+      "sha256": "1c81386d23f2af437b0eb9a74372bc0ebcd7f766be0a65c17dee9d1dd9839aaa"
     },
     {
       "file": "backend/scripts/build-n8n-unified.cjs",
@@ -28,7 +32,7 @@
     },
     {
       "file": "docs/CHECKLIST-ATIVACAO.md",
-      "sha256": "2d8dc5f721a20aa05155ff167b0a908942c1371c53580af9611d8588b106b876"
+      "sha256": "b76eaaef0970c689cae82e930d471b7fb7d79aa5dcd9c0f071bb60babba9138a"
     },
     {
       "file": "docs/EXECUCAO-MIGRATION-PERSONAL.md",
@@ -36,11 +40,11 @@
     },
     {
       "file": "docs/GUIA-CONFIGURACAO.md",
-      "sha256": "f664512cf89c1f567e725b59eab5e4786ae8f47be0977cb050ae9a48afec3a06"
+      "sha256": "0e9831ec07f51b182a7e6afd65b74e9814a49f4309d2a0d3d14f53e6c0f54e04"
     },
     {
       "file": "docs/INTEGRACOES-N8N.md",
-      "sha256": "7834f13d1bff2122784f063f6338ffa2670ddc7d2aa1b413c64f3f981a4b956e"
+      "sha256": "9c65732ef3e95a04df4da0363f5e627128e8779ccd06f4153c1173cb4469af70"
     },
     {
       "file": "docs/MIGRATION-PRODUCAO-PERSONAL.md",
@@ -48,15 +52,19 @@
     },
     {
       "file": "docs/N8N-HOMOLOGACAO.md",
-      "sha256": "2f75f120dc624c3506cb44a2f58ad5efef2979331d438726ef8f464727532152"
+      "sha256": "86d8bbf02120139c29fc9ff3007efafa435d9f0dccc33caae36988464d6e04d9"
     },
     {
       "file": "docs/PROGRESSO.md",
-      "sha256": "26a7587337b521b22c1ab21f937ac938d7ab9c456b750bfd6f30a32e55b372c0"
+      "sha256": "2b696cf81a8e9bccb338b767513e214608885ec7a2ea6268bc24a2a8118cc281"
+    },
+    {
+      "file": "docs/RENDER-HOMOLOGACAO.md",
+      "sha256": "19f36209b2ae5b25ab34d6b20da35a6cfd8e823d3816d7d230d87ce61ce346f6"
     },
     {
       "file": "docs/SPRINT-LANCAMENTO-20261116.md",
-      "sha256": "a460af7caaa0edd426e2398dc12580ea581f0a2dd8171427dec3f352dcacbdee"
+      "sha256": "d03dcc2e8f17bb5d85d41ad6fb177dc18feb80ca3bf0075a130756c5988bd063"
     },
     {
       "file": "docs/VALIDACAO-FUNCIONAL-N8N-20261116.md",
@@ -64,11 +72,11 @@
     },
     {
       "file": "docs/VERCEL-PREVIEW-HOMOLOGACAO.md",
-      "sha256": "ac01fe2950008c9c904a29e3107692d627c46fe58561cfdade671c05f8332975"
+      "sha256": "d74d87e88cad14f4aa26b07cfd1049d19ff5054776bacb5c342cb201890de33e"
     },
     {
       "file": "docs/WORKFLOW-UNICO-N8N.md",
-      "sha256": "74ea8b0273eab5847b741b8321e73f2f8ca71efd6e7ab2ccb79d28a9ae0dc091"
+      "sha256": "80d1ee55fb7ed540da8749f2879af909b53e2f996124630e20eea55168347bf6"
     },
     {
       "file": "docs/audits/functional-n8n-20261116.json",
@@ -84,7 +92,7 @@
     },
     {
       "file": "docs/audits/sprint-release-20261116.json",
-      "sha256": "71bb1a265522bbfb684e3403f7eba55e6741128c90503ab79af132a59588540b"
+      "sha256": "08f37f97f62186288a55fc5c34fe2aaa70540907a2d45234e34e70ae0f5be3fc"
     },
     {
       "file": "docs/integrations/n8n/abelha-automations.json",
@@ -101,6 +109,10 @@
     {
       "file": "docs/releases/n8n-price-scheduler-20261116.json",
       "sha256": "96081d370ff3cc162415c4f878f901bff6bba0bb7509e5175451074b0d646888"
+    },
+    {
+      "file": "docs/releases/n8n-production-transition-20261116.json",
+      "sha256": "b5bd0d6c1b3f82f6ce2d385c04db04dd0c8da9bdf9549074a1855512d837f201"
     },
     {
       "file": "docs/sql/personal-platform-apply.psql",
@@ -174,14 +186,14 @@
   "migration": false,
   "verification": {
     "knownSecretScanPassed": true,
-    "textFilesScanned": 35,
+    "textFilesScanned": 38,
     "privateFilesExcluded": true,
-    "hashesVerified": 34,
-    "sourceFilesUnchangedSinceSprint": 13,
+    "hashesVerified": 37,
     "reportLinksValid": true,
-    "diffCheckPassed": true,
     "remoteWrites": true,
-    "productionDeploymentPerformed": false
+    "productionDeploymentPerformed": true,
+    "controlsRestored": true,
+    "commitOrPushPerformed": false
   },
   "authorizationGranted": {
     "A": true,
@@ -218,7 +230,7 @@
       "restorePending": true
     }
   },
-  "nextStep": "User manually commits/pushes the loader fix and supplies a new full SHA; redeploy corrected HML and revalidate before any Production deployment.",
+  "nextStep": "Application release complete. Review final documentation locally; authorize phase4 separately before changing n8n production credentials/destinations/activation.",
   "pendingCorrectionSha": null,
   "releaseF7efda6": {
     "hmlPublished": true,
@@ -241,8 +253,102 @@
     "failures": 0,
     "lint": "passed",
     "typescriptBuild": "passed",
-    "published": false,
-    "liveCorrectedBrowserVerified": false,
-    "requiresUserManualCommitPushAndNewSha": true
-  }
+    "published": true,
+    "liveCorrectedBrowserVerified": true,
+    "requiresUserManualCommitPushAndNewSha": false,
+    "publishedSha": "94ccaa03b24f402f1519b3654219f54070c77bec"
+  },
+  "release94": {
+    "sha": "94ccaa03b24f402f1519b3654219f54070c77bec",
+    "date": "2026-11-16",
+    "timezone": "America/Sao_Paulo",
+    "authorization": {
+      "A": true,
+      "B": true,
+      "phase4": false
+    },
+    "hml": {
+      "renderDeploymentId": "dep-dbtobdd6e07s73an88cg",
+      "renderStatus": "live",
+      "vercelDeploymentId": "dpl_EW8CdwrcS4EGPH2ptvBEouXxawxc",
+      "vercelStatus": "READY",
+      "url": "https://abelha-gestor-alg3cyiwj-higoraranda-gmailcoms-projects.vercel.app",
+      "sessionCorsChecksPassed": 8,
+      "manualAuthenticatedCrudAndNavigation": "passed-confirmed-by-user",
+      "cleanupTables": 35
+    },
+    "production": {
+      "renderServiceId": "srv-daldd0142hec73c3ltt0",
+      "renderDeploymentId": "dep-dbtohd15efls73cipu2g",
+      "renderStatus": "live",
+      "vercelDeploymentId": "dpl_5YFYxaNqSBe5zg9RPvTVSS5F8QU8",
+      "vercelStatus": "READY",
+      "url": "https://abelha-gestor.vercel.app",
+      "readonlyGetChecksPassed": 24,
+      "manualAuthenticatedRead": "passed-confirmed-by-user",
+      "publicPwaResources": 7,
+      "offlineShellVm": true,
+      "physicalInstallPushVerified": false,
+      "allThreeExistingProductionAliasesAligned": true
+    },
+    "database": {
+      "tables": 35,
+      "indexes": 92,
+      "invalidIndexes": 0,
+      "invalidConstraints": 0,
+      "snapshot": "snap-silent-fog-acdvwgeu",
+      "snapshotSourceBranch": "br-square-sunset-acpb91u2",
+      "migrationPerformed": false,
+      "restorePerformed": false,
+      "commercialWrites": false
+    },
+    "controls": {
+      "render": "On Commit",
+      "renderVerifiedByPlugin": true,
+      "vercel": "Automatic/default",
+      "vercelRestoreApiAcknowledged": true,
+      "readConnectorOmitsRawIgnoreCommand": true,
+      "noDuplicateDeploysAfterRestore": true
+    },
+    "n8n": {
+      "id": "n20DNyb13Aaw3nq5",
+      "nodes": 62,
+      "active": false,
+      "backendHmlTargets": 10,
+      "priceMonitorScheduled": false,
+      "urlsCredentialsSettingsUnchanged": true,
+      "productionTransitionApplied": false,
+      "productionCredentialsApplied": false,
+      "phase4Authorized": false,
+      "reviewPlan": "docs/releases/n8n-production-transition-20261116.json"
+    },
+    "limitations": [
+      "PWA install/offline and push on physical Android/iOS not certified",
+      "Price provider and positive Overpass remain optional pending integrations",
+      "Positive structured report requires real CI evidence",
+      "n8n connector update still has settings additional-properties400 compatibility issue; future writes require compatible path and complete comparison"
+    ],
+    "git": {
+      "branch": "main",
+      "userCommitSha": "94ccaa03b24f402f1519b3654219f54070c77bec",
+      "commitPerformed": false,
+      "pushPerformed": false,
+      "documentationLeftForManualReview": true
+    },
+    "newPaidResources": false,
+    "newBranches": false,
+    "temporaryServersStarted": false,
+    "phase4": {
+      "authorized": false,
+      "productionOrganizationCount": 1,
+      "productionUserCount": 1,
+      "standbyIdentityMatchesReadOnlyCatalog": true,
+      "standbySecretsExclusiveFromHml": true,
+      "valuesApplied": false,
+      "recipientActivationNeedsApproval": true
+    },
+    "verifiedAt": "2026-11-16T23:07:08.648Z"
+  },
+  "productionPromotionAllowed": false,
+  "noFurtherDeploymentRequired": true
 }

@@ -1,0 +1,139 @@
+{
+  "format": "review-plan-not-importable-workflow",
+  "status": "prepared-only-phase4-not-authorized",
+  "workflowId": "n20DNyb13Aaw3nq5",
+  "infrastructureId": "infra_fxJeupUPo3oD",
+  "expectedCurrent": {
+    "nodes": 62,
+    "active": false,
+    "updatedAt": "2026-11-16T21:53:41.207Z",
+    "backendTargetsHml": 10
+  },
+  "remoteApplied": false,
+  "productionApplicationSha": "94ccaa03b24f402f1519b3654219f54070c77bec",
+  "destinations": [
+    {
+      "nodeId": "482ddccf-8611-e172-707d-b68a5a8f4474",
+      "nodeName": "CAPTURA · Enviar captura para revisão",
+      "before": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/leads/capture",
+      "after": "https://abelha-gestor-api.onrender.com/api/v1/integrations/leads/capture",
+      "auth": "Abelha — Backend Produção (new authorized credential, preserve HML)"
+    },
+    {
+      "nodeId": "d7d6dc50-1276-9387-5e25-81147caf3548",
+      "nodeName": "BUSCA · Consultar Overpass pelo backend",
+      "before": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/leads/search",
+      "after": "https://abelha-gestor-api.onrender.com/api/v1/integrations/leads/search",
+      "auth": "Abelha — Backend Produção (new authorized credential, preserve HML)"
+    },
+    {
+      "nodeId": "ef57a005-4595-bed8-393e-05da7fc7438d",
+      "nodeName": "BUSCA · Guardar candidato público",
+      "before": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/leads/stage",
+      "after": "https://abelha-gestor-api.onrender.com/api/v1/integrations/leads/stage",
+      "auth": "Abelha — Backend Produção (new authorized credential, preserve HML)"
+    },
+    {
+      "nodeId": "4be92a9c-ddf5-8d7c-32a7-6b160026f231",
+      "nodeName": "FINANCEIRO · Executar tick completo",
+      "before": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/tick",
+      "after": "https://abelha-gestor-api.onrender.com/api/v1/integrations/tick",
+      "auth": "Abelha — Backend Produção (new authorized credential, preserve HML)"
+    },
+    {
+      "nodeId": "5a28bb78-37c6-76eb-acb0-f02c3938a9e0",
+      "nodeName": "CONTAS · Conferir pendências pelo tick",
+      "before": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/tick",
+      "after": "https://abelha-gestor-api.onrender.com/api/v1/integrations/tick",
+      "auth": "Abelha — Backend Produção (new authorized credential, preserve HML)"
+    },
+    {
+      "nodeId": "2a2f9a30-9e33-0c63-fb2f-724cf37ea40c",
+      "nodeName": "PREÇOS · Listar monitores devidos",
+      "before": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/prices/due",
+      "after": "https://abelha-gestor-api.onrender.com/api/v1/integrations/prices/due",
+      "auth": "Abelha — Backend Produção (new authorized credential, preserve HML)"
+    },
+    {
+      "nodeId": "bf20cee0-8f35-ccca-d8f3-fbc98c319d93",
+      "nodeName": "PREÇOS · Registrar observação",
+      "before": "={{ \"https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/prices/\" + encodeURIComponent($json.watch_id) + \"/observations\" }}",
+      "after": "={{ \"https://abelha-gestor-api.onrender.com/api/v1/integrations/prices/\" + encodeURIComponent($json.watch_id) + \"/observations\" }}",
+      "auth": "Abelha — Backend Produção (new authorized credential, preserve HML)"
+    },
+    {
+      "nodeId": "b9079bfb-2f70-c87d-19ae-6a0bfe088789",
+      "nodeName": "PROJETOS · Registrar relatório pendente",
+      "before": "={{ \"https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/projects/\" + encodeURIComponent($json.project_id) + \"/reports\" }}",
+      "after": "={{ \"https://abelha-gestor-api.onrender.com/api/v1/integrations/projects/\" + encodeURIComponent($json.project_id) + \"/reports\" }}",
+      "auth": "Abelha — Backend Produção (new authorized credential, preserve HML)"
+    },
+    {
+      "nodeId": "34818dac-e083-d0a6-fac9-b4859c71ff1c",
+      "nodeName": "PROJETOS · Encaminhar GitHub assinado",
+      "before": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/github",
+      "after": "https://abelha-gestor-api.onrender.com/api/v1/integrations/github",
+      "auth": "Existing raw-body HMAC; no Header Auth"
+    },
+    {
+      "nodeId": "78ce2cd7-56eb-b09d-3d82-c02dbfd9673f",
+      "nodeName": "REVISÃO · Gerar revisão parcial",
+      "before": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/weekly-review",
+      "after": "https://abelha-gestor-api.onrender.com/api/v1/integrations/weekly-review",
+      "auth": "Abelha — Backend Produção (new authorized credential, preserve HML)"
+    }
+  ],
+  "credentials": {
+    "backend": {
+      "name": "Abelha — Backend Produção",
+      "type": "httpHeaderAuth",
+      "headerName": "Authorization",
+      "privateValueSource": ".abelha-homologacao/propostas-producao/backend.env.proposal",
+      "nodeCount": 9
+    },
+    "incoming": {
+      "name": "Abelha — Entrada Produção",
+      "type": "httpHeaderAuth",
+      "headerName": "X-Abelha-Webhook-Token",
+      "privateValueSource": ".abelha-homologacao/propostas-producao/n8n.credentials.proposal.json",
+      "nodeCount": 3
+    },
+    "backendVariables": [
+      "ABELHA_INTEGRATION_TOKEN",
+      "ABELHA_INTEGRATION_ORGANIZATION_ID",
+      "ABELHA_INTEGRATION_USER_ID",
+      "GITHUB_WEBHOOK_SECRET"
+    ]
+  },
+  "preserve": [
+    "All other nodes/IDs/parameters/positions/connections/settings",
+    "GitHub raw body/HMAC without Header Auth",
+    "HML credentials/backups",
+    "Single inactive workflow until explicit activation authorization",
+    "Per-item idempotency/deduplication and independent branches"
+  ],
+  "priceMonitorEnabled": false,
+  "databaseConnectionFromN8n": false,
+  "activationAuthorized": false,
+  "credentialsApplied": false,
+  "pendingChecks": [
+    "Reconfirm the production owner and notification recipient; payload must not choose them",
+    "Review existing production integration values/consumers privately before applying standby proposals",
+    "Check existing VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY/VAPID_SUBJECT without rotating keys",
+    "Configure one authorized GitHub delivery/producer; never both relay and direct for same event",
+    "Resolve connector settings HTTP400 compatibility or perform authorized editor changes with complete comparison",
+    "Validate and observe essential tick/weekly schedule only after separate phase4 authorization"
+  ],
+  "notGatesForBasicApplication": [
+    "Price API/provider, kept disabled",
+    "Overpass availability",
+    "Positive CI-backed report and physical push/PWA tests"
+  ],
+  "productionIdentityPreflight": {
+    "organizations": 1,
+    "users": 1,
+    "privateStandbyCandidateMatches": true,
+    "recipientRequiresSeparatePhase4Authorization": true
+  },
+  "standbySecretsVerifiedExclusiveFromHml": true
+}

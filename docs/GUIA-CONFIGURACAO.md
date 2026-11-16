@@ -1,5 +1,7 @@
 # Configuração e ativação revisável
 
+**Release publicado16/11:** frontend/backend Production e HML em94ccaa03b24f402f1519b3654219f54070c77bec. HML e leitura autenticada Production confirmadas pelo usuário; Render On Commit e Vercel Automatic restaurados. Não repetir migrations ou publicação a partir das instruções históricas abaixo. n8n segue HML/inativo; fase4 sem autorização e propostas de segredos privadas não aplicadas. [Estado final](SPRINT-LANCAMENTO-20261116.md), [transição futura](releases/n8n-production-transition-20261116.json).
+
 Release autorizado16/11: patch do relógio n8n remoto aplicado/conferido, somente tick, workflow inativo/HML. Controles de deploy temporariamente Render Off/Vercel exit0, originais On Commit/Automatic registrados. Aguardar SHA do commit/push manual na main antes de qualquer deploy; promover Production somente após delta HML aprovado. Restaurar controles ao final. Fase4 (destinos/credenciais/ativação n8n Production) permanece sem autorização. [Execução atual](SPRINT-LANCAMENTO-20261116.md).
 
 Estado final16/11: [publicação coordenada e rollback](SPRINT-LANCAMENTO-20261116.md), com correções DELETE/PWA e preços opt-in ainda locais. HML publicado conserva40c179c; produção Vercel23c06eb/Render2dcc9d0. Não fazer push manual na main antes de controlar os auto-deploys de produção. Propostas exclusivas de automação estão ignoradas em `.abelha-homologacao/propostas-producao/`, sem aplicação; preservar credenciais HML, AUTH_SECRET e VAPID existentes. Migration já aplicada, sem nova execução.

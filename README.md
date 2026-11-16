@@ -416,18 +416,18 @@ As **nove capturas novas** foram feitas no frontend compilado, sem exceções Ja
 
 ## Ambientes e limites
 
-Situação registrada na documentação operacional em **13/11/2026**. Os serviços remotos não foram revalidados durante a reescrita deste README.
+Estado verificado em **16/11/2026**: frontend e backend Production e HML publicados no SHA `94ccaa0`, com validações e limites em [SPRINT-LANCAMENTO-20261116.md](docs/SPRINT-LANCAMENTO-20261116.md).
 
 | Área | Situação documentada e limite |
 |---|---|
 | **Desenvolvimento local** | Vite e Express separados; acesso direto local com identidade existente. Os dados continuam no banco indicado por `DATABASE_URL`. |
 | **Homologação** | Preview Vercel com tema escuro conectado ao Render HML e ao banco `abelha_homologacao`, separado da carteira de produção. Detalhes em [VERCEL-PREVIEW-HOMOLOGACAO.md](docs/VERCEL-PREVIEW-HOMOLOGACAO.md). |
-| **Produção** | A migration Personal segue registrada como não aplicada. Entrar em recursos que dependem das tabelas novas pode retornar `503` explicativo. Produção requer ativação própria. |
-| **Publicação** | O Preview documentado está fixado em um SHA. Novos pushes na `main` podem acionar gatilhos de produção existentes; não atualizam apenas esse Preview. O Render HML está documentado com Auto-Deploy desligado. |
-| **n8n** | Workflow único configurado para HML e desativado. A definição, os Code nodes em VM e chamadas HTTP/SQL foram exercitados; o ensaio no motor n8n continua pendente. |
+| **Produção** | [Abelha](https://abelha-gestor.vercel.app) publicado em `94ccaa0`, com35 tabelas e leitura autenticada de CRM/Personal/Leads/Templates confirmada. Migration Personal aplicada em16/11; não repetir. Escritas funcionais ensaiadas somente em HML sintética. |
+| **Publicação** | Render Production On Commit e Vercel Automatic restaurados. Novos pushes manuais na `main` voltam a acionar produção. HML permanece com Auto-Deploy desligado e Preview fixado em SHA. |
+| **n8n** | Workflow único HML/inativo,62 nós, somente tick automático e preços desligados. Oito callbacks completos e operações manuais passaram no motor em16/11. Transição de destinos/credenciais/ativação Production continua não autorizada. |
 | **Busca pública** | Depende do Overpass; o último ensaio remoto documentado retornou `503`. Há limite de uma consulta pública por minuto por organização. |
 | **Preços** | Cadastro disponível; fonte/API e allowlist autorizadas ainda são necessárias. Sem provedor, não há cotação automática. |
-| **PWA** | Shell offline verificado localmente. O Preview protegido pode impedir a instalação do service worker ao redirecionar os recursos estáticos; o uso online e a instalação são validações distintas. |
+| **PWA** | Sete recursos públicos Production e shell offline em VM verificados. Instalação física ainda não certificada. Preview protegido pode impedir precache; health da mesma origem preserva sua sessão de proteção, sem remover SSO. |
 | **Push** | Lógica local coberta; entrega e instalação em aparelhos físicos continuam pendentes. |
 | **WhatsApp** | Código de integração preservado; exige Evolution API e instância conectada. Esta documentação não atesta envio ou recebimento real. |
 

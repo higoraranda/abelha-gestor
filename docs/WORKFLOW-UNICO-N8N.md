@@ -1,5 +1,7 @@
 # 🐝 ABELHA — AUTOMAÇÕES
 
+**Pós-release16/11/94ccaa0:** aplicação Production validada; este único workflow ainda é HML/inativo.62 nós e credenciais/settings preservados, relógio somente tick e preços desligados. [Plano dos dez destinos Production e credenciais](releases/n8n-production-transition-20261116.json) preparado apenas para revisão; fase4 não autorizada. Não criar/importar workflows, sobrescrever HML, alterar credenciais Production ou ativar sem novo pedido explícito.
+
 **Etapa A concluída16/11:** patch remoto do relógio aplicado pelo editor e conferido por comparação integral após HTTP400 do plugin. Somente tick automático, PRICE_MONITOR_ENABLED=false;62 nós/inativo/dez HML/credenciais/settings/conexões preservados. UpdatedAt2026-11-16T21:53:41.207Z. Sem ativação ou redirecionamento; fase4 não autorizada. [Estado atual](SPRINT-LANCAMENTO-20261116.md). As notas anteriores de patch pendente abaixo registram o preflight.
 
 **Preparação final16/11:** workflow remoto inativo/62 nós/dez destinos HML, testes reais aprovados descritos em [N8N-HOMOLOGACAO.md](N8N-HOMOLOGACAO.md). Correção local do agendador passa a emitir somente tick com PRICE_MONITOR_ENABLED=false; aplicação remota pendente de autorização, sem sobrescrita efetuada. Não ativar enquanto o gate não for aplicado; não reimportar os modelos históricos. [Pacote de publicação e rollback](SPRINT-LANCAMENTO-20261116.md).

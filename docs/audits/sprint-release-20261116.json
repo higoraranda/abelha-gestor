@@ -1,9 +1,9 @@
 {
   "date": "2026-11-16",
-  "status": "HML-critical-loader-failed-local-fix-awaiting-new-user-SHA",
+  "status": "release94-production-complete-controls-restored-phase4-pending",
   "git": {
     "branch": "main",
-    "head": "23c06ebd5a9ab9d2954fb16a9ae145bc91fe1fd6",
+    "head": "94ccaa03b24f402f1519b3654219f54070c77bec",
     "createdBranches": false,
     "commit": false,
     "push": false,
@@ -20,31 +20,36 @@
     },
     "vercel": {
       "projectId": "prj_Cd3vrf5gNVRmT3CjBJeX8saUrVVv",
-      "deploymentId": "dpl_8fuqVWWywbfP8DYU8qh6jdqvNsjC",
+      "deploymentId": "dpl_5YFYxaNqSBe5zg9RPvTVSS5F8QU8",
       "status": "READY",
       "unchangedFromStart": false,
       "protection": {
         "enabled": true,
         "deploymentType": "all_except_custom_domains"
-      }
+      },
+      "sha": "94ccaa03b24f402f1519b3654219f54070c77bec"
     },
     "render": {
       "serviceId": "srv-daldd0142hec73c3ltt0",
-      "deploymentId": "dep-dbt7f5mq1p3s73fjbq7g",
-      "sha": "2dcc9d0d7e05b2f17e6b4eca58549d69b2ddfd34",
+      "deploymentId": "dep-dbtohd15efls73cipu2g",
+      "sha": "94ccaa03b24f402f1519b3654219f54070c77bec",
       "status": "live",
       "autoDeploy": "yes",
-      "serviceUnchanged": false
+      "serviceUnchanged": false,
+      "autoDeployTrigger": "commit"
     },
     "migrationRepeated": false,
     "snapshotModified": false,
     "snapshotId": "snap-silent-fog-acdvwgeu",
     "commercialWrites": false,
     "credentialsModified": false,
-    "deployed": false,
+    "deployed": true,
     "migrationSha256": "9812b2bd74acc1fb983318bab62590da6cf8e92a1536e85032fb8b604f84dcdb",
     "configurationModifiedUnderAuthorization": true,
-    "deploymentArtifactsPreserved": true
+    "deploymentArtifactsPreserved": true,
+    "sha": "94ccaa03b24f402f1519b3654219f54070c77bec",
+    "controlsRestored": true,
+    "noDuplicateDeploysAfterRestore": true
   },
   "n8n": {
     "id": "n20DNyb13Aaw3nq5",
@@ -91,11 +96,12 @@
       "includesTypeScriptBuild": true
     },
     "frontend": {
-      "passed": 40,
+      "passed": 42,
       "command": "npm test",
       "lint": "passed",
       "build": "passed",
-      "newPwaSwRegressions": 8
+      "newPwaSwRegressions": 8,
+      "newReadinessRegressions": 2
     },
     "priorFunctionalHml": {
       "reused": true,
@@ -111,7 +117,8 @@
     },
     "browser": {
       "newNavigationExecuted": false,
-      "reason": "Computer Use asset initialization failed; no bypass"
+      "reason": "Computer Use asset initialization failed; no bypass",
+      "manualHmlAndProductionConfirmed": true
     },
     "devicePush": {
       "executed": false
@@ -141,7 +148,7 @@
     "existingAuthDatabaseVapidPreserved": true
   },
   "pendingAuthorization": [
-    "Phase4 only: production n8n destinations/credentials/activation; A+B already authorized"
+    "Phase4 only: production n8n destinations/credentials/activation; no new publication authorization implied"
   ],
   "report": "docs/SPRINT-LANCAMENTO-20261116.md",
   "temporaryResources": {
@@ -363,34 +370,37 @@
         "serviceId": "srv-daldd0142hec73c3ltt0",
         "originalAutoDeploy": "yes",
         "originalTrigger": "commit",
-        "currentAutoDeploy": "no",
-        "currentTrigger": "off",
+        "currentAutoDeploy": "yes",
+        "currentTrigger": "commit",
         "verifiedByPlugin": true,
         "changedByUser": true,
-        "restorePending": true
+        "restorePending": false
       },
       "vercel": {
         "projectId": "prj_Cd3vrf5gNVRmT3CjBJeX8saUrVVv",
         "originalMode": "Automatic",
         "originalModeConfirmedByUser": true,
-        "currentCommand": "exit 0",
+        "currentCommand": null,
         "updateAcknowledgedByApi": true,
         "rawCommandOmittedByReadConnector": true,
         "otherProjectFieldsVerifiedUnchanged": true,
-        "restorePending": true
+        "restorePending": false,
+        "restoredMode": "Automatic",
+        "restoreAcknowledged": true
       }
     },
     "git": {
       "branch": "main",
       "commitByUserOnly": true,
       "pushByUserOnly": true,
-      "publishedReleaseSha": null
+      "publishedReleaseSha": "94ccaa03b24f402f1519b3654219f54070c77bec"
     },
     "deployments": {
-      "newDeployPerformed": false,
-      "hmlDeltaValidationPerformed": false,
-      "productionPromotionPerformed": false,
-      "requiresHmlPassBeforeProduction": true
+      "newDeployPerformed": true,
+      "hmlDeltaValidationPerformed": true,
+      "productionPromotionPerformed": true,
+      "requiresHmlPassBeforeProduction": true,
+      "sha": "94ccaa03b24f402f1519b3654219f54070c77bec"
     },
     "data": {
       "migration": false,
@@ -400,7 +410,7 @@
       "n8nRedirectedToProduction": false,
       "workflowActivated": false
     },
-    "status": "A-verified-deploy-controls-paused-awaiting-user-main-push-and-SHA",
+    "status": "release94-production-complete-controls-restored-phase4-pending",
     "verifiedAt": "2026-11-16T21:55:15.643Z"
   },
   "releaseF7efda6": {
@@ -486,5 +496,96 @@
       "projectSsoPreserved": true,
       "explicitRevocationVerified": false
     }
+  },
+  "release94": {
+    "sha": "94ccaa03b24f402f1519b3654219f54070c77bec",
+    "date": "2026-11-16",
+    "timezone": "America/Sao_Paulo",
+    "authorization": {
+      "A": true,
+      "B": true,
+      "phase4": false
+    },
+    "hml": {
+      "renderDeploymentId": "dep-dbtobdd6e07s73an88cg",
+      "renderStatus": "live",
+      "vercelDeploymentId": "dpl_EW8CdwrcS4EGPH2ptvBEouXxawxc",
+      "vercelStatus": "READY",
+      "url": "https://abelha-gestor-alg3cyiwj-higoraranda-gmailcoms-projects.vercel.app",
+      "sessionCorsChecksPassed": 8,
+      "manualAuthenticatedCrudAndNavigation": "passed-confirmed-by-user",
+      "cleanupTables": 35
+    },
+    "production": {
+      "renderServiceId": "srv-daldd0142hec73c3ltt0",
+      "renderDeploymentId": "dep-dbtohd15efls73cipu2g",
+      "renderStatus": "live",
+      "vercelDeploymentId": "dpl_5YFYxaNqSBe5zg9RPvTVSS5F8QU8",
+      "vercelStatus": "READY",
+      "url": "https://abelha-gestor.vercel.app",
+      "readonlyGetChecksPassed": 24,
+      "manualAuthenticatedRead": "passed-confirmed-by-user",
+      "publicPwaResources": 7,
+      "offlineShellVm": true,
+      "physicalInstallPushVerified": false,
+      "allThreeExistingProductionAliasesAligned": true
+    },
+    "database": {
+      "tables": 35,
+      "indexes": 92,
+      "invalidIndexes": 0,
+      "invalidConstraints": 0,
+      "snapshot": "snap-silent-fog-acdvwgeu",
+      "snapshotSourceBranch": "br-square-sunset-acpb91u2",
+      "migrationPerformed": false,
+      "restorePerformed": false,
+      "commercialWrites": false
+    },
+    "controls": {
+      "render": "On Commit",
+      "renderVerifiedByPlugin": true,
+      "vercel": "Automatic/default",
+      "vercelRestoreApiAcknowledged": true,
+      "readConnectorOmitsRawIgnoreCommand": true,
+      "noDuplicateDeploysAfterRestore": true
+    },
+    "n8n": {
+      "id": "n20DNyb13Aaw3nq5",
+      "nodes": 62,
+      "active": false,
+      "backendHmlTargets": 10,
+      "priceMonitorScheduled": false,
+      "urlsCredentialsSettingsUnchanged": true,
+      "productionTransitionApplied": false,
+      "productionCredentialsApplied": false,
+      "phase4Authorized": false,
+      "reviewPlan": "docs/releases/n8n-production-transition-20261116.json"
+    },
+    "limitations": [
+      "PWA install/offline and push on physical Android/iOS not certified",
+      "Price provider and positive Overpass remain optional pending integrations",
+      "Positive structured report requires real CI evidence",
+      "n8n connector update still has settings additional-properties400 compatibility issue; future writes require compatible path and complete comparison"
+    ],
+    "git": {
+      "branch": "main",
+      "userCommitSha": "94ccaa03b24f402f1519b3654219f54070c77bec",
+      "commitPerformed": false,
+      "pushPerformed": false,
+      "documentationLeftForManualReview": true
+    },
+    "newPaidResources": false,
+    "newBranches": false,
+    "temporaryServersStarted": false,
+    "phase4": {
+      "authorized": false,
+      "productionOrganizationCount": 1,
+      "productionUserCount": 1,
+      "standbyIdentityMatchesReadOnlyCatalog": true,
+      "standbySecretsExclusiveFromHml": true,
+      "valuesApplied": false,
+      "recipientActivationNeedsApproval": true
+    },
+    "verifiedAt": "2026-11-16T23:07:08.648Z"
   }
 }

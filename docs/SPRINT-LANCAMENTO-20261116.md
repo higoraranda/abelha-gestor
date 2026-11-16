@@ -1,5 +1,16 @@
 # Estabilização e lançamento — 16/11/2026
 
+## Resultado final — A+B concluídas, fase4 não autorizada
+
+Release **94ccaa03b24f402f1519b3654219f54070c77bec** publicado em HML e Production. Production: Render dep-dbtohd15efls73cipu2g/live, Vercel dpl_5YFYxaNqSBe5zg9RPvTVSS5F8QU8/READY, https://abelha-gestor.vercel.app. Aliases principal, de projeto e git-main existentes alinhados ao mesmo deployment; nenhum domínio novo. HML: dep-dbtobdd6e07s73an88cg/live e dpl_EW8CdwrcS4EGPH2ptvBEouXxawxc/READY, https://abelha-gestor-alg3cyiwj-higoraranda-gmailcoms-projects.vercel.app. A falha302 do loader no f7efda6 foi corrigida, publicada e aprovada no Chrome pelo usuário.
+
+Gates:42 testes frontend/lint/TypeScript/build da correção;8 retestes HML de sessão/CORS/cookies; fluxo visual autenticado com CRUD/exclusão/rejeições/navegação/logout confirmado pelo usuário; cleanup35/35;24 GETs Production de saúde/proxy/proteção/artefatos PWA, com sete recursos públicos e shell offline em VM; leitura autenticada de produção confirmada pelo usuário. Os testes de backend/callbacks n8n inalterados aprovados antes não foram repetidos. Não declarar entrega física de push, instalação em Android/iOS ou teste de exclusão em dados reais de produção.
+
+Render On Commit restaurado pelo usuário e conferido pelo plugin; Vercel Automatic/default restaurado com commandForIgnoringBuildStep=null, API aceitou e releitura conservou aliases/SSO/deployment. O conector não expõe o campo cru do ignoreCommand. Últimos deployments permaneceram os mesmos, sem trigger duplicado. Código/banco/credenciais de produção preservados durante os testes de leitura; nenhuma migration/restauração ou escrita comercial. Catálogo35/92, zero objetos inválidos e snapshot snap-silent-fog-acdvwgeu preservados. Git main ficou no SHA enviado manualmente, sem commit/push nesta execução; somente documentação posterior é deixada local.
+
+**Próxima etapa separada:** [plano de transição n8n](releases/n8n-production-transition-20261116.json), revisão apenas, não um workflow importável. Contém os dez before/after, nove saídas e três entradas de credencial, preservação GitHub/HMAC e preços desligados. Nenhuma URL, credencial ou ativação de produção n8n foi aplicada. O problema400 de settings no conector exige compatibilidade resolvida ou edição autorizada com comparação integral; não remover binaryMode para forçar PUT. Propostas privadas não autorizam rotação de consumidores existentes. Conferir VAPID/destinatário antes de qualquer aviso real. Os estados pendentes/falhas abaixo são históricos; não repetir deploy ou migration a partir deles.
+
+
 ## Gate de HML f7efda6 reprovado — correção local do health autenticado
 
 Backend e Preview HML publicados em f7efda682180b4c89d1bc721e3f7f0aa97fbf090, respectivamente dep-dbtnudmk1f9s7397tcb0/live e dpl_EDn8YNwof7hxcF9xoHSdLyao8Gqf/READY. URL https://abelha-gestor-6xxwd85w6-higoraranda-gmailcoms-projects.vercel.app. FRONTEND_URL HML ajustado por merge de um nome; o plugin iniciou automaticamente esse deploy, portanto não houve segundo trigger. BACKEND_URL foi conferida apenas em Preview e aponta ao Render HML. Push Production automático cancelado pelo bloqueio exit0.
