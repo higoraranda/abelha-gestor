@@ -76,3 +76,24 @@ test('an already cancelled initialization does not send a request', async () => 
   controller.abort()
   await assert.rejects(waitForBackend(url, { ...options(controller.signal), fetcher: async () => assert.fail('must not fetch') }), { name: 'AbortError' })
 })
+
+test('redirected JSON is rejected and failures report a bounded backoff', async () => {
+  const failures = []
+  let calls = 0
+  await waitForBackend(url, { ...options(new AbortController().signal), onFailure: failure => failures.push(failure), fetcher: async () => {
+    calls++
+    if (calls === 1) {
+      const response = healthy()
+      Object.defineProperty(response, 'redirected', { value: true })
+      return response
+    }
+    if (calls < 5) return Response.json({ error: 'unavailable' }, { status: 503 })
+    return healthy()
+  } })
+  assert.equal(calls, 5)
+  assert.equal(failures[0].reason, 'invalid')
+  assert.equal(failures[1].reason, 'http')
+  assert.equal(failures[1].status, 503)
+  assert.ok(failures.every(failure => failure.nextRetryMs <= 10000))
+  assert.ok(failures.at(-1).nextRetryMs > failures[0].nextRetryMs)
+})

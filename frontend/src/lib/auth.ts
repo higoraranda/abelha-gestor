@@ -10,6 +10,8 @@ export interface LoginResult {
   }
 }
 
+export interface StartupSession { user: LoginResult['user'] | null }
+
 export async function login(email: string, password: string): Promise<LoginResult> {
   const csrfRes = await fetch(`${API_BASE_URL}/api/auth/csrf`, { credentials: 'include' })
   if (!csrfRes.ok) throw new Error('Falha ao iniciar autenticação')
@@ -35,8 +37,9 @@ export async function login(email: string, password: string): Promise<LoginResul
   return { user: session.user }
 }
 
-export async function getSession(): Promise<LoginResult['user'] | null> {
-  const response = await fetch(`${API_BASE_URL}/api/auth/session`, { credentials: 'include',cache:'no-store',signal:AbortSignal.timeout(20000) })
+export async function getSession(signal?: AbortSignal): Promise<LoginResult['user'] | null> {
+  const deadline = AbortSignal.timeout(20000)
+  const response = await fetch(`${API_BASE_URL}/api/auth/session`, { credentials: 'include',cache:'no-store',signal:signal ? AbortSignal.any([signal, deadline]) : deadline })
   if ([401,403].includes(response.status)) return null
   if (!response.ok) throw new Error('Não foi possível verificar a sessão. Tente novamente quando o servidor estiver disponível.')
   const session = await response.json() as { user?: LoginResult['user'] } | null

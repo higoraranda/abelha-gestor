@@ -37,3 +37,16 @@ test('an unavailable session endpoint still reports failure instead of logging o
   t.mock.method(globalThis, 'fetch', async () => new Response(null, { status: 503 }))
   await assert.rejects(getSession(), /Não foi possível verificar a sessão/)
 })
+
+test('startup cancellation aborts the actual session request', async (t) => {
+  const controller = new AbortController()
+  let requestSignal
+  t.mock.method(globalThis, 'fetch', async (_url, options) => {
+    requestSignal = options.signal
+    return new Promise((_resolve, reject) => options.signal.addEventListener('abort', () => reject(options.signal.reason), { once: true }))
+  })
+  const pending = getSession(controller.signal)
+  controller.abort()
+  assert.equal(requestSignal.aborted, true)
+  await assert.rejects(pending, { name: 'AbortError' })
+})
