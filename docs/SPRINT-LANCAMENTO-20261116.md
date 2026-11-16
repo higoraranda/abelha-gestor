@@ -1,5 +1,17 @@
 # Estabilização e lançamento — 16/11/2026
 
+## Gate de HML f7efda6 reprovado — correção local do health autenticado
+
+Backend e Preview HML publicados em f7efda682180b4c89d1bc721e3f7f0aa97fbf090, respectivamente dep-dbtnudmk1f9s7397tcb0/live e dpl_EDn8YNwof7hxcF9xoHSdLyao8Gqf/READY. URL https://abelha-gestor-6xxwd85w6-higoraranda-gmailcoms-projects.vercel.app. FRONTEND_URL HML ajustado por merge de um nome; o plugin iniciou automaticamente esse deploy, portanto não houve segundo trigger. BACKEND_URL foi conferida apenas em Preview e aponta ao Render HML. Push Production automático cancelado pelo bloqueio exit0.
+
+26 checks de API HML e cleanup35/35 passaram, incluindo autenticação real/cookies/CORS/leituras essenciais/exclusão e logout. Quatro GETs do Preview pelo conector (shell, SW, manifesto e sessão anônima) e cinco grupos do artefato SW/VM passaram. **Usuário reprovou a abertura real:** Chrome desktop fica na animação antes do formulário. Consequentemente, Production não foi promovida.
+
+Causa comprovada por GET sem cookies: health direto do Render200 JSON; health do Preview302 para vercel.com. O health inicial usava credentials:'omit', então a proteção Vercel não recebia seu cookie e waitForBackend repetia indefinidamente. O acesso autenticado do conector recebia200 e mascarava essa diferença de contexto. A correção local usa somente credentials:'same-origin' em frontend/src/lib/backendReady.ts. Não encaminha cookies da origem frontend a backend externo; redirect:error e no-store continuam. Não modificar a proteção Vercel nem o credentials:omit do precache SW para resolver isso.
+
+Regressão em backendReady.test.mjs ficou vermelha com a política antiga e verde após a alteração.8 testes direcionados/42 frontend, lint e TypeScript/build aprovados. O novo comportamento ainda **não foi publicado/testado visualmente**; exige commit/push manual e novo SHA antes de retomar HML. A autorização B continua válida no mesmo escopo; não promover f7efda6 enquanto esse gate estiver reprovado. Os dados sintéticos foram removidos e35 contagens/fingerprints reconferidos em leitura.
+
+Render Production permanece2dcc9d0/live; alias Vercel Production permanece dpl_8fuqVWWywbfP8DYU8qh6jdqvNsjC/23c06eb. Render Off/Vercel exit0 ficam mantidos durante a correção/push para impedir publicação acidental; ao concluir o release, restaurar On Commit/Automatic e conferir. Snapshot,35 tabelas de produção e n8n HML/inativo preservados. Não há migrations/restaurações ou fase4 autorizadas. Os estados de prontidão anteriores abaixo são históricos e não aprovam o gate visual atual.
+
 ## Execução autorizada — controles pausados e SHA aguardado
 
 A+B foram explicitamente autorizados, inclusive a substituição técnica do array de62 nós com somente o jsCode alterado. Não pedir essa autorização novamente. Fase4 permanece excluída. Publicação Git segue exclusivamente manual, sem branch nova.

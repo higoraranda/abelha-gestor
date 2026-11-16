@@ -1,9 +1,9 @@
 {
   "date": "2026-11-16",
-  "status": "A-verified-deploy-controls-paused-awaiting-user-main-push-and-SHA",
+  "status": "HML-critical-loader-failed-local-fix-awaiting-new-user-SHA",
   "branch": "main",
   "baseSha": "23c06ebd5a9ab9d2954fb16a9ae145bc91fe1fd6",
-  "publishedReleaseSha": null,
+  "publishedReleaseSha": "f7efda682180b4c89d1bc721e3f7f0aa97fbf090",
   "hashFormat": "SHA-256 of current working-tree bytes; Git may normalize EOL",
   "files": [
     {
@@ -52,15 +52,19 @@
     },
     {
       "file": "docs/PROGRESSO.md",
-      "sha256": "a140e92c329fbfc4d566b352bc1b3ab93159113b885e5ee76103d3c036e47b64"
+      "sha256": "26a7587337b521b22c1ab21f937ac938d7ab9c456b750bfd6f30a32e55b372c0"
     },
     {
       "file": "docs/SPRINT-LANCAMENTO-20261116.md",
-      "sha256": "4460de42854c7043ad8b7861f62f0780ab15f6cd348914b760d7114af3fe31b4"
+      "sha256": "a460af7caaa0edd426e2398dc12580ea581f0a2dd8171427dec3f352dcacbdee"
     },
     {
       "file": "docs/VALIDACAO-FUNCIONAL-N8N-20261116.md",
       "sha256": "055a071820bc903f39c3059600524efb83905a0e29d17e055b5f59481cc31e3e"
+    },
+    {
+      "file": "docs/VERCEL-PREVIEW-HOMOLOGACAO.md",
+      "sha256": "ac01fe2950008c9c904a29e3107692d627c46fe58561cfdade671c05f8332975"
     },
     {
       "file": "docs/WORKFLOW-UNICO-N8N.md",
@@ -80,7 +84,7 @@
     },
     {
       "file": "docs/audits/sprint-release-20261116.json",
-      "sha256": "616f0faeeaab4ae4fc1545cd4872b8881af7427c367ccb6b39deade2e487f10c"
+      "sha256": "71bb1a265522bbfb684e3403f7eba55e6741128c90503ab79af132a59588540b"
     },
     {
       "file": "docs/integrations/n8n/abelha-automations.json",
@@ -109,6 +113,14 @@
     {
       "file": "frontend/src/hooks/usePwa.ts",
       "sha256": "2882ae6d1e675f532bccecc971881e494ed351da84c25a540056ca3eba7e3289"
+    },
+    {
+      "file": "frontend/src/lib/backendReady.test.mjs",
+      "sha256": "bbc9f2371582b8224fb1f3180e6208d4fcbd48ba92f5129472706f3f01b321d9"
+    },
+    {
+      "file": "frontend/src/lib/backendReady.ts",
+      "sha256": "2e062ea31ee6558b0ef09ccff07b85ec96d3f224e6b668e1dfae46a8fdcecd92"
     },
     {
       "file": "frontend/src/lib/projectDeletion.test.mjs",
@@ -162,9 +174,9 @@
   "migration": false,
   "verification": {
     "knownSecretScanPassed": true,
-    "textFilesScanned": 32,
+    "textFilesScanned": 35,
     "privateFilesExcluded": true,
-    "hashesVerified": 31,
+    "hashesVerified": 34,
     "sourceFilesUnchangedSinceSprint": 13,
     "reportLinksValid": true,
     "diffCheckPassed": true,
@@ -206,5 +218,31 @@
       "restorePending": true
     }
   },
-  "nextStep": "User reviews and manually commits/pushes main, then supplies full published SHA. No deployment before SHA confirmation."
+  "nextStep": "User manually commits/pushes the loader fix and supplies a new full SHA; redeploy corrected HML and revalidate before any Production deployment.",
+  "pendingCorrectionSha": null,
+  "releaseF7efda6": {
+    "hmlPublished": true,
+    "productionPublished": false,
+    "criticalUiPassed": false,
+    "localCorrectionPrepared": true
+  },
+  "localCorrection": {
+    "files": [
+      "frontend/src/lib/backendReady.ts",
+      "frontend/src/lib/backendReady.test.mjs"
+    ],
+    "redRegression": {
+      "tests": 8,
+      "passed": 7,
+      "failed": 1
+    },
+    "greenDirectedTests": 8,
+    "frontendTests": 42,
+    "failures": 0,
+    "lint": "passed",
+    "typescriptBuild": "passed",
+    "published": false,
+    "liveCorrectedBrowserVerified": false,
+    "requiresUserManualCommitPushAndNewSha": true
+  }
 }

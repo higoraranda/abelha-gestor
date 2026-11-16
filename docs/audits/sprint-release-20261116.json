@@ -1,6 +1,6 @@
 {
   "date": "2026-11-16",
-  "status": "A-verified-deploy-controls-paused-awaiting-user-main-push-and-SHA",
+  "status": "HML-critical-loader-failed-local-fix-awaiting-new-user-SHA",
   "git": {
     "branch": "main",
     "head": "23c06ebd5a9ab9d2954fb16a9ae145bc91fe1fd6",
@@ -402,5 +402,89 @@
     },
     "status": "A-verified-deploy-controls-paused-awaiting-user-main-push-and-SHA",
     "verifiedAt": "2026-11-16T21:55:15.643Z"
+  },
+  "releaseF7efda6": {
+    "sha": "f7efda682180b4c89d1bc721e3f7f0aa97fbf090",
+    "hml": {
+      "backend": {
+        "id": "dep-dbtnudmk1f9s7397tcb0",
+        "status": "live"
+      },
+      "preview": {
+        "id": "dpl_EDn8YNwof7hxcF9xoHSdLyao8Gqf",
+        "url": "https://abelha-gestor-6xxwd85w6-higoraranda-gmailcoms-projects.vercel.app",
+        "status": "READY"
+      },
+      "backendApiRequestsPassed": 26,
+      "essentialReadRoutesPassed": 10,
+      "cleanupTablesVerified": 35,
+      "protectedConnectorGetChecksPassed": 4,
+      "pwaArtifactVmGroupsPassed": 5,
+      "browserGate": "failed",
+      "reportedByUser": "Chrome desktop; loader before login",
+      "productionPromotionAllowed": false
+    },
+    "rootCause": {
+      "file": "frontend/src/lib/backendReady.ts",
+      "before": "credentials: 'omit'",
+      "localAfter": "credentials: 'same-origin'",
+      "observedAnonymousPreviewHealthStatus": 302,
+      "observedAnonymousPreviewHealthRedirectOrigin": "https://vercel.com",
+      "observedRenderHealthStatus": 200,
+      "authenticatedConnectorHealthStatus": 200,
+      "reason": "Readiness probe omitted the Vercel protection cookie and retried before rendering login.",
+      "previewProtectionChanged": false,
+      "serviceWorkerPublicPrecacheCredentialsChanged": false
+    },
+    "localCorrection": {
+      "files": [
+        "frontend/src/lib/backendReady.ts",
+        "frontend/src/lib/backendReady.test.mjs"
+      ],
+      "redRegression": {
+        "tests": 8,
+        "passed": 7,
+        "failed": 1
+      },
+      "greenDirectedTests": 8,
+      "frontendTests": 42,
+      "failures": 0,
+      "lint": "passed",
+      "typescriptBuild": "passed",
+      "published": false,
+      "liveCorrectedBrowserVerified": false,
+      "requiresUserManualCommitPushAndNewSha": true
+    },
+    "production": {
+      "renderDeploymentId": "dep-dbt7f5mq1p3s73fjbq7g",
+      "renderSha": "2dcc9d0d7e05b2f17e6b4eca58549d69b2ddfd34",
+      "renderStatus": "live",
+      "vercelProductionDeploymentId": "dpl_8fuqVWWywbfP8DYU8qh6jdqvNsjC",
+      "vercelAlias": "abelha-gestor.vercel.app",
+      "promotionPerformed": false,
+      "schema": {
+        "tables": 35,
+        "indexes": 92,
+        "invalidIndexes": 0
+      },
+      "commercialWrites": false,
+      "migration": false,
+      "restore": false
+    },
+    "controls": {
+      "renderOff": true,
+      "vercelIgnoreCommand": "exit 0",
+      "restorePending": true,
+      "originalRender": "On Commit",
+      "originalVercel": "Automatic",
+      "reasonRetained": "Release remains in progress; keep protected manual fix push from deploying production."
+    },
+    "temporaryAccess": {
+      "provider": "Vercel authenticated fetch connector",
+      "management": "Connector creates/reuses a temporary deployment share link; new links expire in 23h.",
+      "secretReturnedToConversation": false,
+      "projectSsoPreserved": true,
+      "explicitRevocationVerified": false
+    }
   }
 }

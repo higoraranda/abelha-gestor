@@ -46,7 +46,7 @@ export async function waitForBackend(url: string, {
       const response = await fetcher(url, {
         method: 'GET',
         cache: 'no-store',
-        credentials: 'omit',
+        credentials: 'same-origin',
         redirect: 'error',
         signal: AbortSignal.any([signal, attempt.signal]),
       })

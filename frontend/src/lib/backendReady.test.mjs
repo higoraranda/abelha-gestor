@@ -6,6 +6,37 @@ const url = 'http://127.0.0.1/api/v1/health'
 const healthy = () => Response.json({ status: 'ok' })
 const options = signal => ({ signal, retryDelayMs: 1, requestTimeoutMs: 30 })
 
+test('same-origin protected preview health reaches readiness with the existing protection session', async () => {
+  const controller = new AbortController()
+  let calls = 0
+  await waitForBackend('https://preview.example/api/v1/health', {
+    ...options(controller.signal),
+    fetcher: async (_target, init) => {
+      calls++
+      return init.credentials === 'same-origin'
+        ? healthy()
+        : new Response(null, { status: 302, headers: { location: 'https://vercel.com/login' } })
+    },
+    onFailure: () => controller.abort(new Error('The health request discarded the same-origin protection session')),
+  })
+  assert.equal(calls, 1, 'a protected same-origin health response must not enter the retry loop')
+})
+
+test('external backend health checks do not forward the frontend origin cookies', async () => {
+  const frontendOrigin = 'https://preview.example'
+  const externalHealth = 'https://api.example/api/v1/health'
+  let sentCookies = false
+  await waitForBackend(externalHealth, {
+    ...options(new AbortController().signal),
+    fetcher: async (target, init) => {
+      sentCookies = init.credentials === 'include'
+        || (init.credentials === 'same-origin' && new URL(target).origin === frontendOrigin)
+      return healthy()
+    },
+  })
+  assert.equal(sentCookies, false)
+})
+
 test('retries transport, HTTP, HTML and invalid health responses until the backend is ready', async () => {
   const controller = new AbortController()
   const responses = [

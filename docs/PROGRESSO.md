@@ -1,5 +1,15 @@
 # Progresso — Abelha CRM + Personal
 
+## Release f7efda6 — HML publicado, promoção interrompida por loader —16/11/2026
+
+- SHA manual confirmado no GitHub/main: f7efda682180b4c89d1bc721e3f7f0aa97fbf090. Backend HML dep-dbtnudmk1f9s7397tcb0/live e Preview dpl_EDn8YNwof7hxcF9xoHSdLyao8Gqf/READY no mesmo SHA. Preview: https://abelha-gestor-6xxwd85w6-higoraranda-gmailcoms-projects.vercel.app. Somente FRONTEND_URL do Render HML foi atualizado; essa alteração já iniciou o deploy, sem trigger duplicado. O push automático Production Vercel foi cancelado pelo exit0 conforme esperado.
+-26 verificações reais no Render/Neon HML passaram: saúde, autenticação/CSRF/cookies Secure/HttpOnly/SameSite, CORS do Preview, dez leituras essenciais, DELETE400/403 preservando vínculos,204/cascatas e404/reenvio, logout401. Cleanup e conferência posterior restauraram35 contagens/fingerprints. Quatro GETs do Preview pelo conector e cinco grupos do artefato PWA/VM passaram; não equivalem a navegador/dispositivo.
+- **Gate visual reprovado:** usuário em Chrome desktop informou animação travada antes do login. Diagnóstico confirmou health Render200/JSON, health Preview sem cookies302→vercel.com; o conector autenticado retornava200 e não reproduzia a chamada do navegador. waitForBackend usava credentials=omit, descartando o cookie de proteção Vercel e mantendo o loop antes do formulário. Nenhuma promoção Production foi executada.
+- Correção **somente local** em backendReady.ts: credentials=same-origin na checagem de saúde. Preserva cookies na mesma origem e não os encaminha a backend externo; redirect:error/no-store e proteção SSO preservados. SW mantém precache público com credentials=omit. Nova regressão reproduziu a falha antes da correção;8/8 direcionados e42/42 frontend, lint, TypeScript/build passaram. A abertura real corrigida ainda precisa de novo SHA manual e Preview publicado.
+- Produção preserva Vercel23c06eb/dpl_8fuqVWWywbfP8DYU8qh6jdqvNsjC e Render2dcc9d0/dep-dbt7f5mq1p3s73fjbq7g/live. Catálogo somente leitura:35 tabelas/92 índices/zero inválidos. Snapshot preservado; sem migration, restore, escrita comercial, novo recurso pago ou alteração de credencial Production.
+- Controles continuam pausados (Render Off/Vercel exit0) para o commit/push manual da correção e novo SHA. B já está autorizada: retestar o delta corrigido em HML e promover somente após os gates críticos. Restaurar On Commit/Automatic ao finalizar o release. n8n continua inativo/HML/somente tick; fase4 não autorizada.
+
+
 ## Execução autorizada A+B —16/11/2026
 
 - Recebida autorização explícita para patch n8n HML e publicação coordenada; Git permanece exclusivamente manual. Sem commit/push/deploy nesta rodada, main/23c06eb e todas as alterações preservadas. A fase4 continua não autorizada.

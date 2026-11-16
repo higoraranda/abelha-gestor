@@ -1,5 +1,7 @@
 # Vercel Preview — homologação
 
+**Release16/11/f7efda6:** novo Preview https://abelha-gestor-6xxwd85w6-higoraranda-gmailcoms-projects.vercel.app / dpl_EDn8YNwof7hxcF9xoHSdLyao8Gqf está READY no mesmo SHA do Render HML. BACKEND_URL somente Preview e FRONTEND_URL HML conferidas. API26 checks/cleanup35 e artefatos PWA passaram, mas usuário reprovou a abertura em Chrome desktop: health com credentials:omit não envia cookie de proteção Vercel e recebe302, mantendo a animação. Correção local para same-origin com regressão vermelha/verde;42 testes frontend/lint/build aprovados. Aguardar novo SHA manual e reteste real antes de Production. Proteção SSO e precache público não foram removidos. [Estado atual e causa](SPRINT-LANCAMENTO-20261116.md). O Preview13/11 abaixo registra a rodada anterior.
+
 Verificado em **13/11/2026**: deployment **READY**, com Dark Mode e backend isolado. Resultado estruturado: [vercel-preview-20261113.json](audits/vercel-preview-20261113.json).
 
 ## Ambiente
