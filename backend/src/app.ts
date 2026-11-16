@@ -48,7 +48,8 @@ app.use("/api/v1/integrations", createIntegrationsRouter())
 app.use("/api/events", eventsRouter)
 app.use("/webhooks", webhooksRouter)
 
-app.get("/health", (_req, res) => {
+app.get(["/health", "/api/v1/health"], (_req, res) => {
+  res.set("Cache-Control", "no-store")
   res.json({ status: "ok" })
 })
 

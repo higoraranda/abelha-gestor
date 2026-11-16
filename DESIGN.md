@@ -41,6 +41,7 @@ Em celular: navegação rolável no topo, rail inferior, cards empilhados e quad
 ## Padrões reutilizados
 - Modal.tsx: Radix, foco preso, Escape, título e restauração de foco.
 - DataState.tsx: carregamento, erro com tentativa e vazio com orientação.
+- BeeLoader.tsx: inicialização com a arte intacta de `public/bee-mark.png` e flor SVG independente; voo até a resposta de saúde, pouso único e transição para o sistema. Consome a paleta compartilhada e respeita movimento reduzido.
 - useRemote.ts: consultas canceláveis, respostas antigas descartadas e atualização após mutações.
 - theme.css: paleta semântica, estados, elevação, scrollbar, raios e adaptadores Tailwind `@theme inline`. Nenhum componente declara sua própria paleta.
 - workspace.css: forms, cabeçalhos, cards, tabelas, quadros, filtros, notificações, conversas e impressão.

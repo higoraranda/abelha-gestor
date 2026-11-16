@@ -12,6 +12,7 @@ Fonte de produto: docs/ROADMAP-ABELHA.md, docs/ARQUITETURA-PERSONAL.md, docs/bri
 | CRUD | useRemote.ts + lib/api.ts | docs/ARQUITETURA-PERSONAL.md | Consultas canceláveis; atualizar após salvar; cancelar não grava | Testes HTTP/SQL e browser |
 | Modal | components/ui/Modal.tsx | DESIGN.md | Radix, Escape, foco/restauração, conteúdo rolável | Browser/teclado |
 | Navegação | lib/navigation.ts + AppSidebar/AppPage | docs/ROADMAP-ABELHA.md | Ambiente/tela na URL e histórico | Testes e browser |
+| Inicialização | BeeLoader.tsx + useBackendReady.ts + lib/backendReady.ts | Pedido do loader e DESIGN.md | loading → finishing → done; GET /api/v1/health sem cache; timeout por tentativa, retry automático e manual, offline, movimento reduzido; telas montadas após concluir | backendReady.test.mjs + scripts/verify-bee-loader.cjs |
 
 Tema: escuro fixo e padrão para CRM/Personal/login, com adaptadores das primitivas Tailwind. Controles nativos respeitam `color-scheme:dark`; popups pertencem ao navegador/sistema. Extrato claro somente em impressão. Conversas usam os tokens compartilhados, incluindo seleção, bolhas, composição e estados vazios. Evidência visual: `frontend/scripts/verify-dark-mode.cjs` e `docs/DARK-MODE.md`.
 
