@@ -5,6 +5,8 @@ Direção atual: Dark Mode padrão, grafite e amarelo Abelha, conforme o redesig
 ## Produto e identidade
 CRM individual e organização pessoal em ambientes separados, em pt-BR, valores em reais, fuso America/Sao_Paulo. Preservar a marca da abelha e o amarelo. Nada de equipes, metas de vendedores ou decoração empresarial.
 
+Exclusão de projetos: ação secundária destrutiva no detalhe, com o Modal existente e nome exato digitado. O texto deve explicar a remoção definitiva de marcos, decisões, relatórios e avisos vinculados. Bloquear submissão sem confirmação/durante envio, manter o erro no diálogo e voltar à lista somente após204. Consumir os tokens e a classe button-danger-ghost atuais, sem criar nova paleta. Implementação local; validação visual e publicação dependem das etapas de homologação.
+
 ## Cores e superfícies
 Fonte de verdade executável: `frontend/src/theme.css`, importado por `index.css`. Modelo de propriedade: o CSS mantém os valores; este documento espelha os papéis e explica o uso. `workspace.css` mantém os componentes compartilhados; `personal.css`, carregado por último, mantém somente a composição Personal, consumindo a mesma paleta.
 

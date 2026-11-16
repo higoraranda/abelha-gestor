@@ -12,7 +12,7 @@
         0
       ],
       "parameters": {
-        "content": "# 🐝 CONTROLE E CONFIGURAÇÃO\n\nDESATIVADO até credenciais e ensaio. Um relógio compartilha tick/preços; webhooks não passam pelo roteador. Teste manual: editar operation em Escolher operação. Erros são tratados por bloco, sem subworkflows. Mesmo backend/conta/hosts revisados; não apontar testes de gravação à produção.",
+        "content": "# 🐝 CONTROLE E CONFIGURAÇÃO\n\nDESATIVADO até credenciais e ensaio. Um relógio executa tick; preços opcionais desligados por PRICE_MONITOR_ENABLED=false em Operações do relógio. Habilitar somente após fonte autorizada configurada e validada. Webhooks não passam pelo roteador. Teste manual: editar operation em Escolher operação. Erros são tratados por bloco, sem subworkflows. Mesmo backend/conta/hosts revisados; não apontar testes de gravação à produção.",
         "color": 1,
         "width": 4400,
         "height": 750
@@ -49,7 +49,7 @@
       ],
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "return [{json:{operation:\"tick\"}},{json:{operation:\"prices\"}}];"
+        "jsCode": "const PRICE_MONITOR_ENABLED=false;\nconst operations=[{json:{operation:\"tick\"}}];\nif(PRICE_MONITOR_ENABLED)operations.push({json:{operation:\"prices\"}});\nreturn operations;"
       },
       "onError": "continueErrorOutput"
     },
@@ -887,7 +887,7 @@
         3300
       ],
       "parameters": {
-        "content": "# 🟢 MONITORAMENTO DE PREÇOS\n\nGET due respeita interval_minutes por produto. API/hosts/credencial própria pendentes. Lote finito de até 20 observações, gravação por item com retries/reset desligado. Sem link aguarda configuração; nenhuma cotação fictícia.",
+        "content": "# 🟢 MONITORAMENTO DE PREÇOS\n\nAutomático desligado em Operações do relógio: PRICE_MONITOR_ENABLED=false. Habilitar somente após configurar e validar API/hosts/credencial própria. Diagnóstico manual prices preservado; falhas configuradas continuam visíveis. GET due respeita interval_minutes por produto. Lote finito de até 20 observações, gravação por item com retries/reset desligado. Sem link aguarda configuração; nenhuma cotação fictícia.",
         "color": 4,
         "width": 2100,
         "height": 1400

@@ -1,5 +1,14 @@
 # Checklist de ativação — Abelha CRM + Personal
 
+Execução autorizada16/11: **A verificada**, relógio remoto somente tick/preços desligados;62 nós/inativo/dez HML e demais campos preservados. **B com gatilhos pausados:** Render Off confirmado, Vercel exit0 aplicado após registrar original Automatic. Aguardar commit/push manual e SHA, HML/delta/cleanup e promoção somente se passar. Restaurar Render On Commit/Vercel Automatic ao concluir B. Fase4 sem autorização. [Roteiro vigente](SPRINT-LANCAMENTO-20261116.md).
+
+Atualização final16/11 — [pacote único de lançamento](SPRINT-LANCAMENTO-20261116.md):55 testes backend/40 frontend, DELETE compilado local→Neon HML em15 requisições e cleanup35/35; correção PWA e preços opt-in locais. **Remoto n8n inalterado/inativo; gate de preços aguarda autorização antes de ativar.** Preparadas propostas de credenciais exclusivas fora do Git, ainda não aplicadas. Pausar auto-deploy de produção antes do push manual na main; validar o delta HML e publicar na sequência coordenada. Nenhuma migration nova. Push físico e inspeção visual da UI nova continuam pendentes.
+
+
+Atualização16/11 — **testes reais n8n/HML aprovados**: oito callbacks completos200/503, captura/GitHub com replay, rejeições sem persistência, tick/accounts e revisão parcial/replay com SQL/fingerprints.62 nós, inativo, `operation=tick`; cleanups restauraram35 tabelas e removeram estado/processos temporários. Pendem Overpass positivo, CI real, preços, push/PWA e observabilidade/lotes. [Relatório vigente](VALIDACAO-FUNCIONAL-N8N-20261116.md). Não ativar automaticamente.
+
+Atualização16/11 — **migration de produção aplicada e COMMIT confirmado**:35 tabelas,92 índices,17 tabelas CRM preservadas. Snapshot Free snap-silent-fog-acdvwgeu mantido sem expiração. Usuário confirmou leitura de Personal, Leads e Templates sem erro. Não repetir a migration. [Execução e evidências](EXECUCAO-MIGRATION-PERSONAL.md). Integrações opcionais e n8n não foram ativados.
+
 Atualização13/11 — **workflow único conectado à HML e desativado**: dez destinos atualizados, duas credenciais HML configuradas; faltam ensaio no motor com listener, disponibilidade Overpass, evidência CI real para relatório positivo, fonte autorizada de preços e testes físicos/stdout. [Procedimento atual](N8N-HOMOLOGACAO.md). Nenhum deploy, migration ou alteração de produção nesta etapa.
 
 Atualização13/11: **Preview READY com Dark Mode**, usando o commit existente da main, BACKEND_URL exclusiva de Preview e FRONTEND_URL HML atualizada. Nenhum commit, push, migration ou alteração de produção. Uso online e integrações sintéticas validados; instalação offline remota bloqueada pela proteção Vercel. Instruções atuais: [VERCEL-PREVIEW-HOMOLOGACAO.md](VERCEL-PREVIEW-HOMOLOGACAO.md). Os registros de12/11 abaixo são históricos; o workflow continua desativado.
@@ -19,12 +28,12 @@ Consolidação posterior concluída: administrar somente **🐝 ABELHA — AUTOM
 - [ ] Revisar `AUDITORIA-ATIVACAO.md`, os relatórios de dependências e o diff local. Conservar os lockfiles revisados.
 - [ ] Confirmar Node 22.12+ e URLs distintas de teste/produção. O proxy da prévia deve apontar para o backend de teste; nunca deixar `BACKEND_URL` cair no endereço de produção durante testes de gravação.
 - [x] Neon e Render de homologação autorizados: banco isolado provisionado, compute existente habilitado em0,25CU Free e backend live. Recursos mantidos para a homologação solicitada; nenhum upgrade autorizado.
-- [ ] Confirmar backup/ponto de restauração do ambiente que receberá a migration e procedimento de recuperação. Conservar o schema e as contagens/fingerprints dos registros comerciais antes da alteração.
+- [x] Confirmar backup/ponto de restauração do ambiente que receberá a migration e procedimento de recuperação. Snapshot Free snap-silent-fog-acdvwgeu preservado; schema e contagens/fingerprints privados conservados. Restauração completa não executada.
 - [ ] Confirmar qual `organization_id` e qual `users.id` existente pertencem à mesma conta. A integração recebe esses IDs no servidor; nunca do payload externo.
 
 ## 2. Migration — ensaio antes de produção
 
-Arquivo único: `backend/src/db/migrations/20261111_personal_platform.sql`. Não executar schema.sql, reset ou seed. Ensaio sintético Neon aprovado; migration nova continua pendente **na produção**. Revalidar pré-condições no ambiente que receberá a ativação.
+Arquivo único: `backend/src/db/migrations/20261111_personal_platform.sql`. Ensaio sintético Neon aprovado e migration **aplicada em produção em16/11/2026**, transação71684/committed. Não executar novamente, nem executar schema.sql, reset ou seed. Os passos de ensaio abaixo documentam o procedimento de referência.
 
 - [ ] Conferir `SELECT current_database(), current_schema(), version();` e o endpoint/branch escolhido, usando conexão direta, sem `-pooler`.
 - [ ] Conferir tipos `uuid` de organizations.id, users.id/organization_id e clients.id/organization_id; PKs/FKs existentes e definições dos índices `users_org_identity` / `clients_org_identity`.
@@ -82,8 +91,9 @@ No `.env` local inspecionado, DATABASE_URL, AUTH_SECRET, AUTH_URL e FRONTEND_URL
 ## 6. n8n — ativar somente o que está pronto
 
 - [x] Instância `socialbaboon` confirmada; fontes conferidas e consolidado criado/relido, com62 nós, sem subworkflows. Sete backups mantidos existentes/desativados. Inventário em `integrations/cloudfy-workflows.json`.
-- [ ] Abrir **somente n20DNyb13Aaw3nq5** e confirmar versão n8n em Help/About. Não trocar `N8N_ENCRYPTION_KEY`. Conferir os dez nós backend pelo manifesto de homologação; host publicado já contém a rota nova, respondendo503 sem integração. Não testar gravações nele. Backend HTTPS de homologação disponível e autenticado; configurar os dez destinos do workflow antes de qualquer execução de teste.
-- [ ] Criar **Abelha — Backend** (Header Auth: `Authorization`, valor `Bearer <ABELHA_INTEGRATION_TOKEN>`) e selecioná-la somente nos nós backend listados no guia. Criar **Abelha — Entrada Webhook** com `X-Abelha-Webhook-Token` e segredo distinto nos três webhooks protegidos. Não colocar segredo em formulário público, JSON exportado, URL ou logs.
+- [x] Dez destinos backend do consolidado usam exclusivamente HML, com conta/banco sintéticos. Código, URLs, credenciais e conexões conferidos; testes de gravação restritos à HML. Não importar modelos históricos sobre o remoto atual.
+- [ ] Confirmar versão n8n em Help/About e auditar retenção/logs globais da instância. Não trocar `N8N_ENCRYPTION_KEY`.
+- [x] **Abelha — Backend Homologação** e **Abelha — Entrada Homologação** configuradas e usadas nos testes reais. Nove saídas Header Auth e três entradas; GitHub conserva somente HMAC/binário. Não recriar essas credenciais nem expor valores. Produção exigirá credenciais exclusivas e autorização própria.
 - [ ] Manter o único relógio do consolidado a cada15min, America/Sao_Paulo; ele roteia tick/preços e o backend verifica o que está devido. Configurar horários no Personal. Não ativar nenhum backup. Testes manuais escolhem uma operation por vez.
 - [ ] Conferir saída ok:false e configurar/verificar CODE_ENABLE_STDOUT=true no host n8n para logs genéricos, sem payloads/secrets. Falhas tratadas não devem ser interpretadas como aprovação de todos os blocos pelo status global concluído.
 - [ ] O tick implementa lembretes, contas, revisão e envio push. Horários no fim do dia têm tolerância de 30 minutos para o tick após a virada. Interrupções prolongadas ainda exigem revisar avisos/revisões manualmente; não há promessa de recuperação irrestrita de agendamentos perdidos.
@@ -92,7 +102,8 @@ No `.env` local inspecionado, DATABASE_URL, AUTH_SECRET, AUTH_URL e FRONTEND_URL
 - [ ] Para projetos, conectar produtor real de `project_id` UUID e `report` v1; configurar o webhook GitHub e seu secret. Usar relay binário n8n **ou** backend direto, sem duplicar o caminho. Não reserializar o corpo assinado.
 - [ ] Para preços, escolher API/feed autorizado; preencher `PROVIDER_URL`/`PRODUCT_HOSTS`, credencial própria e allowlist backend. Mapear formato nativo se diferente do contrato, respeitando frequência, 429 e custos. Pipeline HTTP/validação/POST já preparado; sem fonte não há cotações.
 - [ ] Manter retenção de sucesso/erro desativada e `saveManualExecutions=false` nos modelos. Conferir também retenção da instância e uso de logs antes de inserir dados pessoais. Falhas devem ser acompanhadas por metadados sem expor payloads/segredos.
-- [ ] Executar primeiro em homologação com dados sintéticos, usando Test URL/Listen for test event; comparar reenvios e isolamento antes da conta real. As definições foram criadas remotamente; nenhuma execução/ativação remota foi feita.
+- [x] Executar em HML com dados sintéticos e Test URLs: oito callbacks completos via responders, deduplicação, GitHub/HMAC, erros, tick/accounts e revisão parcial/replay aprovados. Limpeza35/35 e seletor tick restaurado. Nenhuma ativação.
+- [ ] Concluir busca positiva/Overpass, CI real para relatório positivo, fonte de preços, push/PWA e contagem de retries/falhas parciais de lotes no motor. Fonte/cron/conta de produção só após plano e autorização específicos.
 
 ## 7. Push em dispositivos reais
 
@@ -105,7 +116,7 @@ No `.env` local inspecionado, DATABASE_URL, AUTH_SECRET, AUTH_URL e FRONTEND_URL
 ## 8. Autorizações ainda necessárias
 
 - [ ] Ambiente/compute isolado Neon, se precisar ser reativado/criado.
-- [ ] Aplicação da migration revisada em produção, depois do ensaio autorizado.
+- [x] Aplicação da migration revisada em produção, depois do ensaio autorizado:16/11/2026, transação71684/committed,35 tabelas e92 índices.
 - [ ] Configuração de variáveis/credenciais remotas, cadastro GitHub e ativação seletiva após testes. A criação dos workflows desativados já foi autorizada e concluída.
 - [ ] Fonte de preços/classificador e qualquer custo associado.
 - [ ] Publicação/deploy. Commit/push continuam fora desta autorização.

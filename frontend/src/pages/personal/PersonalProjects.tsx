@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { ArrowLeft, ArrowUpRight, GitBranch, Plus, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, GitBranch, Plus, CheckCircle2, Trash2 } from 'lucide-react'
 import { useRemote } from '@/hooks/useRemote'
 import { api } from '@/lib/api'
 import { civilDate } from '@/types/crm'
 import type { PersonalProject, ProjectDetails, ProjectUpdate, ProjectMilestone } from '@/types/personal'
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/DataState'
 import Modal from '@/components/ui/Modal'
+import {deleteConfirmedProject,hasProjectDeletionConfirmation} from '@/lib/projectDeletion'
 
 const STATUSES:Record<string,string>={planned:'Planejado',active:'Em andamento',paused:'Pausado',done:'Concluído'}
 export default function PersonalProjects({focusId,onOpen}:{focusId?:string;onOpen:(id?:string)=>void}) {
@@ -23,7 +24,7 @@ function NewProject({onClose,onSaved}:{onClose:()=>void;onSaved:(id:string)=>voi
   return <Modal title="Novo projeto" description="Comece pelo contexto. Nenhum status será importado automaticamente." onClose={()=>{if(!busy)onClose()}}><form className="crm-form" onSubmit={save}><label>Nome<input required maxLength={240} autoFocus value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/></label><label>Descrição<textarea rows={3} maxLength={10000} value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/></label><label>Repositório GitHub (opcional)<input type="url" placeholder="https://github.com/usuario/projeto" value={form.repository} onChange={e=>setForm({...form,repository:e.target.value})}/></label><label>Branch principal<input required value={form.main_branch} onChange={e=>setForm({...form,main_branch:e.target.value})}/></label><label>Próxima ação<input maxLength={2000} value={form.next_step} onChange={e=>setForm({...form,next_step:e.target.value})}/></label>{error&&<p className="form-error" role="alert">{error}</p>}<footer><button type="button" className="button button-secondary" disabled={busy} onClick={onClose}>Cancelar</button><button className="button button-primary" disabled={busy}>{busy?'Salvando…':'Criar projeto'}</button></footer></form></Modal>
 }
 function ProjectDetail({id,onBack}:{id:string;onBack:()=>void}) {
-  const remote=useRemote<ProjectDetails>('/api/v1/personal/projects/'+id);const [editor,setEditor]=useState<'milestone'|'decision'|'report'|null>(null)
+  const remote=useRemote<ProjectDetails>('/api/v1/personal/projects/'+id);const [editor,setEditor]=useState<'milestone'|'decision'|'report'|null>(null);const [deleting,setDeleting]=useState(false)
   if(remote.loading&&!remote.data)return <LoadingState/>
   if(remote.error)return <ErrorState message={remote.error} retry={remote.reload}/>
   if(!remote.data)return null
@@ -31,8 +32,16 @@ function ProjectDetail({id,onBack}:{id:string;onBack:()=>void}) {
   return <div className="module-page"><button className="button button-secondary" onClick={onBack}><ArrowLeft size={16}/> Todos os projetos</button><header className="page-heading personal-detail-heading"><div><p className="eyebrow">CENTRAL DE PROJETOS</p><h1>{project.name}</h1><p className="page-subtitle">{project.description}</p>{project.repository&&<a className="text-link" href={project.repository} target="_blank" rel="noopener noreferrer">Abrir repositório <ArrowUpRight size={14}/></a>}</div><span className="status-pill">{STATUSES[project.status]}</span></header>
     <div className="personal-grid"><section className="crm-panel personal-section"><h2>O próximo passo</h2><ProjectState key={project.updated_at} project={project}/></section><section className="crm-panel personal-section"><div className="personal-row"><h2>Marcos do projeto</h2><button className="button button-secondary" onClick={()=>setEditor('milestone')}>Adicionar marco</button></div>{!milestones.length?<EmptyState title="Defina a primeira etapa" text="Cada marco tem critérios de aceite. Sem marcos, não há progresso presumido."/>:milestones.map(milestone=><article className="personal-milestone" key={milestone.id}><span>{milestone.completed_at?<CheckCircle2 size={18}/>:<GitBranch size={18}/>}</span><div><strong>{milestone.title}</strong><p>{milestone.acceptance}</p><small>{milestone.completed_at?'Concluído após revisão':'Aguardando evidências e revisão'}</small></div></article>)}</section></div>
     <section className="crm-panel personal-section"><div className="personal-row"><div><p className="eyebrow">CONTEXTO PRESERVADO</p><h2>Linha do tempo</h2></div><div className="crm-toolbar"><button className="button button-secondary" onClick={()=>setEditor('decision')}>Registrar decisão</button><button className="button button-primary" onClick={()=>setEditor('report')}>Receber relatório</button></div></div>{!updates.length?<EmptyState title="O histórico começa aqui" text="Registre decisões e relatórios. Um relatório recebido não conclui etapas automaticamente."/>:updates.map(update=><Update key={update.id} update={update} project={project} milestones={milestones}/>)}</section>
+    <div className="crm-toolbar"><button className="button button-danger-ghost" onClick={()=>setDeleting(true)}><Trash2 size={16}/> Excluir projeto</button></div>
+    {deleting&&<DeleteProject project={project} onClose={()=>setDeleting(false)} onDeleted={onBack}/>}
     {editor&&<ProjectEntry kind={editor} projectId={id} onClose={()=>setEditor(null)}/>}
   </div>
+}
+function DeleteProject({project,onClose,onDeleted}:{project:PersonalProject;onClose:()=>void;onDeleted:()=>void}) {
+  const [confirmation,setConfirmation]=useState('');const [busy,setBusy]=useState(false);const [error,setError]=useState('')
+  const confirmed=hasProjectDeletionConfirmation(project.name,confirmation)
+  async function remove(event:React.FormEvent){event.preventDefault();if(busy||!confirmed)return;setBusy(true);setError('');try{await deleteConfirmedProject(project,confirmation);onDeleted()}catch(error){setError(error instanceof Error?error.message:'Não foi possível excluir o projeto.')}finally{setBusy(false)}}
+  return <Modal title="Excluir projeto" description="Esta ação remove permanentemente o projeto, seus marcos, decisões, relatórios e avisos vinculados." onClose={()=>{if(!busy)onClose()}}><form className="crm-form" onSubmit={remove} aria-busy={busy}><p>Para excluir <strong>{project.name}</strong>, digite o nome exatamente como aparece.</p><label>Nome do projeto para confirmar<input required autoFocus autoComplete="off" maxLength={240} value={confirmation} disabled={busy} onChange={event=>setConfirmation(event.target.value)}/></label>{error&&<p className="form-error" role="alert">{error}</p>}<footer><button type="button" className="button button-secondary" disabled={busy} onClick={onClose}>Cancelar</button><button className="button button-danger-ghost" disabled={busy||!confirmed} aria-busy={busy}><Trash2 size={16}/>{busy?'Excluindo…':'Excluir projeto'}</button></footer></form></Modal>
 }
 function ProjectState({project}:{project:PersonalProject}) {
   const [form,setForm]=useState({status:project.status,next_step:project.next_step,blockers:project.blockers});const [busy,setBusy]=useState(false);const [error,setError]=useState('')

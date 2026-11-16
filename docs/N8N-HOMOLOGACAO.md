@@ -1,5 +1,32 @@
 # Workflow único — integração à homologação
 
+**Execução autorizada16/11 — etapa A aplicada e conferida:** somente jsCode de Operações do relógio alterado para PRICE_MONITOR_ENABLED=false/somente tick. Após HTTP400 do plugin por compatibilidade de settings, edição feita pelo usuário no editor e comparação integral pelo plugin:62 nós, IDs, posições, credenciais, conexões, settings (binaryMode incluído) e dez destinos HML preservados, inativo. UpdatedAt2026-11-16T21:53:41.207Z. Apenas metadados de salvamento e o campo aprovado mudaram. Backup privado/snapshot mws_hfTw59hbiJx3 preservados. Não ativar/redirecionar; fase4 continua não autorizada. Estados de patch local/rejeição anteriores abaixo são históricos. [Release atual](SPRINT-LANCAMENTO-20261116.md).
+
+## Preparação final16/11 — preços automáticos opt-in, ainda local
+
+Gerador/modelo e regressões locais aprovados: PRICE_MONITOR_ENABLED=false em Operações do relógio emite somente tick; true recupera preços explicitamente. Diagnóstico manual prices e seus erros reais preservados. Patch de um único campo em [releases/n8n-price-scheduler-20261116.json](releases/n8n-price-scheduler-20261116.json). A revisão automática rejeitou a escrita via plugin porque exige substituir o array de62 nós e considerou insuficiente a autorização explícita; **nenhuma alteração remota aplicada**. Releitura final integralmente igual ao início, updatedAt2026-11-16T14:38:10.757Z, inativo/dez destinos HML/zero running e waiting listados. Não ativar o clock antigo sem aplicar o gate autorizado. Não reimportar o JSON histórico local, que usa URLs de produção. Os testes no motor descritos abaixo continuam válidos e não foram repetidos. Publicação/credenciais/rollback e pendências em [SPRINT-LANCAMENTO-20261116.md](SPRINT-LANCAMENTO-20261116.md).
+
+
+## Validação de16/11/2026 — continuidade
+
+Relatório vigente: [VALIDACAO-FUNCIONAL-N8N-20261116.md](VALIDACAO-FUNCIONAL-N8N-20261116.md). Infraestrutura resolvida pelo plugin: `infra_fxJeupUPo3oD` / socialbaboon; o identificador antigo abaixo é histórico. Consolidado permanece inativo, com 62 nós e dez destinos HML. Códigos, URLs, referências de credenciais e conexões permanecem iguais; diferenças salvas pelo editor em posições/parâmetros padrão e `binaryMode=separate` foram preservadas, sem reimportação ou atualização pelo conector.
+
+Os 10 grupos VM e 10 grupos VM→HTTP/SQL passaram novamente, com limpeza35/35. **São testes de contrato, não execuções do motor.** Na primeira tentativa com listener manual, o POST de captura recebeu200 sem confirmação e não criou candidato; só o webhook ficou verde. Essa tentativa não foi aprovada.
+
+Na continuidade pelo editor, executar a etapa final de cada ramo permitiu comprovar no motor: captura e reenvio com um candidato/fingerprint estável; GitHub assinado e replay com uma atualização estável; corpo adulterado com delivery novo sem persistência e nó Falha · PROJETOS executado; relatório sem CI e busca inválida sem gravação e com nós de erro executados. Uma única busca válida chegou à falha; disponibilidade Overpass continua pendente, sem repetição automática.
+
+Tick e accounts também executaram no motor: exatamente dois avisos sintéticos, sem duplicação, pagamento, mudança de vencimento, preço ou revisão indevida. Revisão semanal criou uma parcial/um aviso; repetição preservou ID/fingerprints. Para accounts/weekly-review, foi necessário limpar o estado do editor e iniciar por Teste manual antes da etapa HTTP. O seletor foi restaurado para `operation=tick` e conferido pelo plugin.
+
+As primeiras execuções parciais pararam antes do responder compartilhado e retornaram HTTP200 vazio. A rodada posterior resolveu essa lacuna: **oito casos HTTP completos passaram no motor**. Captura/replay e GitHub/replay retornaram200 com JSON validado; captura inválida, push adulterado com delivery novo, relatório sem CI e busca inválida retornaram503 com ok=false, bloco e código genérico corretos. Banco confirmou deduplicação e ausência de gravação/conclusão indevida. O helper rejeita200 sem os campos de sucesso e503 genérico/de outro bloco;13 cenários de regressão passaram sem rede.
+
+Antes de armar, executar prepare apenas uma vez e mantê-lo para toda a série; responder imediatamente após o clique, sem esperar o output, e enviar o POST antes dos120s. Uma sugestão de método POST em GET404 não garante listener disponível. Não usar probes GET como confirmação de prontidão. O painel de saída continua carregando em alguns testes; a causa ainda não foi demonstrada. Retenção de execução permanece desligada, sem expor payloads para contornar a falta de histórico.
+
+Rodadas parcial e completa encerradas:35 contagens/fingerprints restaurados após cada limpeza, estado privado removido e nenhum runner temporário ativo. Os auxiliares de tick foram necessários apenas na primeira rodada; a rodada final de callbacks usou prepare/cleanup do helper existente. Não repetir os callbacks já aprovados sem mudança/falha que justifique novo ensaio. Os auxiliares privados não conectam o n8n ao banco, não aplicam migrations e não alteram credenciais.
+
+Para recuperar o editor: parar a execução/listener se disponível, fechar o painel e atualizar com Ctrl+F5. Confirmar Inactive e a seleção de **apenas um gatilho** antes de executar. O teste isolado de um nó pode ser parcial e não prova o percurso completo. `Execute workflow` sem seleção confirmada pode iniciar a operação manual; não usar para contornar o problema. As diferenças entre execução parcial e completa constam na [documentação oficial](https://docs.n8n.io/build/understand-workflows/understand-executions/types-of-executions/).
+
+O status Overpass respondeu502/capacidade esgotada após a busca HML503; não insistir em consultas públicas. Relatório positivo continua sem evidência Actions real. Push físico, PWA no Preview protegido e observabilidade stdout permanecem pendentes. O preparo/cleanup e o estado de encerramento desta rodada estão no relatório vigente.
+
 ## Tentativa de execução real — 13/11/2026
 
 O helper `prepare` foi executado com sucesso no banco HML. A tentativa de abrir o editor pelo Computer Use foi interrompida pela ferramenta: **não foi possível determinar a URL atual do Chrome no Windows com confiança suficiente para aplicar a política de segurança**. Nenhum listener foi armado nem operação executada no motor. A configuração e as credenciais existentes permaneceram intactas.
@@ -47,7 +74,7 @@ GitHub mantém os três headers `X-Hub-Signature-256`, `X-GitHub-Event`, `X-GitH
 - Captura, busca e webhooks de projetos não alcançam tick, preços, contas ou revisão. O relógio continua emitindo somente tick/preços e o seletor manual escolhe uma operação.
 - **Accounts conserva o contrato original: é um alias do tick completo.** Esse tick verifica horários individuais de finanças/contas/revisão; não paga contas. Não é correto descrevê-lo como endpoint exclusivo de assinaturas. Essa lógica não foi modificada nesta configuração.
 
-## Testes realmente executados
+## Histórico — testes de13/11 e continuidade
 
 | Camada | Resultado e limite |
 |---|---|
@@ -56,33 +83,33 @@ GitHub mantém os três headers `X-Hub-Signature-256`, `X-GitHub-Event`, `X-GitH
 | Code nodes remotos em VM → HTTP Render HML → PostgreSQL HML real |10 grupos passaram: captura201/replay/conflito409/token401; staging sintético/replay; aviso diário e conta devidos; tick sem duplicação; accounts sem pagamento; GitHub HMAC/replay/tamper401; rejeição de relatório sem evidência; revisão parcial/replay; preços503 e limpeza. |
 | Busca pública |Uma consulta de cidade sintética, sem dados comerciais, retornou503. Validação/erro e staging com fixture sintética passaram; disponibilidade real do Overpass não foi aprovada. Sem repetição automática dessa consulta. |
 | Relatório Codex positivo remoto |Pendente: consulta ao GitHub retornou0 execuções Actions neste repositório. Foi usada a SHA real40c179c no teste negativo, sem fabricar URL de evidência. O backend rejeitou o relatório sem testes/evidência e não gravou conclusão. Contrato positivo continua coberto localmente com fixtures. |
-| Motor n8n remoto |Não executado. O plugin oferece configuração/credenciais e consulta de execuções, mas não registra listener manual nem inicia esse ensaio. A lista consultada não contém execuções do workflow. Procedimento abaixo. |
+| Motor n8n remoto |Em13/11 não executado. Em16/11 foram aprovados os oito callbacks completos e tick/accounts/revisão descritos no início. Plugin não arma listeners; o editor foi operado manualmente. A ausência de histórico persistido não invalida as respostas HTTP/SQL verificadas, pois a retenção manual está desligada. |
 
 O ensaio remoto comprovou `current_database=abelha_homologacao` e `current_user=abelha_hml_app`, somente a identidade sintética, ausência de inscrição push e restauração das **35 contagens/fingerprints**. Nenhum cliente comercial, pagamento, preço ou marco concluído foi criado; nenhum push físico foi enviado. Conexões encerradas; não foi iniciado servidor/worker/listener local ou remoto.
 
 ## Ensaio manual exato no motor n8n
 
-O helper local `.abelha-homologacao/test-n8n-listener.cjs` está preparado, validado sintaticamente e ignorado pelo Git. Lê segredos privados em memória e só envia a URLs **`/webhook-test/abelha/v1/...`**; não imprime headers ou payload. Seus POSTs no motor ainda não foram executados.
+O helper local `.abelha-homologacao/test-n8n-listener.cjs` foi usado na rodada de16/11 e continua ignorado pelo Git. Lê segredos privados em memória, só envia a URLs **`/webhook-test/abelha/v1/...`** e não imprime headers/payload. Treze contratos locais de resposta e os oito casos completos no motor passaram; não confundir a primeira tentativa inconclusiva com os resultados finais. Uma nova rodada precisa de prepare, pois o estado anterior foi limpo.
 
 1. Abrir o consolidado, confirmar **Inactive**,62 nós e os dez destinos HML. Não alterar os sete backups, publicar ou ativar. Trabalhar somente com a identidade sintética.
 2. Na raiz do repositório, executar `node .abelha-homologacao/test-n8n-listener.cjs prepare`. O helper confere banco/role e35 tabelas vazias além da organização/usuário; recusa iniciar se já houver registros. Cria somente um projeto sintético de apoio e salva o estado privado para limpeza.
-3. Abrir o webhook desejado, selecionar **Test URL** e clicar **Listen for test event**. O listener é temporário. Rearmá-lo **antes de cada POST**, inclusive reenvio. Esse é o procedimento previsto na [documentação oficial de Webhook](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.webhook/).
-4. Executar somente a linha correspondente; conferir os nós percorridos e a resposta no editor. Não usar `/webhook/`, não enviar tokens pelo frontend e não fixar dados da execução.
+3. Confirmar a Test URL do evento e fechar o painel. Para os contratos completos, usar o procedimento comprovado: **Ctrl+F5**, manter Inactive, abrir **Responder webhook** para sucesso ou **Responder falha webhook** para rejeição, e clicar **Execute step**. Enviar imediatamente o evento, sem esperar o Output; rearmar do mesmo modo antes de cada POST/replay. O listener temporário dura120s, conforme a [documentação oficial](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.webhook/workflow-development/). Listen for test event no nó de entrada pode executar somente o gatilho; isso não comprova a cadeia inteira.
+4. Executar somente a linha correspondente; conferir resposta semântica, caminho e efeitos em HML. Não clicar em Execute workflow, relógio ou Teste manual durante os callbacks. O responder de sucesso só tem webhooks como entradas; o de falha tem outros ancestrais e exige estado limpo/entrada correta. Interromper se outro gatilho iniciar. Não usar `/webhook/`, enviar tokens pelo frontend ou fixar dados da execução.
 
-| Webhook aberto | Comando após armar o listener | Resultado esperado |
+| Evento / responder a executar | Comando após armar | Resultado esperado |
 |---|---|---|
-| CAPTURA · Receber captura | `node .abelha-homologacao/test-n8n-listener.cjs capture` |200, received/review_required; primeiro reused=false |
-| Mesmo webhook, rearmado | Mesmo comando capture |200, mesmo evento; reused=true, um candidato |
-| CAPTURA · Receber captura | `node .abelha-homologacao/test-n8n-listener.cjs capture-invalid` |503 genérico; nenhum candidato novo |
-| BUSCA · Receber busca | `node .abelha-homologacao/test-n8n-listener.cjs search-invalid` |503 genérico; sem consulta pública |
-| BUSCA · Receber busca | `node .abelha-homologacao/test-n8n-listener.cjs search` |Esperado200 vazio. Se retornar503, a busca continua pendente e o helper encerra com exit1. Aguardar pelo menos1min entre consultas públicas. |
-| PROJETOS · Receber GitHub assinado | `node .abelha-homologacao/test-n8n-listener.cjs github-ping` |200; bytes/HMAC reconhecidos, sem evento comercial |
-| Mesmo webhook, rearmado | `node .abelha-homologacao/test-n8n-listener.cjs github-invalid` |503 no n8n a partir da assinatura inválida401 no backend |
-| PROJETOS · Receber relatório Codex | `node .abelha-homologacao/test-n8n-listener.cjs report-negative` |503 no n8n a partir do relatório sem evidências400 no backend |
+| Captura / Responder webhook | `node .abelha-homologacao/test-n8n-listener.cjs capture` |200, received/review_required; primeiro reused=false |
+| Mesmo evento / Responder webhook rearmado | Mesmo comando capture |200, reused=true; um candidato e fingerprint estável |
+| Captura inválida / Responder falha webhook | `node .abelha-homologacao/test-n8n-listener.cjs capture-invalid` |503/ABELHA_CAPTURA_FAILED; nenhum candidato novo |
+| Busca inválida / Responder falha webhook | `node .abelha-homologacao/test-n8n-listener.cjs search-invalid` |503/ABELHA_BUSCA_FAILED; sem consulta pública |
+| Busca válida / ensaio futuro, quando provedor disponível | `node .abelha-homologacao/test-n8n-listener.cjs search` |Disponibilidade não aprovada nesta rodada; não repetir agora. Resposta200 vazia sem campos não prova busca funcional. |
+| GitHub sintético / Responder webhook | `node .abelha-homologacao/test-n8n-listener.cjs github-push` |200 com campos GitHub; uma atualização no projeto sintético; replay mantém registro/fingerprints |
+| GitHub adulterado / Responder falha webhook | `node .abelha-homologacao/test-n8n-listener.cjs github-push-invalid` |503/ABELHA_PROJETOS_FAILED; delivery novo e nenhum registro novo |
+| Relatório sem CI / Responder falha webhook | `node .abelha-homologacao/test-n8n-listener.cjs report-negative` |503/ABELHA_PROJETOS_FAILED; nenhum relatório/marco criado |
 
-404 indica que o listener não foi registrado/expirou; rearmar e repetir. Não ativar para contornar404. O helper mantém o mesmo event_id entre os dois ensaios de captura. O editor deve mostrar apenas os nós desse webhook e o responder/erro correspondente, sem preços/tick/revisão.
+404 indica que o listener não foi registrado/expirou; rearmar e repetir. Não ativar para contornar404. HTTP200 sem o corpo esperado também não aprova o teste. O helper mantém o mesmo event_id entre os dois ensaios de captura. O editor deve mostrar apenas os nós desse webhook e o responder/erro correspondente, sem preços/tick/revisão. Conferir um único candidato no banco e `reused=true` no segundo envio; se a saída carregar indefinidamente, interromper e registrar o teste como pendente, sem repetir indiscriminadamente.
 
-5. Para os ramos agendados, abrir **Escolher operação**, ajustar somente `operation` e executar pela entrada **Teste manual**, uma vez por `tick`, `accounts` e `weekly-review`. Não executar o Schedule Trigger nem `prices`. Tick/accounts devem responder200 e não pagar contas; sem horários/contas configurados podem não emitir aviso. Weekly deve retornar a revisão parcial e manter o ID no reenvio. Os efeitos de horário/deduplicação já passaram no ensaio HTTP/SQL; aqui se valida o motor e a credencial.
+5. Para os ramos agendados, definir somente `operation` em **Escolher operação**, limpar o estado do editor e executar **Teste manual** pelo botão do próprio nó. Quando verde, executar a etapa HTTP correspondente: FINANCEIRO para tick, CONTAS para accounts, REVISÃO para weekly-review. Não executar o Schedule Trigger nem prices. O início explícito pelo Manual resolveu a tentativa parcial de accounts que não alcançava o nó. Tick/accounts criaram/preservaram os dois avisos devidos e nenhum pagamento; weekly gerou uma parcial e manteve ID/aviso no reenvio. Efeitos foram conferidos no motor e SQL, além dos testes de contrato.
 6. Manter o workflow desativado. Restaurar `operation=tick`, encerrar qualquer **Listen for test event** pendente e não habilitar retenção de payloads. Para verificar o coletor, confirmar no host **CODE_ENABLE_STDOUT=true** e observar somente código/bloco genérico nos logs. O plugin não configurou essa variável; validar com o administrador da instância.
 7. Ao terminar, executar **`node .abelha-homologacao/test-n8n-listener.cjs cleanup`**. Remove somente a captura/projeto/relatórios/revisão vinculados ao estado privado e seus avisos; exige as35 contagens/fingerprints iguais ao início antes de apagar o estado local. Não usar DELETE manual amplo.
 
@@ -90,10 +117,10 @@ O helper local `.abelha-homologacao/test-n8n-listener.cjs` está preparado, vali
 
 Após existir uma execução GitHub Actions **real e aprovada**, preparar um JSON local pelo contrato `docs/integrations/development-report.schema.json`, com SHA real, `event_id` estável, testes/resultados e URL `https://github.com/higoraranda/abelha-gestor/actions/runs/<ID_REAL>`. Não usar placeholders em uma chamada. Confirmar o vínculo ao mesmo repositório e a evidência no GitHub; o backend valida formato/vínculo, não certifica o resultado por API.
 
-Com o helper preparado e o listener **PROJETOS · Receber relatório Codex** armado: `node .abelha-homologacao/test-n8n-listener.cjs report-positive CAMINHO_DO_RELATORIO.json`. Rearmar e repetir o mesmo arquivo para conferir idempotência. A resposta deve exigir revisão humana e nunca concluir marco. Encerrar com cleanup. Criar CI ou publicar alterações para isso não foi autorizado nesta etapa; push na main pode acionar produção.
+Com evidência CI real, helper preparado e a etapa **Responder webhook** armada conforme o procedimento acima: `node .abelha-homologacao/test-n8n-listener.cjs report-positive CAMINHO_DO_RELATORIO.json`. Rearmar e repetir o mesmo arquivo para conferir idempotência. Exigir corpo que peça revisão humana e zero marcos concluídos, além da verificação SQL; semanticResponseVerified=null/exit0 por transporte não aprova um modo sem validador próprio. Encerrar com cleanup. Criar CI ou publicar alterações para isso não foi autorizado; push na main pode acionar produção.
 
 Para integração GitHub permanente futura, escolher somente um destino: relay n8n `/webhook/abelha/v1/projects/github` **após ativação autorizada**, ou backend direto, nunca ambos para o mesmo evento. Content type JSON, secret GitHub exclusivo HML, eventos push/pull_request/workflow_run. Até lá, usar só o listener de teste.
 
 Preços continuam bloqueados: faltam API/fonte real autorizada, `PRICE_ALLOWED_HOSTS` no backend, `PROVIDER_URL`/`PRODUCT_HOSTS` e credencial própria do provedor no bloco de preços. Não inserir cotações fictícias. Também pendem entrega física de push, ensaio do coletor stdout e execução no motor. As credenciais de entrada/saída Abelha **já estão configuradas**.
 
-**Prontidão:** configuração HML concluída e testável; ativação completa ainda não liberada. O relógio executaria também o ramo preços, que segue sem fonte. Concluir os ensaios manuais, resolver pendências e obter autorização específica antes de ativar este único workflow. Nenhum upgrade ou serviço pago foi solicitado.
+**Prontidão:** callbacks básicos e operações manuais HML aprovados; ativação completa ainda não liberada. O relógio executaria também preços, que segue sem fonte. Resolver disponibilidade Overpass, CI positivo real, fonte de preços, push/PWA e observabilidade/retries em lotes antes de uma ativação integral; uma ativação faseada dos blocos validados exige plano e autorização específicos. Não repetir os ensaios aprovados sem mudança/falha que os justifique. Nenhum upgrade ou serviço pago foi solicitado.

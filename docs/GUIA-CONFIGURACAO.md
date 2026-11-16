@@ -1,20 +1,24 @@
 # Configuração e ativação revisável
 
+Release autorizado16/11: patch do relógio n8n remoto aplicado/conferido, somente tick, workflow inativo/HML. Controles de deploy temporariamente Render Off/Vercel exit0, originais On Commit/Automatic registrados. Aguardar SHA do commit/push manual na main antes de qualquer deploy; promover Production somente após delta HML aprovado. Restaurar controles ao final. Fase4 (destinos/credenciais/ativação n8n Production) permanece sem autorização. [Execução atual](SPRINT-LANCAMENTO-20261116.md).
+
+Estado final16/11: [publicação coordenada e rollback](SPRINT-LANCAMENTO-20261116.md), com correções DELETE/PWA e preços opt-in ainda locais. HML publicado conserva40c179c; produção Vercel23c06eb/Render2dcc9d0. Não fazer push manual na main antes de controlar os auto-deploys de produção. Propostas exclusivas de automação estão ignoradas em `.abelha-homologacao/propostas-producao/`, sem aplicação; preservar credenciais HML, AUTH_SECRET e VAPID existentes. Migration já aplicada, sem nova execução.
+
 Estado13/11: [Vercel Preview conectado ao backend HML](VERCEL-PREVIEW-HOMOLOGACAO.md), com Dark Mode e BACKEND_URL somente em Preview. Render HML usa main/40c179c, Auto-Deploy desligado e FRONTEND_URL do novo Preview. Sem mudanças na produção; offline remoto depende de acesso estático compatível com a proteção Vercel. Os detalhes de12/11 abaixo conservam o histórico anterior.
 
 ## Desenvolvimento
 
-Backend de homologação **ativo no Render Free**: https://abelha-gestor-api-hml.onrender.com, branch codex/homologacao-abelha, Auto-Deploy desligado. Database **abelha_homologacao**, role própria e compute Neon existente habilitado em0,25CU. AUTH_URL, FRONTEND_URL e VAPID foram configurados com os destinos de homologação. Conexão/secrets somente em `.abelha-homologacao/backend.env`, fora do Git; backend/.env de produção preservado. Resultado e próximo passo Preview: [RENDER-HOMOLOGACAO.md](RENDER-HOMOLOGACAO.md).
+Backend de homologação **ativo no Render Free**: https://abelha-gestor-api-hml.onrender.com, branch main, Auto-Deploy desligado. Database **abelha_homologacao**, role própria e compute Neon existente habilitado em0,25CU. AUTH_URL, FRONTEND_URL e VAPID foram configurados com os destinos de homologação. Conexão/secrets somente em `.abelha-homologacao/backend.env`, fora do Git; backend/.env de produção preservado. Resultado e próximo passo Preview: [RENDER-HOMOLOGACAO.md](RENDER-HOMOLOGACAO.md).
 
 Use Node 22.12+ (Vite 8 e dependências atuais). Frontend e backend mantêm seus `package-lock.json`. Instale com `npm ci` em cada diretório; nunca use `npm run seed` ou schema.sql em uma base existente.
 
 Backend: `DATABASE_URL`, `AUTH_SECRET`, `AUTH_URL`, `FRONTEND_URL`, variáveis Evolution existentes. Frontend de desenvolvimento: `VITE_API_URL` aponta para o backend local. Produção mantém API pelo proxy existente e não recebe secrets VITE.
 
-## Migration pendente
+## Migration aplicada em produção
 
-`backend/src/db/migrations/20261111_personal_platform.sql` passou em PGlite e no **Neon isolado autorizado em12/11**, com dados sintéticos:18 tabelas, reexecução, FKs/isolamento e preservação. Schemas/role de teste foram removidos; o public da branch foi preservado por rollback e o compute voltou a disabled/idle. **Não aplicada à produção.** Não roda no startup. Produção continua usando o CRM sem depender das tabelas novas; entrar no Personal antes da ativação retorna erro 503 explicativo. Estado e configuração de homologação: [HOMOLOGACAO-INTEGRACAO.md](HOMOLOGACAO-INTEGRACAO.md).
+`backend/src/db/migrations/20261111_personal_platform.sql` foi ensaiada em isolamento e aplicada após autorização em **16/11/2026**, no Neon produção br-square-sunset-acpb91u2/neondb. COMMIT da transação71684 confirmado;35 tabelas,92 índices e17 tabelas CRM preservadas por contagens/hashes. Snapshot Free snap-silent-fog-acdvwgeu mantido sem expiração. Usuário confirmou Personal, Leads e Templates abrindo sem erro. [Resultado e limites](EXECUCAO-MIGRATION-PERSONAL.md). A migration não roda no startup e não deve ser executada novamente.
 
-Para ativar: obter autorização específica do ambiente; verificar backup/ponto de restauração e diferenças de schema; executar apenas esta migration em uma transação com `lock_timeout` e `statement_timeout`; conferir preservação dos registros de negócio e isolamento com usuário sintético no ambiente de teste, antes de autorizar produção. Usar conexão direta, não pooler, para a migração. Não reutilizar uma autorização antiga de outra migration.
+Para futuras migrations: obter autorização específica, revalidar backup/catálogo, ensaiar com dados sintéticos em isolamento e usar transação limitada por timeouts e conexão direta. A autorização da execução concluída não se estende a novas migrations ou restaurações. Não apagar as tabelas recém-criadas como rollback automático.
 
 Tabelas novas usam organização/usuário e FKs compostas. Nenhum contrato, cobrança, despesa, conversa, senha ou sessão existente é alterado. O índice composto novo em users não muda os IDs existentes.
 

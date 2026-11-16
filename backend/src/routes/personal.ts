@@ -83,6 +83,16 @@ export function createPersonalRouter(sql:Database=postgresDatabase(db),middlewar
       const [row]=await tx.query('UPDATE personal_projects SET status=$4,next_step=$5,blockers=$6,updated_at=now() WHERE organization_id=$1 AND user_id=$2 AND id=$3 RETURNING *',[org,user,project.id,status,text(b.next_step??'',2000,true),text(b.blockers??'',5000,true)]);return row
     });res.json(row)
   }))
+  router.delete('/projects/:id',endpoint(async(req,res)=>{
+    const {org,user}=scope(res);const id=uuid(req.params.id)
+    await sql.transaction(async tx=>{
+      const [project]=await tx.query('SELECT id,name FROM personal_projects WHERE organization_id=$1 AND user_id=$2 AND id=$3 FOR UPDATE',[org,user,id])
+      if(!project)throw new InputError('Projeto não encontrado.',404)
+      if(typeof req.body?.confirmation_name!=='string'||req.body.confirmation_name!==project.name)throw new InputError('Digite exatamente o nome do projeto para confirmar a exclusão.')
+      await tx.query("DELETE FROM personal_notifications WHERE organization_id=$1 AND user_id=$2 AND (url=$3 OR event_key IN (SELECT 'report:'||id::text FROM personal_project_updates WHERE organization_id=$1 AND user_id=$2 AND project_id=$4 AND kind='report'))",[org,user,'/?space=personal&view=personal-projects&record='+project.id,project.id])
+      await tx.query('DELETE FROM personal_projects WHERE organization_id=$1 AND user_id=$2 AND id=$3',[org,user,project.id])
+    });res.status(204).end()
+  }))
   router.post('/projects/:id/milestones',endpoint(async(req,res)=>{
     const {org,user}=scope(res);const id=uuid(req.params.id)
     const row=await sql.transaction(async tx=>{

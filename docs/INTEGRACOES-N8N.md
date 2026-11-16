@@ -1,6 +1,10 @@
 # Integrações e continuidade dos projetos
 
-**Configuração atual13/11:** workflow único conectado exclusivamente ao backend HML, com nove saídas Header Auth, três entradas protegidas e relay GitHub/HMAC preservado. Continua desativado. Credenciais já configuradas; testes reais, pendências e instruções de listener em [N8N-HOMOLOGACAO.md](N8N-HOMOLOGACAO.md). Os modelos locais originais mantêm destinos históricos e não devem ser reimportados sobre a configuração remota.
+**Etapa A verificada16/11:** clock remoto agora emite somente tick com preços automáticos desligados. Edição aprovada pelo editor após incompatibilidade HTTP400 do plugin; comparação integral comprovou somente jsCode alterado, além dos metadados normais de salvamento.62 nós/inativo/dez destinos HML, settings/credenciais/conexões preservados. Não ativar ou apontar produção; fase4 segue sem autorização. [Execução e publicação coordenada](SPRINT-LANCAMENTO-20261116.md).
+
+**Preparação final16/11:** preços automáticos desligados no gerador/modelo **local**, com flag explícita; patch remoto pendente de autorização por rejeição da escrita ampla pelo plugin. Workflow remoto segue HML/inativo/62 nós, integralmente preservado. Propostas de segredos exclusivos de produção preparadas fora do Git, sem aplicar/rotacionar valores existentes. Não repetir migration ou os callbacks já aprovados. Roteiro atual: [SPRINT-LANCAMENTO-20261116.md](SPRINT-LANCAMENTO-20261116.md).
+
+**Configuração atual16/11:** workflow único conectado exclusivamente à HML, com nove saídas Header Auth, três entradas protegidas e relay GitHub/HMAC. Inativo,62 nós e operation=tick. Oito callbacks completos200/503 e tick/accounts/revisão passaram no motor com dados sintéticos, SQL/fingerprints e cleanup35/35. Credenciais já prontas; pendem Overpass positivo, CI real, preços, push/PWA e observabilidade/lotes. Resultados e procedimento comprovado em [N8N-HOMOLOGACAO.md](N8N-HOMOLOGACAO.md). Não reimportar os modelos históricos sobre o remoto atual.
 
 ## Estado e limites
 
@@ -10,11 +14,11 @@ Em 12/11/2026, **sete workflows foram criados diretamente na Cloudfy/socialbaboo
 
 ## Configuração
 
-1. Após autorização de ativação do banco, aplique apenas a migration incremental descrita em GUIA-CONFIGURACAO.md, no ambiente explicitamente autorizado.
+1. A migration incremental já foi aplicada em produção em16/11/2026, com35 tabelas; não reaplicar. Para ambientes atuais, conferir compatibilidade em leitura conforme GUIA-CONFIGURACAO.md.
 2. No backend, defina token aleatório exclusivo com pelo menos 32 caracteres, `ABELHA_INTEGRATION_ORGANIZATION_ID` e `ABELHA_INTEGRATION_USER_ID` da conta já existente. O payload não escolhe a conta. Não compartilhe DATABASE_URL com n8n.
 3. No n8n, crie **Header Auth**: nome `Authorization`, valor `Bearer <token>`. Selecione essa credencial no nó HTTP; nunca grave o token em JSON exportado, frontend ou variável pública.
 4. Os nós apontam à URL canônica **direta do backend**, `https://abelha-gestor-api.onrender.com`. A base2485697 já está publicada; GET de preços responde503 por integração não configurada, superando o404 histórico. Em homologação, alterar os dez nós backend preservando paths/expressões **somente quando existir um backend HTTPS isolado autorizado**. Lista exata e configurações em [HOMOLOGACAO-INTEGRACAO.md](HOMOLOGACAO-INTEGRACAO.md) e [manifesto](integrations/homologacao-config.json). Os modelos não requerem `$vars`/plano pago. Não encaminhar GitHub pelo proxy frontend; o relay n8n preparado conserva o binário original.
-5. Abrir somente o consolidado. Um Schedule Trigger de15min roteia tick e preços; contas/revisão final pertencem ao tick, sem cron redundante. Auxiliares manuais usam Escolher operação. O backend conserva horário/domingo em São Paulo, deduplicação e tolerância de30min na virada. Frequência de cada produto permanece no GET due.
+5. Abrir somente o consolidado. O patch preparado faz o Schedule Trigger de15min emitir somente tick; preços passam a ser opt-in explícito após fonte autorizada validada. O remoto ainda aguarda esse patch, portanto mantê-lo inativo. Contas/revisão final pertencem ao tick, sem cron redundante. Auxiliares manuais usam Escolher operação. O backend conserva horário/domingo em São Paulo, deduplicação e tolerância de30min na virada. Frequência de cada produto permanece no GET due.
 6. Confira as execuções em ambiente sintético. Os modelos desabilitam armazenamento de dados de execução de sucesso/erro e execuções manuais (`saveManualExecutions=false`); configure também retenção e logs da instância sem conteúdo financeiro/credenciais.
 
 Token e conta são validados em todas as rotas; tokens de integração não podem concluir marcos, pagar contas, contratar serviços nem consultar SQL arbitrário. Rotas retornam 503 quando não configuradas. Em produção, também configure limite de requisições do proxy/host conforme a instalação; o limite público Overpass está implementado por processo, não é um limitador distribuído.

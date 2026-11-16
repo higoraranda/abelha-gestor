@@ -1,0 +1,28 @@
+{
+  "workflowId": "n20DNyb13Aaw3nq5",
+  "infrastructureId": "infra_fxJeupUPo3oD",
+  "expectedUpdatedAt": "2026-11-16T14:38:10.757Z",
+  "expectedActive": false,
+  "expectedNodeCount": 62,
+  "application": "PENDING_EXPLICIT_AUTHORIZATION",
+  "remoteWriteRequiresFullNodesArray": true,
+  "changes": [
+    {
+      "nodeId": "f3a2ae7f-194b-d809-9f66-fb4650e4bdaa",
+      "nodeName": "Operações do relógio",
+      "field": "parameters.jsCode",
+      "before": "return [{json:{operation:\"tick\"}},{json:{operation:\"prices\"}}];",
+      "after": "const PRICE_MONITOR_ENABLED=false;\nconst operations=[{json:{operation:\"tick\"}}];\nif(PRICE_MONITOR_ENABLED)operations.push({json:{operation:\"prices\"}});\nreturn operations;"
+    }
+  ],
+  "preserve": [
+    "all other node fields",
+    "positions and Sticky Notes",
+    "connections",
+    "settings",
+    "all ten HML backend URLs",
+    "credential references",
+    "inactive state"
+  ],
+  "rollback": "Restore only the previous scheduler jsCode after a fresh read; keep inactive. Never import the historical generated artifact over the remote workflow."
+}

@@ -1,0 +1,386 @@
+{
+  "date": "2026-11-16",
+  "status": "prepared-awaiting-authorization-and-snapshot",
+  "git": {
+    "branch": "main",
+    "head": "23c06ebd5a9ab9d2954fb16a9ae145bc91fe1fd6",
+    "initiallyClean": true,
+    "existingChangesPreserved": true,
+    "commit": false,
+    "push": false
+  },
+  "target": {
+    "project": "curly-river-94350351",
+    "branch": "br-square-sunset-acpb91u2",
+    "database": "neondb",
+    "role": "neondb_owner",
+    "compute": "ep-wandering-pond-acitqqn8",
+    "directHost": "ep-wandering-pond-acitqqn8.sa-east-1.aws.neon.tech",
+    "branchProtected": false,
+    "version": "18.7 (a21afb5)"
+  },
+  "deployments": {
+    "frontend": {
+      "sha": "23c06ebd5a9ab9d2954fb16a9ae145bc91fe1fd6",
+      "id": "dpl_8fuqVWWywbfP8DYU8qh6jdqvNsjC",
+      "state": "READY",
+      "productionAliasVerified": true,
+      "nullSessionFixPresent": true
+    },
+    "backend": {
+      "sha": "2dcc9d0d7e05b2f17e6b4eca58549d69b2ddfd34",
+      "id": "dep-dbt7f5mq1p3s73fjbq7g",
+      "state": "live",
+      "backendDiffVsLocalHead": []
+    },
+    "hmlBackend": {
+      "sha": "40c179cc2f976deb8f312e4ec3559e284d1a5924",
+      "id": "dep-dbrfscdbedkc73dg79gg",
+      "state": "live",
+      "apiRoutesCompatible": true
+    }
+  },
+  "backup": {
+    "retentionSeconds": 21600,
+    "manualSnapshots": 0,
+    "schedules": 0,
+    "historicalSchemaQuery": {
+      "timestampUtc": "2026-11-16T11:50:00Z",
+      "timestampBrasilia": "2026-11-16 08:50",
+      "success": true,
+      "diff": ""
+    },
+    "fullRestoreTested": false,
+    "created": false,
+    "freeManualSnapshotAllowanceVerified": 1,
+    "proposedName": "abelha-pre-personal-20261116",
+    "readyForExecution": false,
+    "revalidateImmediatelyBeforeExecution": true
+  },
+  "production": {
+    "tables": 17,
+    "columns": 163,
+    "indexes": 53,
+    "constraintsExcludingNotNull": 87,
+    "foreignKeys": 28,
+    "userTriggers": 0,
+    "enabledEventTriggers": 0,
+    "catalogSha256": "14065d3974541db89835d91bad2a7e6014852cc81e61914553e2d6a237a52b6f",
+    "commercialRecordsExported": 0,
+    "all17CountsAndHashesUnchanged": true,
+    "catalogUnchanged": true,
+    "commercialBaselinesPrivateAndIgnored": true,
+    "noDataMutation": true
+  },
+  "migration": {
+    "path": "backend/src/db/migrations/20261111_personal_platform.sql",
+    "sha256": "9812b2bd74acc1fb983318bab62590da6cf8e92a1536e85032fb8b604f84dcdb",
+    "originalGitBlob": "24bfbc07e10f11988d0bd93830fffc34be3adff8",
+    "identicalToCommit": "2485697",
+    "createTableStatements": 18,
+    "createIndexStatements": 6,
+    "existingIndexReused": "clients_org_identity",
+    "newIndexes": 39,
+    "newConstraintsExcludingNotNull": 79,
+    "newForeignKeys": 21,
+    "onlyAdditiveCreateStatements": true,
+    "sourceChanged": false
+  },
+  "rehearsal": {
+    "rerun": true,
+    "version": "18.7 (a21afb5)",
+    "tables_after": 35,
+    "crm_preserved": true,
+    "indexes_after": 92,
+    "tables_before": 17,
+    "indexes_before": 53,
+    "migration_sha256": "9812b2bd74acc1fb983318bab62590da6cf8e92a1536e85032fb8b604f84dcdb",
+    "constraints_after": 166,
+    "rollback_verified": true,
+    "constraints_before": 87,
+    "cross_org_rejected": true,
+    "foreign_keys_after": 49,
+    "corruption_rejected": true,
+    "cross_user_rejected": true,
+    "postflight_validated": true,
+    "draft_tenant_rejected": true,
+    "hml_public_catalog_preserved": true,
+    "database": "abelha_homologacao",
+    "branch": "br-hidden-night-ace956m0",
+    "metadataOnlyClone": true,
+    "realBusinessRowsCopied": 0,
+    "public35CountsAndHashesUnchanged": true,
+    "newBranch": false,
+    "newCompute": false,
+    "newRole": false,
+    "temporarySchemaRemoved": true,
+    "guards": {
+      "missingAuthorizationRejected": true,
+      "wrongTargetRejected": true,
+      "catalogDriftRejected": true
+    },
+    "draftPostflightAmbiguityCorrectedAndRetested": true
+  },
+  "tests": {
+    "backend": 53,
+    "frontend": 29,
+    "failures": 0,
+    "typescript": true,
+    "eslintNoWarnings": true,
+    "builds": true,
+    "hmlHttpRequests": 40,
+    "hmlHttpPassed": true,
+    "hmlHttpDetails": [
+      {
+        "path": "/health",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/auth/session",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/projects",
+        "method": "GET",
+        "status": 401,
+        "error": "Não autorizado"
+      },
+      {
+        "path": "/api/auth/csrf",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/auth/callback/credentials",
+        "method": "POST",
+        "status": 200
+      },
+      {
+        "path": "/api/auth/session",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/preferences",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/notifications",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/projects",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/finance",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/subscriptions",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/prices",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/reviews",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/prospecting/leads/candidates",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/prospecting/leads/niches",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/prospecting/templates",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/prospecting/drafts",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/crm/overview",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/crm/tasks",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/crm/contracts",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/crm/opportunities",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/crm/notifications",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/crm/reports",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/clients",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/conversations",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/reminders",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/finance/summary",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/finance/clients",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/finance/expenses",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/finance/receivables",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/catalog",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/projects",
+        "method": "OPTIONS",
+        "status": 204
+      },
+      {
+        "path": "/api/v1/personal/projects",
+        "method": "OPTIONS",
+        "status": 204
+      },
+      {
+        "path": "/api/v1/personal/projects",
+        "method": "POST",
+        "status": 403,
+        "error": "Origem da operação não reconhecida."
+      },
+      {
+        "path": "/api/v1/integrations/prices/due",
+        "method": "GET",
+        "status": 401,
+        "error": "Token de integração inválido."
+      },
+      {
+        "path": "/api/v1/integrations/prices/due",
+        "method": "GET",
+        "status": 503,
+        "error": "Configure uma fonte autorizada de preços antes de ativar consultas."
+      },
+      {
+        "path": "/api/auth/csrf",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/auth/signout",
+        "method": "POST",
+        "status": 200
+      },
+      {
+        "path": "/api/auth/session",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/personal/projects",
+        "method": "GET",
+        "status": 401,
+        "error": "Não autorizado"
+      }
+    ],
+    "initialHealthAttemptTimedOut": true,
+    "retryAfterHealth200Passed": true,
+    "productionHealth": 200,
+    "hmlHealth": 200,
+    "productionProxyHealth": 200,
+    "psqlClientExecuted": false,
+    "authenticatedProductionPostMigrationNavigation": "pending-authorized-migration"
+  },
+  "execution": {
+    "preparedFile": "docs/sql/personal-platform-apply.psql",
+    "sha256": "1a235f8657a2ac3d07fa65bcec186093bf0336d5c5c4f72402ce5b79b14e1f44",
+    "preflightFile": "docs/sql/personal-platform-preflight.sql",
+    "lockTimeout": "5s",
+    "statementTimeout": "60s",
+    "transactionTimeout": "120s",
+    "idleTransactionTimeout": "30s",
+    "crmLock": "SHARE ROW EXCLUSIVE",
+    "crmTablesLocked": 17,
+    "singleTransaction": true,
+    "neonRpcStatements": 35,
+    "requiresFreshAuthorization": true,
+    "requiresValidatedSnapshot": true,
+    "automaticRollbackBeforeCommit": true,
+    "postCommitRestoreRequiresSeparateAuthorization": true
+  },
+  "changes": {
+    "productionMigration": false,
+    "productionDeploy": false,
+    "productionConfig": false,
+    "credentials": false,
+    "n8n": false,
+    "paidResources": false
+  },
+  "cleanup": {
+    "hmlSchemaRemoved": true,
+    "hmlPublicPreserved": true,
+    "temporaryLocalProcessesRemaining": 0,
+    "persistentServicesPreserved": true
+  },
+  "sources": [
+    "https://neon.com/docs/introduction/plans",
+    "https://neon.com/docs/introduction/branch-restore",
+    "https://www.postgresql.org/docs/18/explicit-locking.html",
+    "https://www.postgresql.org/docs/18/runtime-config-client.html"
+  ],
+  "productionPersonalReady": false
+}

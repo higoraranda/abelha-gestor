@@ -53,3 +53,41 @@ test('an SPA HTML fallback with HTTP 200 cannot be installed as JavaScript',asyn
   let completion;handlers.install({waitUntil:value=>{completion=value}})
   await assert.rejects(completion)
 })
+test('public precache requests omit credentials and bypass the HTTP cache',async()=>{
+  const {handlers,context}=await worker();const fetchPublic=context.fetch;const requests=[]
+  context.fetch=async request=>{requests.push(request);return fetchPublic(request)}
+  let completion;handlers.install({waitUntil:value=>{completion=value}});await completion
+  assert.equal(requests.length,3)
+  for(const request of requests){assert.equal(request.credentials,'omit');assert.equal(request.cache,'no-cache')}
+})
+test('redirected or private static responses never populate a new shell cache',async()=>{
+  for(const blocked of ['redirected','private','no-store']){
+    const {handlers,context,stored}=await worker();const fetchPublic=context.fetch
+    context.fetch=async request=>{
+      const response=await fetchPublic(request)
+      if(request.url.endsWith('.js')){
+        if(blocked==='redirected')Object.defineProperty(response,'redirected',{value:true})
+        else response.headers.set('Cache-Control',blocked)
+      }
+      return response
+    }
+    let completion;handlers.install({waitUntil:value=>{completion=value}})
+    await assert.rejects(completion,/Public precache failed/,blocked)
+    assert.equal(stored.size,0,blocked+' must not leave a partial new shell')
+  }
+})
+test('installing an update never skips waiting until explicitly requested',async()=>{
+  const {handlers,context}=await worker();let activations=0;context.self.skipWaiting=async()=>{activations++}
+  let completion;handlers.install({waitUntil:value=>{completion=value}});await completion
+  assert.equal(activations,0)
+  handlers.message({data:{type:'UNRELATED_MESSAGE'}});assert.equal(activations,0)
+  handlers.message({data:{type:'ACTIVATE_UPDATE'}});assert.equal(activations,1)
+})
+test('activation removes only obsolete Abelha shell caches',async()=>{
+  const {handlers,context}=await worker();const removed=[];let claimed=false
+  context.caches.keys=async()=>['abelha-shell-old','abelha-shell-test','other-application-cache']
+  context.caches.delete=async key=>{removed.push(key);return true}
+  context.self.clients.claim=async()=>{claimed=true}
+  let completion;handlers.activate({waitUntil:value=>{completion=value}});await completion
+  assert.deepEqual(removed,['abelha-shell-old']);assert.equal(claimed,true)
+})

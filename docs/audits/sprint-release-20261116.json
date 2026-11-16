@@ -1,0 +1,406 @@
+{
+  "date": "2026-11-16",
+  "status": "A-verified-deploy-controls-paused-awaiting-user-main-push-and-SHA",
+  "git": {
+    "branch": "main",
+    "head": "23c06ebd5a9ab9d2954fb16a9ae145bc91fe1fd6",
+    "createdBranches": false,
+    "commit": false,
+    "push": false,
+    "previousLocalChangesPreserved": true
+  },
+  "production": {
+    "schema": {
+      "tables": 35,
+      "indexes": 92,
+      "invalidIndexes": 0,
+      "verification": "fresh-read-only-Neon-query",
+      "branch": "br-square-sunset-acpb91u2",
+      "database": "neondb"
+    },
+    "vercel": {
+      "projectId": "prj_Cd3vrf5gNVRmT3CjBJeX8saUrVVv",
+      "deploymentId": "dpl_8fuqVWWywbfP8DYU8qh6jdqvNsjC",
+      "status": "READY",
+      "unchangedFromStart": false,
+      "protection": {
+        "enabled": true,
+        "deploymentType": "all_except_custom_domains"
+      }
+    },
+    "render": {
+      "serviceId": "srv-daldd0142hec73c3ltt0",
+      "deploymentId": "dep-dbt7f5mq1p3s73fjbq7g",
+      "sha": "2dcc9d0d7e05b2f17e6b4eca58549d69b2ddfd34",
+      "status": "live",
+      "autoDeploy": "yes",
+      "serviceUnchanged": false
+    },
+    "migrationRepeated": false,
+    "snapshotModified": false,
+    "snapshotId": "snap-silent-fog-acdvwgeu",
+    "commercialWrites": false,
+    "credentialsModified": false,
+    "deployed": false,
+    "migrationSha256": "9812b2bd74acc1fb983318bab62590da6cf8e92a1536e85032fb8b604f84dcdb",
+    "configurationModifiedUnderAuthorization": true,
+    "deploymentArtifactsPreserved": true
+  },
+  "n8n": {
+    "id": "n20DNyb13Aaw3nq5",
+    "active": false,
+    "nodeCount": 62,
+    "updatedAt": "2026-11-16T21:53:41.207Z",
+    "unchanged": false,
+    "schedulerRemotePriceOptInApplied": true,
+    "running": 0,
+    "waiting": 0,
+    "appliedRemotePatch": true,
+    "localScheduler": [
+      "tick"
+    ],
+    "manualPriceDiagnosticPreserved": true,
+    "remoteBackendTargetsHml": 10,
+    "credentialsModified": false,
+    "writeRejection": "Initial authorized API attempt: HTTP400 settings additional properties. Resolved by authorized manual editor change with full comparison; no settings removed.",
+    "futurePatch": "docs/releases/n8n-price-scheduler-20261116.json",
+    "testsReused": {
+      "fullEngineHttpCases": 8,
+      "manualOperations": [
+        "tick",
+        "accounts",
+        "weekly-review"
+      ],
+      "vmGroups": 10,
+      "vmHttpSqlGroups": 10
+    },
+    "testsNotRun": [
+      "automatic remote clock with new gate",
+      "engine exact retry counts",
+      "mixed success/failure batch",
+      "positive CI-backed report",
+      "positive Overpass/provider prices"
+    ],
+    "appliedBy": "User editor; verified through Cloudfy plugin",
+    "onlyApprovedJsCodeChanged": true
+  },
+  "tests": {
+    "backend": {
+      "passed": 55,
+      "command": "npm test",
+      "includesTypeScriptBuild": true
+    },
+    "frontend": {
+      "passed": 40,
+      "command": "npm test",
+      "lint": "passed",
+      "build": "passed",
+      "newPwaSwRegressions": 8
+    },
+    "priorFunctionalHml": {
+      "reused": true,
+      "groups": 11,
+      "requests": 96
+    },
+    "deltaDeleteHml": {
+      "requests": 15,
+      "publishedRenderVerified": false,
+      "realSession": true,
+      "cleanupTables": 35,
+      "cleanupVerified": true
+    },
+    "browser": {
+      "newNavigationExecuted": false,
+      "reason": "Computer Use asset initialization failed; no bypass"
+    },
+    "devicePush": {
+      "executed": false
+    },
+    "offlineBuiltWorkerVm": {
+      "passed": true,
+      "publicResourcesPrecached": 7,
+      "realDevice": false
+    }
+  },
+  "proposals": {
+    "privateIgnored": true,
+    "applied": false,
+    "distinctSecrets": 3,
+    "exclusiveFromHml": true,
+    "uniqueProductionIdentityReadOnlyConfirmed": true,
+    "backendVariables": [
+      "ABELHA_INTEGRATION_TOKEN",
+      "ABELHA_INTEGRATION_ORGANIZATION_ID",
+      "ABELHA_INTEGRATION_USER_ID",
+      "GITHUB_WEBHOOK_SECRET"
+    ],
+    "credentialNames": [
+      "Abelha — Backend Produção",
+      "Abelha — Entrada Produção"
+    ],
+    "existingAuthDatabaseVapidPreserved": true
+  },
+  "pendingAuthorization": [
+    "Phase4 only: production n8n destinations/credentials/activation; A+B already authorized"
+  ],
+  "report": "docs/SPRINT-LANCAMENTO-20261116.md",
+  "temporaryResources": {
+    "deltaHttpPort": 51337,
+    "serverClosed": true,
+    "databaseClosed": true,
+    "n8nListenerStateAbsent": true,
+    "newPersistentResources": false,
+    "existingHmlRetained": true,
+    "knownTemporaryPidsAbsent": [
+      4828,
+      20116
+    ],
+    "port51337Free": true,
+    "globalProcessCommandLineInspection": "CIM access denied; known PIDs and listener checked separately; user processes preserved"
+  },
+  "sourceFiles": [
+    {
+      "file": "backend/src/routes/personal.ts",
+      "sha256": "581efd65084315df21a06fb9e5595bde70b980280648a2097760f7c2b4ea7783"
+    },
+    {
+      "file": "backend/src/services/project-deletion.test.ts",
+      "sha256": "9ee163d025e97bd4a1164c1c3222bd7b3599eea84069fb0d35cec932e6537f9d"
+    },
+    {
+      "file": "backend/src/services/unified-workflow.test.ts",
+      "sha256": "fb06f36ab5cbee0d4f1b949ad6a1a0a9b67b6c4ade8874ccb4fcde053059d6eb"
+    },
+    {
+      "file": "backend/scripts/build-n8n-unified.cjs",
+      "sha256": "63f5e9d726ec59b45f4108926b0caf7a21a848016067fac98fc50d9f04fae0c5"
+    },
+    {
+      "file": "docs/integrations/n8n/abelha-automations.json",
+      "sha256": "fdefd612642d28f18d1adee525b5d3b5a05366c3ff30eb9190f745e77790128e"
+    },
+    {
+      "file": "frontend/src/pages/personal/PersonalProjects.tsx",
+      "sha256": "9df5cd346adc7186a67eb45bcc2946a56b23ce112182534667e6c224bb20e78f"
+    },
+    {
+      "file": "frontend/src/lib/projectDeletion.ts",
+      "sha256": "5a6fff31f86679adbc45ca371b8e05de92ef7b37b1d211b5fd2e27367f4f2c4c"
+    },
+    {
+      "file": "frontend/src/lib/projectDeletion.test.mjs",
+      "sha256": "8f2c8f35b26c082755d8ffd77e286f5ad9d2019cdc00d851109b458d71db7f09"
+    },
+    {
+      "file": "frontend/src/hooks/usePwa.ts",
+      "sha256": "2882ae6d1e675f532bccecc971881e494ed351da84c25a540056ca3eba7e3289"
+    },
+    {
+      "file": "frontend/src/lib/pwa.test.mjs",
+      "sha256": "fa9ea6d477b9491d6c3fd2f840aacca5a3f718eb8b257437fd6267c10a505a67"
+    },
+    {
+      "file": "frontend/src/lib/pwaLifecycle.test.mjs",
+      "sha256": "9712a41dd1b857e8e62380f4bb96a700945499cea3b06e583d850e0cd1f533a5"
+    },
+    {
+      "file": "frontend/vercel.json",
+      "sha256": "1f498cdadd3124f9ba28c0df9bd0fc5e5563dbe148e8cf3d7383ef77355f8727"
+    },
+    {
+      "file": "docs/releases/n8n-price-scheduler-20261116.json",
+      "sha256": "96081d370ff3cc162415c4f878f901bff6bba0bb7509e5175451074b0d646888"
+    }
+  ],
+  "generatedAt": "2026-11-16T21:23:45.942Z",
+  "packageVerification": {
+    "knownSecretScanPassed": true,
+    "publishableTextFilesScanned": 30,
+    "sourceHashesVerified": 13,
+    "localReportLinksValid": true,
+    "diffCheckPassed": true,
+    "commitOrPushPerformed": false
+  },
+  "finalReleasePreflight": {
+    "verifiedAt": "2026-11-16T21:40:10.219Z",
+    "status": "awaiting-explicit-A-and-B-authorization",
+    "localHead": "23c06ebd5a9ab9d2954fb16a9ae145bc91fe1fd6",
+    "relatedTests": {
+      "backend": {
+        "executedAt": "2026-11-16T21:36:21.513Z",
+        "networkScope": "local-test-fixtures-only",
+        "passed": true,
+        "commands": [
+          {
+            "name": "backend-build",
+            "exitCode": 0,
+            "error": null
+          },
+          {
+            "name": "backend-related-tests",
+            "exitCode": 0,
+            "error": null,
+            "tests": 10,
+            "pass": 10,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        ]
+      },
+      "frontend": {
+        "executedAt": "2026-11-16T21:36:27.655Z",
+        "networkScope": "local-test-fixtures-only",
+        "passed": true,
+        "commands": [
+          {
+            "name": "frontend-related-tests",
+            "exitCode": 0,
+            "error": null,
+            "tests": 17,
+            "pass": 17,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          {
+            "name": "frontend-lint",
+            "exitCode": 0,
+            "error": null
+          },
+          {
+            "name": "frontend-build",
+            "exitCode": 0,
+            "error": null
+          }
+        ]
+      }
+    },
+    "remote": {
+      "vercelProduction": {
+        "id": "dpl_8fuqVWWywbfP8DYU8qh6jdqvNsjC",
+        "sha": "23c06ebd5a9ab9d2954fb16a9ae145bc91fe1fd6",
+        "status": "READY"
+      },
+      "renderProduction": {
+        "id": "dep-dbt7f5mq1p3s73fjbq7g",
+        "sha": "2dcc9d0d7e05b2f17e6b4eca58549d69b2ddfd34",
+        "status": "live"
+      },
+      "renderHml": {
+        "id": "dep-dbrfscdbedkc73dg79gg",
+        "sha": "40c179cc2f976deb8f312e4ec3559e284d1a5924",
+        "status": "live"
+      }
+    },
+    "n8n": {
+      "id": "n20DNyb13Aaw3nq5",
+      "nodeCount": 62,
+      "active": false,
+      "backendHmlTargets": 10,
+      "updatedAt": "2026-11-16T14:38:10.757Z",
+      "versionId": "b7996e88-5a32-47ff-b0a5-019c6cc9d54d",
+      "twoReadsIdentical": true,
+      "privateSnapshotSaved": true,
+      "privateSnapshotSha256": "732b5a9cc7ffbec39da384befe4ec5d8ecc241e25b764db1a2c988d299bd3dce",
+      "proposedChangedFields": [
+        "Operações do relógio.parameters.jsCode"
+      ],
+      "proposedSchedule": [
+        "tick"
+      ],
+      "remoteWritePerformed": false,
+      "remoteWriteRequiresFullNodesArray": true,
+      "authorizationRequired": true
+    },
+    "productionDeployPerformed": false,
+    "commitPushPerformed": false,
+    "migrationRepeated": false,
+    "phase4RedirectCredentialsActivationAuthorized": false
+  },
+  "authorizedReleaseExecution": {
+    "authorization": {
+      "A": true,
+      "B": true,
+      "phase4": false
+    },
+    "n8n": {
+      "workflowId": "n20DNyb13Aaw3nq5",
+      "infrastructureId": "infra_fxJeupUPo3oD",
+      "authorizedScope": "Only scheduler jsCode; full 62-node array permitted",
+      "attempted": true,
+      "applied": true,
+      "blockedBy": null,
+      "httpStatus": 400,
+      "message": "Initial API attempt failed400; user applied reviewed code in editor; full remote comparison passed.",
+      "reReadUnchanged": false,
+      "nodeCount": 62,
+      "active": false,
+      "updatedAt": "2026-11-16T21:53:41.207Z",
+      "versionId": "1e85344d-4cf5-4619-bd41-8e2bcd145f3d",
+      "backendHmlTargets": 10,
+      "privateBackupSaved": true,
+      "serverPrewriteSnapshotId": "mws_hfTw59hbiJx3",
+      "manualEditorCorrectionPending": false,
+      "settingsNotRemovedToForceWrite": true,
+      "failedApiAttemptPreserved": true,
+      "onlyApprovedChangeVerified": true,
+      "fullNodesConnectionsSettingsIdsCredentialsCompared": true,
+      "appliedBy": "user-authorized editor change; plugin verification",
+      "actualChangedFields": [
+        "updatedAt",
+        "nodes.2.parameters.jsCode",
+        "versionId",
+        "versionCounter"
+      ],
+      "scheduledOperations": [
+        "tick"
+      ],
+      "remoteCodeVmVerified": true
+    },
+    "deploymentControls": {
+      "render": {
+        "serviceId": "srv-daldd0142hec73c3ltt0",
+        "originalAutoDeploy": "yes",
+        "originalTrigger": "commit",
+        "currentAutoDeploy": "no",
+        "currentTrigger": "off",
+        "verifiedByPlugin": true,
+        "changedByUser": true,
+        "restorePending": true
+      },
+      "vercel": {
+        "projectId": "prj_Cd3vrf5gNVRmT3CjBJeX8saUrVVv",
+        "originalMode": "Automatic",
+        "originalModeConfirmedByUser": true,
+        "currentCommand": "exit 0",
+        "updateAcknowledgedByApi": true,
+        "rawCommandOmittedByReadConnector": true,
+        "otherProjectFieldsVerifiedUnchanged": true,
+        "restorePending": true
+      }
+    },
+    "git": {
+      "branch": "main",
+      "commitByUserOnly": true,
+      "pushByUserOnly": true,
+      "publishedReleaseSha": null
+    },
+    "deployments": {
+      "newDeployPerformed": false,
+      "hmlDeltaValidationPerformed": false,
+      "productionPromotionPerformed": false,
+      "requiresHmlPassBeforeProduction": true
+    },
+    "data": {
+      "migration": false,
+      "restore": false,
+      "commercialWrites": false,
+      "productionCredentialsModified": false,
+      "n8nRedirectedToProduction": false,
+      "workflowActivated": false
+    },
+    "status": "A-verified-deploy-controls-paused-awaiting-user-main-push-and-SHA",
+    "verifiedAt": "2026-11-16T21:55:15.643Z"
+  }
+}

@@ -1,0 +1,526 @@
+{
+  "date": "2026-11-16",
+  "status": "migration-committed-production-structure-released",
+  "authorization": {
+    "source": "current-user-explicit-request",
+    "scope": "Free manual snapshot, original production migration, read-only post-checks",
+    "paidUpgradeAuthorized": false,
+    "restoreAuthorized": false
+  },
+  "git": {
+    "branch": "main",
+    "head": "23c06ebd5a9ab9d2954fb16a9ae145bc91fe1fd6",
+    "existingChangesPreserved": true,
+    "commit": false,
+    "push": false
+  },
+  "target": {
+    "project": "curly-river-94350351",
+    "branch": "br-square-sunset-acpb91u2",
+    "database": "neondb",
+    "role": "neondb_owner",
+    "compute": "ep-wandering-pond-acitqqn8",
+    "directHost": "ep-wandering-pond-acitqqn8.sa-east-1.aws.neon.tech",
+    "poolerUsed": false,
+    "plan": "free_v3"
+  },
+  "snapshot": {
+    "id": "snap-silent-fog-acdvwgeu",
+    "name": "abelha-personal-pre-migration-20261116-122850z",
+    "source_branch_id": "br-square-sunset-acpb91u2",
+    "created_at": "2026-11-16T12:29:04Z",
+    "manual": true,
+    "full_size": 33226752,
+    "state": "materialized-creation-and-archive-operations-finished",
+    "stateProvenance": "create/list/fetch plus finished create_branch and timeline_archive operations with zero failures",
+    "expiresAt": null,
+    "retained": true,
+    "restored": false,
+    "manualFreeAllowance": 1
+  },
+  "migration": {
+    "path": "backend/src/db/migrations/20261111_personal_platform.sql",
+    "sha256": "9812b2bd74acc1fb983318bab62590da6cf8e92a1536e85032fb8b604f84dcdb",
+    "sourceChanged": false,
+    "originalCreateStatements": 24,
+    "singleTransaction": true,
+    "transactionId": "71684",
+    "transactionStartedAt": "2026-11-16T12:31:18.217Z",
+    "commitStatus": "committed",
+    "commitProof": "pg_xact_status(transaction_id::xid8) queried after transaction response",
+    "retries": 0,
+    "rollback": false,
+    "restoration": false,
+    "lockTimeout": "5s",
+    "statementTimeout": "60s",
+    "transactionTimeout": "120s",
+    "idleInTransactionTimeout": "30s"
+  },
+  "preflight": {
+    "catalogMatchesReviewedHash": true,
+    "baselineTables": 17,
+    "activeOtherWriteLocks": 0,
+    "idleTransactions": 0,
+    "preparedTransactions": 0,
+    "eventTriggers": 0,
+    "snapshotReadyBeforeDispatch": true
+  },
+  "schema": {
+    "tablesBefore": 17,
+    "tablesAfter": 35,
+    "newTables": [
+      "crm_lead_candidates",
+      "crm_service_drafts",
+      "personal_invoice_cycles",
+      "personal_invoice_entries",
+      "personal_milestones",
+      "personal_monthly_plans",
+      "personal_notifications",
+      "personal_preferences",
+      "personal_price_observations",
+      "personal_price_watches",
+      "personal_project_updates",
+      "personal_projects",
+      "personal_push_deliveries",
+      "personal_subscription_changes",
+      "personal_subscription_payments",
+      "personal_subscriptions",
+      "personal_weekly_reviews",
+      "push_subscriptions"
+    ],
+    "indexesBefore": 53,
+    "indexesAfter": 92,
+    "constraintsExcludingNotNull": 166,
+    "foreignKeys": 49,
+    "invalidIndexes": 0,
+    "invalidConstraints": 0,
+    "newTablesOwnedBy": "neondb_owner",
+    "newTableOwnerPermissions": true,
+    "advisoryLocksRemaining": 0
+  },
+  "preservation": {
+    "originalTablesCompared": 17,
+    "lockedBeforeAfterComparisonPassed": true,
+    "postCommitCountsAndSha256Match": true,
+    "preflightAndLockedBaselinesMatch": true,
+    "comparisonDetails": [
+      {
+        "table": "catalog_items",
+        "countEqual": true,
+        "hashEqual": true
+      },
+      {
+        "table": "client_contracts",
+        "countEqual": true,
+        "hashEqual": true
+      },
+      {
+        "table": "client_notes",
+        "countEqual": true,
+        "hashEqual": true
+      },
+      {
+        "table": "clients",
+        "countEqual": true,
+        "hashEqual": true
+      },
+      {
+        "table": "companies",
+        "countEqual": true,
+        "hashEqual": true
+      },
+      {
+        "table": "company_contacts",
+        "countEqual": true,
+        "hashEqual": true
+      },
+      {
+        "table": "conversations",
+        "countEqual": true,
+        "hashEqual": true
+      },
+      {
+        "table": "delivery_tasks",
+        "countEqual": true,
+        "hashEqual": true
+      },
+      {
+        "table": "evolution_instances",
+        "countEqual": true,
+        "hashEqual": true
+      },
+      {
+        "table": "expenses",
+        "countEqual": true,
+        "hashEqual": true
+      },
+      {
+        "table": "messages",
+        "countEqual": true,
+        "hashEqual": true
+      },
+      {
+        "table": "notification_states",
+        "countEqual": true,
+        "hashEqual": true
+      },
+      {
+        "table": "opportunities",
+        "countEqual": true,
+        "hashEqual": true
+      },
+      {
+        "table": "organizations",
+        "countEqual": true,
+        "hashEqual": true
+      },
+      {
+        "table": "receivables",
+        "countEqual": true,
+        "hashEqual": true
+      },
+      {
+        "table": "reminders",
+        "countEqual": true,
+        "hashEqual": true
+      },
+      {
+        "table": "users",
+        "countEqual": true,
+        "hashEqual": true
+      }
+    ],
+    "bigintCountsNormalizedForExternalComparison": true,
+    "rawCommercialRowsExported": 0,
+    "commercialTestWrites": 0,
+    "privateReceipt": ".abelha-homologacao/production-migration-receipt-20261116.json"
+  },
+  "productionTests": {
+    "publicHttpPassed": true,
+    "httpChecks": [
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/health",
+        "status": 200,
+        "expected": 200,
+        "ms": 22830
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/auth/session",
+        "status": 200,
+        "expected": 200,
+        "ms": 659
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/v1/personal/preferences",
+        "status": 401,
+        "expected": 401,
+        "ms": 256
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/v1/personal/notifications",
+        "status": 401,
+        "expected": 401,
+        "ms": 246
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/v1/personal/projects",
+        "status": 401,
+        "expected": 401,
+        "ms": 251
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/v1/personal/finance",
+        "status": 401,
+        "expected": 401,
+        "ms": 258
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/v1/personal/subscriptions",
+        "status": 401,
+        "expected": 401,
+        "ms": 271
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/v1/personal/prices",
+        "status": 401,
+        "expected": 401,
+        "ms": 224
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/v1/personal/reviews",
+        "status": 401,
+        "expected": 401,
+        "ms": 257
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/v1/prospecting/leads/candidates",
+        "status": 401,
+        "expected": 401,
+        "ms": 269
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/v1/prospecting/leads/niches",
+        "status": 401,
+        "expected": 401,
+        "ms": 247
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/v1/prospecting/templates",
+        "status": 401,
+        "expected": 401,
+        "ms": 233
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/v1/prospecting/drafts",
+        "status": 401,
+        "expected": 401,
+        "ms": 247
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/v1/crm/overview",
+        "status": 401,
+        "expected": 401,
+        "ms": 226
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/v1/clients",
+        "status": 401,
+        "expected": 401,
+        "ms": 236
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/v1/crm/tasks",
+        "status": 401,
+        "expected": 401,
+        "ms": 263
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/v1/crm/opportunities",
+        "status": 401,
+        "expected": 401,
+        "ms": 254
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/v1/finance/summary",
+        "status": 401,
+        "expected": 401,
+        "ms": 245
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/v1/reminders",
+        "status": 401,
+        "expected": 401,
+        "ms": 223
+      },
+      {
+        "origin": "https://abelha-gestor-api.onrender.com",
+        "path": "/api/v1/crm/reports",
+        "status": 401,
+        "expected": 401,
+        "ms": 229
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/health",
+        "status": 200,
+        "expected": 200,
+        "ms": 362
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/auth/session",
+        "status": 200,
+        "expected": 200,
+        "ms": 270
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/personal/preferences",
+        "status": 401,
+        "expected": 401,
+        "ms": 435
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/personal/notifications",
+        "status": 401,
+        "expected": 401,
+        "ms": 262
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/personal/projects",
+        "status": 401,
+        "expected": 401,
+        "ms": 271
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/personal/finance",
+        "status": 401,
+        "expected": 401,
+        "ms": 243
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/personal/subscriptions",
+        "status": 401,
+        "expected": 401,
+        "ms": 274
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/personal/prices",
+        "status": 401,
+        "expected": 401,
+        "ms": 261
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/personal/reviews",
+        "status": 401,
+        "expected": 401,
+        "ms": 394
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/prospecting/leads/candidates",
+        "status": 401,
+        "expected": 401,
+        "ms": 922
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/prospecting/leads/niches",
+        "status": 401,
+        "expected": 401,
+        "ms": 252
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/prospecting/templates",
+        "status": 401,
+        "expected": 401,
+        "ms": 275
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/prospecting/drafts",
+        "status": 401,
+        "expected": 401,
+        "ms": 245
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/crm/overview",
+        "status": 401,
+        "expected": 401,
+        "ms": 260
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/clients",
+        "status": 401,
+        "expected": 401,
+        "ms": 250
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/crm/tasks",
+        "status": 401,
+        "expected": 401,
+        "ms": 245
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/crm/opportunities",
+        "status": 401,
+        "expected": 401,
+        "ms": 230
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/finance/summary",
+        "status": 401,
+        "expected": 401,
+        "ms": 283
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/reminders",
+        "status": 401,
+        "expected": 401,
+        "ms": 225
+      },
+      {
+        "origin": "https://abelha-gestor.vercel.app",
+        "path": "/api/v1/crm/reports",
+        "status": 401,
+        "expected": 401,
+        "ms": 246
+      }
+    ],
+    "healthAndAnonymousSession200": 4,
+    "unauthenticatedProtectedRequests401": 36,
+    "authenticatedAutomatedTests": false,
+    "manualAuthenticatedValidation": {
+      "source": "user",
+      "allPersonalLeadsTemplatesOpenWithoutErrors": true,
+      "productionUrl": "https://abelha-gestor.vercel.app",
+      "authenticatedAutomationPerformed": false,
+      "browserUnavailable": true
+    },
+    "backendDatabaseReadPathsVerifiedBy": "user-confirmed authenticated Personal/Leads/Templates navigation after migration",
+    "renderDeployUnchanged": "dep-dbt7f5mq1p3s73fjbq7g",
+    "vercelDeployUnchanged": "dpl_8fuqVWWywbfP8DYU8qh6jdqvNsjC",
+    "renderLogs": {
+      "sampleLimit": 100,
+      "basePathWarnings": 66,
+      "undefinedTableOrPermissionErrors": 0,
+      "unhandledErrors": 0
+    },
+    "vercelErrorFatalLogsLast15m": 0
+  },
+  "limitations": {
+    "computerUse": "initialization failed twice; authenticated navigation confirmed manually by user",
+    "commercialWriteFlows": "not exercised in production",
+    "physicalPush": "pending",
+    "realPriceSource": "pending",
+    "overpassRuntime": "not tested",
+    "n8nEngine": "not activated or tested"
+  },
+  "changes": {
+    "applicationDeploy": false,
+    "code": false,
+    "credentials": false,
+    "n8n": false,
+    "paidResources": false,
+    "dataDeletion": false
+  },
+  "cleanup": {
+    "newTemporaryLocalServers": 0,
+    "temporaryHttpCheckerFinished": true,
+    "tempBaselineDroppedOnCommit": true,
+    "productionSnapshotPreserved": true,
+    "persistentServicesPreserved": true
+  }
+}

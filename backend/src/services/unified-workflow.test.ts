@@ -56,15 +56,24 @@ test('lead webhooks cannot reach prices, tick or weekly actions, with no cycles 
   for(const n of flow.nodes)visit(n.name)
 })
 
-test('shared clock dispatches only tick and prices; manual selector routes exactly one allowed operation',()=>{
+test('shared clock keeps optional prices disabled until explicitly enabled',()=>{
   const scheduled=run('Operações do relógio').map((item:any)=>item.json.operation)
-  assert.equal(JSON.stringify(scheduled),JSON.stringify(['tick','prices']))
+  assert.equal(JSON.stringify(scheduled),JSON.stringify(['tick']))
+  const enabled=get('Operações do relógio').parameters.jsCode.replace('const PRICE_MONITOR_ENABLED=false','const PRICE_MONITOR_ENABLED=true')
+  const configured=vm.runInNewContext('(function(){'+enabled+'})()',{}, {timeout:1000})
+  assert.equal(JSON.stringify(configured.map((item:any)=>item.json.operation)),JSON.stringify(['tick','prices']))
+  const clock=get('Relógio compartilhado')
+  assert.equal(clock.parameters.rule.interval[0].minutesInterval,15)
+})
+
+test('manual selector routes exactly one allowed operation including price diagnostics',()=>{
   const route=get('Rotear operação'),expected=['tick','accounts','prices','weekly-review']
   assert.equal(JSON.stringify(route.parameters.rules.values.map((v:any)=>v.conditions.conditions[0].rightValue)),JSON.stringify(expected))
   for(const operation of expected)assert.equal(run('Validar operação',{operation}).json.operation,operation)
   assert.throws(()=>run('Validar operação',{operation:'../leads/capture'}))
   const flow=load();assert.equal(flow.connections['Rotear operação'].main.length,5)
-  for(let index=0;index<4;index++)assert.equal(flow.connections['Rotear operação'].main[index].length,1)
+  const destinations=['FINANCEIRO · Executar tick completo','CONTAS · Conferir pendências pelo tick','PREÇOS · Listar monitores devidos','REVISÃO · Gerar revisão parcial']
+  for(let index=0;index<4;index++)assert.deepEqual(flow.connections['Rotear operação'].main[index].map((edge:any)=>edge.node),[destinations[index]])
 })
 
 test('branch errors discard untrusted data and use non-2xx webhook response without stopping siblings',()=>{

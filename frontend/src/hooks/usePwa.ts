@@ -14,14 +14,34 @@ export function usePwa() {
     window.addEventListener('online',availability);window.addEventListener('offline',availability)
     window.addEventListener('beforeinstallprompt',installable);window.addEventListener('appinstalled',installed)
     let active=true
+    const listeners:Array<()=>void>=[]
+    const unavailable='A instalação offline não pôde ser preparada. Recarregue quando estiver conectado.'
     if(import.meta.env.PROD&&'serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).then(reg=>{
         if(!active)return
-        setRegistration(reg);setWaiting(reg.waiting)
-        reg.addEventListener('updatefound',()=>{const worker=reg.installing;worker?.addEventListener('statechange',()=>{if(active&&worker.state==='installed'&&navigator.serviceWorker.controller)setWaiting(reg.waiting||worker)})})
-      }).catch(()=>{if(active)setFailure('A instalação offline não pôde ser preparada. Recarregue quando estiver conectado.')})
+        const sync=()=>{setRegistration(reg.active?.state==='activated'?reg:null);setWaiting(reg.waiting)}
+        const watched=new Set<ServiceWorker>()
+        const observe=(worker:ServiceWorker|null)=>{
+          if(!worker||watched.has(worker))return
+          watched.add(worker)
+          const changed=()=>{
+            if(!active)return
+            sync()
+            if(worker.state==='installed'&&navigator.serviceWorker.controller)setWaiting(reg.waiting||worker)
+            if(worker.state==='redundant')setFailure(unavailable)
+            else if(worker.state==='activated')setFailure('')
+          }
+          worker.addEventListener('statechange',changed)
+          listeners.push(()=>worker.removeEventListener('statechange',changed))
+          changed()
+        }
+        const found=()=>observe(reg.installing)
+        reg.addEventListener('updatefound',found);listeners.push(()=>reg.removeEventListener('updatefound',found))
+        sync();found()
+        if(reg.active?.state==='activating')observe(reg.active)
+      }).catch(()=>{if(active)setFailure(unavailable)})
     }
-    return()=>{active=false;window.removeEventListener('online',availability);window.removeEventListener('offline',availability);window.removeEventListener('beforeinstallprompt',installable);window.removeEventListener('appinstalled',installed)}
+    return()=>{active=false;listeners.forEach(remove=>remove());window.removeEventListener('online',availability);window.removeEventListener('offline',availability);window.removeEventListener('beforeinstallprompt',installable);window.removeEventListener('appinstalled',installed)}
   },[])
   return {online,registration,waiting,failure,canInstall:Boolean(install),
     install:useCallback(async()=>{if(install){await install.prompt();await install.userChoice;setInstall(null)}},[install]),

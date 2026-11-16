@@ -1,5 +1,9 @@
 # 🐝 ABELHA — AUTOMAÇÕES
 
+**Etapa A concluída16/11:** patch remoto do relógio aplicado pelo editor e conferido por comparação integral após HTTP400 do plugin. Somente tick automático, PRICE_MONITOR_ENABLED=false;62 nós/inativo/dez HML/credenciais/settings/conexões preservados. UpdatedAt2026-11-16T21:53:41.207Z. Sem ativação ou redirecionamento; fase4 não autorizada. [Estado atual](SPRINT-LANCAMENTO-20261116.md). As notas anteriores de patch pendente abaixo registram o preflight.
+
+**Preparação final16/11:** workflow remoto inativo/62 nós/dez destinos HML, testes reais aprovados descritos em [N8N-HOMOLOGACAO.md](N8N-HOMOLOGACAO.md). Correção local do agendador passa a emitir somente tick com PRICE_MONITOR_ENABLED=false; aplicação remota pendente de autorização, sem sobrescrita efetuada. Não ativar enquanto o gate não for aplicado; não reimportar os modelos históricos. [Pacote de publicação e rollback](SPRINT-LANCAMENTO-20261116.md).
+
 **Atualização13/11 — homologação conectada:** os dez destinos agora usam o backend HML; credenciais **Abelha — Backend Homologação** e **Abelha — Entrada Homologação** criadas/vinculadas.62 nós e estado desativado preservados. Configuração vigente, resultados e ensaio manual em [N8N-HOMOLOGACAO.md](N8N-HOMOLOGACAO.md). As instruções de configuração inicial abaixo registram12/11; não recriar credenciais nem reimportar os JSONs originais sobre o remoto configurado.
 
 **Workflow único criado na Cloudfy/socialbaboon:** [n20DNyb13Aaw3nq5](https://socialbaboon-n8n.cloudfy.live/workflow/n20DNyb13Aaw3nq5). Estado conferido: **desativado**. São **62 nós**, com todas as ações dentro do mesmo workflow, sem Execute Workflow, subworkflows externos ou Error Workflow separado.

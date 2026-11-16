@@ -1,0 +1,210 @@
+{
+  "date": "2026-11-16",
+  "status": "A-verified-deploy-controls-paused-awaiting-user-main-push-and-SHA",
+  "branch": "main",
+  "baseSha": "23c06ebd5a9ab9d2954fb16a9ae145bc91fe1fd6",
+  "publishedReleaseSha": null,
+  "hashFormat": "SHA-256 of current working-tree bytes; Git may normalize EOL",
+  "files": [
+    {
+      "file": "DESIGN.md",
+      "sha256": "8c7f7446d6f6081e021a3231aa4266747ca613d23f6eb8e3926a55dcae8a40cd"
+    },
+    {
+      "file": "backend/scripts/build-n8n-unified.cjs",
+      "sha256": "63f5e9d726ec59b45f4108926b0caf7a21a848016067fac98fc50d9f04fae0c5"
+    },
+    {
+      "file": "backend/src/routes/personal.ts",
+      "sha256": "581efd65084315df21a06fb9e5595bde70b980280648a2097760f7c2b4ea7783"
+    },
+    {
+      "file": "backend/src/services/project-deletion.test.ts",
+      "sha256": "9ee163d025e97bd4a1164c1c3222bd7b3599eea84069fb0d35cec932e6537f9d"
+    },
+    {
+      "file": "backend/src/services/unified-workflow.test.ts",
+      "sha256": "fb06f36ab5cbee0d4f1b949ad6a1a0a9b67b6c4ade8874ccb4fcde053059d6eb"
+    },
+    {
+      "file": "docs/CHECKLIST-ATIVACAO.md",
+      "sha256": "2d8dc5f721a20aa05155ff167b0a908942c1371c53580af9611d8588b106b876"
+    },
+    {
+      "file": "docs/EXECUCAO-MIGRATION-PERSONAL.md",
+      "sha256": "1f3072f8ffc0a4ab75e340594bb62d211e940b8a274049c7a8045f25fbfc097e"
+    },
+    {
+      "file": "docs/GUIA-CONFIGURACAO.md",
+      "sha256": "f664512cf89c1f567e725b59eab5e4786ae8f47be0977cb050ae9a48afec3a06"
+    },
+    {
+      "file": "docs/INTEGRACOES-N8N.md",
+      "sha256": "7834f13d1bff2122784f063f6338ffa2670ddc7d2aa1b413c64f3f981a4b956e"
+    },
+    {
+      "file": "docs/MIGRATION-PRODUCAO-PERSONAL.md",
+      "sha256": "e895c7df5dd68f805d04399a361059739461e2871e8889e3b343e69f0332fc0f"
+    },
+    {
+      "file": "docs/N8N-HOMOLOGACAO.md",
+      "sha256": "2f75f120dc624c3506cb44a2f58ad5efef2979331d438726ef8f464727532152"
+    },
+    {
+      "file": "docs/PROGRESSO.md",
+      "sha256": "a140e92c329fbfc4d566b352bc1b3ab93159113b885e5ee76103d3c036e47b64"
+    },
+    {
+      "file": "docs/SPRINT-LANCAMENTO-20261116.md",
+      "sha256": "4460de42854c7043ad8b7861f62f0780ab15f6cd348914b760d7114af3fe31b4"
+    },
+    {
+      "file": "docs/VALIDACAO-FUNCIONAL-N8N-20261116.md",
+      "sha256": "055a071820bc903f39c3059600524efb83905a0e29d17e055b5f59481cc31e3e"
+    },
+    {
+      "file": "docs/WORKFLOW-UNICO-N8N.md",
+      "sha256": "74ea8b0273eab5847b741b8321e73f2f8ca71efd6e7ab2ccb79d28a9ae0dc091"
+    },
+    {
+      "file": "docs/audits/functional-n8n-20261116.json",
+      "sha256": "353d018fea020ea11660930328d6c16e37b6339153b02f804c128369b5c4fc6e"
+    },
+    {
+      "file": "docs/audits/personal-migration-execution-20261116.json",
+      "sha256": "f20cb5ca67880e9d270018eb3d95a29215cf796af27c38ae3d4c5978591e6e86"
+    },
+    {
+      "file": "docs/audits/personal-migration-preflight-20261116.json",
+      "sha256": "f9f2cd8ed9aee29aee8956681ca31700f3de0be6304c8ae3f070f129e74887c6"
+    },
+    {
+      "file": "docs/audits/sprint-release-20261116.json",
+      "sha256": "616f0faeeaab4ae4fc1545cd4872b8881af7427c367ccb6b39deade2e487f10c"
+    },
+    {
+      "file": "docs/integrations/n8n/abelha-automations.json",
+      "sha256": "fdefd612642d28f18d1adee525b5d3b5a05366c3ff30eb9190f745e77790128e"
+    },
+    {
+      "file": "docs/planos/2026-11-16-estabilizacao-lancamento.md",
+      "sha256": "0b14afe6882bfe0be33848c0a73fa7fa353d1cd2c3169a4a6ac2d677194e0fd4"
+    },
+    {
+      "file": "docs/planos/2026-11-16-exclusao-projetos.md",
+      "sha256": "350397c69051e4c37684f7317bbd3bbd132e9466ec72e6a0973caeea4748ba34"
+    },
+    {
+      "file": "docs/releases/n8n-price-scheduler-20261116.json",
+      "sha256": "96081d370ff3cc162415c4f878f901bff6bba0bb7509e5175451074b0d646888"
+    },
+    {
+      "file": "docs/sql/personal-platform-apply.psql",
+      "sha256": "1a235f8657a2ac3d07fa65bcec186093bf0336d5c5c4f72402ce5b79b14e1f44"
+    },
+    {
+      "file": "docs/sql/personal-platform-preflight.sql",
+      "sha256": "ddb81efff67a95512fefc7e843a81fb0bc24b695361b3f96cbb0a6274d4c03f7"
+    },
+    {
+      "file": "frontend/src/hooks/usePwa.ts",
+      "sha256": "2882ae6d1e675f532bccecc971881e494ed351da84c25a540056ca3eba7e3289"
+    },
+    {
+      "file": "frontend/src/lib/projectDeletion.test.mjs",
+      "sha256": "8f2c8f35b26c082755d8ffd77e286f5ad9d2019cdc00d851109b458d71db7f09"
+    },
+    {
+      "file": "frontend/src/lib/projectDeletion.ts",
+      "sha256": "5a6fff31f86679adbc45ca371b8e05de92ef7b37b1d211b5fd2e27367f4f2c4c"
+    },
+    {
+      "file": "frontend/src/lib/pwa.test.mjs",
+      "sha256": "fa9ea6d477b9491d6c3fd2f840aacca5a3f718eb8b257437fd6267c10a505a67"
+    },
+    {
+      "file": "frontend/src/lib/pwaLifecycle.test.mjs",
+      "sha256": "9712a41dd1b857e8e62380f4bb96a700945499cea3b06e583d850e0cd1f533a5"
+    },
+    {
+      "file": "frontend/src/pages/personal/PersonalProjects.tsx",
+      "sha256": "9df5cd346adc7186a67eb45bcc2946a56b23ce112182534667e6c224bb20e78f"
+    }
+  ],
+  "selfManifest": "docs/releases/release-final-20261116.json",
+  "privatePathsExcluded": [
+    ".abelha-homologacao/**",
+    "backend/.env",
+    "frontend/.env.local",
+    "**/node_modules/**",
+    "**/dist/**"
+  ],
+  "runtimeTestRecordsIncluded": false,
+  "codeRegressionFixturesIncluded": true,
+  "authorization": {
+    "A": "Scheduler field only through complete 62-node array; fresh-read/snapshot/concurrency comparison; keep ten HML destinations, credentials and inactive state",
+    "B": "Pause/record automatic deployment controls; user manually commits/pushes main and confirms SHA; deploy HML only, validate critical delta and cleanup; only on success deploy production backend/frontend same SHA and restore controls"
+  },
+  "phase4": {
+    "redirectToProduction": false,
+    "configureProductionCredentials": false,
+    "activateWorkflow": false,
+    "requiresSeparateExplicitAuthorization": true
+  },
+  "testSummary": {
+    "backend": 10,
+    "frontend": 17,
+    "failures": 0,
+    "buildsAndTypescript": "passed",
+    "frontendLint": "passed"
+  },
+  "newServices": false,
+  "migration": false,
+  "verification": {
+    "knownSecretScanPassed": true,
+    "textFilesScanned": 32,
+    "privateFilesExcluded": true,
+    "hashesVerified": 31,
+    "sourceFilesUnchangedSinceSprint": 13,
+    "reportLinksValid": true,
+    "diffCheckPassed": true,
+    "remoteWrites": true,
+    "productionDeploymentPerformed": false
+  },
+  "authorizationGranted": {
+    "A": true,
+    "B": true,
+    "phase4": false
+  },
+  "A": {
+    "applied": true,
+    "verified": true,
+    "workflowId": "n20DNyb13Aaw3nq5",
+    "inactive": true,
+    "backendDestinationsHml": 10,
+    "onlySchedulerJsCodeChanged": true
+  },
+  "deploymentControls": {
+    "render": {
+      "serviceId": "srv-daldd0142hec73c3ltt0",
+      "originalAutoDeploy": "yes",
+      "originalTrigger": "commit",
+      "currentAutoDeploy": "no",
+      "currentTrigger": "off",
+      "verifiedByPlugin": true,
+      "changedByUser": true,
+      "restorePending": true
+    },
+    "vercel": {
+      "projectId": "prj_Cd3vrf5gNVRmT3CjBJeX8saUrVVv",
+      "originalMode": "Automatic",
+      "originalModeConfirmedByUser": true,
+      "currentCommand": "exit 0",
+      "updateAcknowledgedByApi": true,
+      "rawCommandOmittedByReadConnector": true,
+      "otherProjectFieldsVerifiedUnchanged": true,
+      "restorePending": true
+    }
+  },
+  "nextStep": "User reviews and manually commits/pushes main, then supplies full published SHA. No deployment before SHA confirmation."
+}
