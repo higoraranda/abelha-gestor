@@ -1,16 +1,20 @@
 {
   "format": "review-plan-not-importable-workflow",
-  "status": "prepared-only-phase4-not-authorized",
+  "status": "LAUNCHED_WITH_PENDING_VALIDATIONS",
   "workflowId": "n20DNyb13Aaw3nq5",
   "infrastructureId": "infra_fxJeupUPo3oD",
   "expectedCurrent": {
     "nodes": 62,
-    "active": false,
-    "updatedAt": "2026-11-16T21:53:41.207Z",
-    "backendTargetsHml": 10
+    "active": true,
+    "updatedAt": "2026-11-17T03:32:29.189Z",
+    "backendTargetsHml": 0,
+    "validatedProductionBackendUrls": 10,
+    "backendUrlsIncorrect": 0,
+    "priceProviderAuthentication": "none-default",
+    "priceProviderCredentialAbsent": true
   },
-  "remoteApplied": false,
-  "productionApplicationSha": "94ccaa03b24f402f1519b3654219f54070c77bec",
+  "remoteApplied": true,
+  "productionApplicationSha": "c421abbdc8bde703bd10e179f8715c56371c369c",
   "destinations": [
     {
       "nodeId": "482ddccf-8611-e172-707d-b68a5a8f4474",
@@ -89,14 +93,16 @@
       "type": "httpHeaderAuth",
       "headerName": "Authorization",
       "privateValueSource": ".abelha-homologacao/propostas-producao/backend.env.proposal",
-      "nodeCount": 9
+      "nodeCount": 9,
+      "remoteId": "Abd3Qw4AX18sLF7N"
     },
     "incoming": {
       "name": "Abelha — Entrada Produção",
       "type": "httpHeaderAuth",
       "headerName": "X-Abelha-Webhook-Token",
       "privateValueSource": ".abelha-homologacao/propostas-producao/n8n.credentials.proposal.json",
-      "nodeCount": 3
+      "nodeCount": 3,
+      "remoteId": "nm0JbSU2k2mKgMoA"
     },
     "backendVariables": [
       "ABELHA_INTEGRATION_TOKEN",
@@ -114,15 +120,14 @@
   ],
   "priceMonitorEnabled": false,
   "databaseConnectionFromN8n": false,
-  "activationAuthorized": false,
-  "credentialsApplied": false,
+  "activationAuthorized": true,
+  "credentialsApplied": true,
   "pendingChecks": [
-    "Reconfirm the production owner and notification recipient; payload must not choose them",
-    "Review existing production integration values/consumers privately before applying standby proposals",
-    "Check existing VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY/VAPID_SUBJECT without rotating keys",
-    "Configure one authorized GitHub delivery/producer; never both relay and direct for same event",
-    "Resolve connector settings HTTP400 compatibility or perform authorized editor changes with complete comparison",
-    "Validate and observe essential tick/weekly schedule only after separate phase4 authorization"
+    "Set daily invoice and Sunday weekly-review times in Personal Settings Seu ritmo; currently blank",
+    "Confirm production VAPID runtime and physical push separately; no subscriptions exist",
+    "Detailed node execution and individual HTTP status not retained by current privacy settings; engine success is metadata evidence, not full HTTP trace",
+    "Authorize/configure real price provider before enabling price operations; keep disabled",
+    "External GitHub/CI/capture producers and Overpass availability remain separate pending integrations"
   ],
   "notGatesForBasicApplication": [
     "Price API/provider, kept disabled",
@@ -133,7 +138,114 @@
     "organizations": 1,
     "users": 1,
     "privateStandbyCandidateMatches": true,
-    "recipientRequiresSeparatePhase4Authorization": true
+    "recipientRequiresSeparatePhase4Authorization": false,
+    "recipientRevalidated": true,
+    "recipientValidatedByApi": true
   },
-  "standbySecretsVerifiedExclusiveFromHml": true
+  "standbySecretsVerifiedExclusiveFromHml": true,
+  "phase4Authorized": true,
+  "approvedApplicationCodeSha": "94ccaa03b24f402f1519b3654219f54070c77bec",
+  "applicationCodeEquivalentToApproved": true,
+  "backendVariablesApplied": true,
+  "credentialsCreated": true,
+  "report": "docs/AUDITORIA-N8N-MANUAL-20261117.md",
+  "authenticatedProductionProbesPassed": true,
+  "manualAudit": {
+    "date": "2026-11-17",
+    "approved": false,
+    "report": "docs/AUDITORIA-N8N-MANUAL-20261117.md",
+    "details": "docs/releases/n8n-manual-audit-20261117.json",
+    "correctionsRequired": 20,
+    "affectedNodes": 14,
+    "incorrectUrls": 11,
+    "incorrectCredentialReferences": 9,
+    "remoteUpdatedAt": "2026-11-17T03:05:44.848Z",
+    "correctiveWriteRejectedByAutomaticReview": true,
+    "remoteUnchangedAfterRejection": true,
+    "active": false,
+    "firstAutomaticExecution": null
+  },
+  "baselineFile": ".abelha-homologacao/go-live-n8n-before-20261116.json",
+  "manualEditAudited": true,
+  "manualEditApproved": true,
+  "recheck": {
+    "at": "2026-11-17T03:23:29.457Z",
+    "active": false,
+    "initialCorrections": 20,
+    "correctionsVerified": 18,
+    "remainingCorrections": 2,
+    "backendUrlsExact": 10,
+    "incomingCredentialsExact": 3,
+    "outgoingBackendCredentialsExact": 8,
+    "otherFieldsPreserved": true,
+    "findings": [
+      {
+        "nodeId": "b9079bfb-2f70-c87d-19ae-6a0bfe088789",
+        "node": "PROJETOS · Registrar relatório pendente",
+        "field": "credentials.httpHeaderAuth",
+        "found": {
+          "id": "nm0JbSU2k2mKgMoA",
+          "name": "Abelha — Entrada Produção"
+        },
+        "expected": {
+          "id": "Abd3Qw4AX18sLF7N",
+          "name": "Abelha — Backend Produção"
+        }
+      },
+      {
+        "nodeId": "05a164e3-cade-d618-5a42-c84c7ea8f5c5",
+        "node": "PREÇOS · Consultar API autorizada",
+        "field": "credentials",
+        "found": {
+          "httpHeaderAuth": {
+            "id": "Abd3Qw4AX18sLF7N",
+            "name": "Abelha — Backend Produção"
+          }
+        },
+        "expected": null
+      }
+    ],
+    "remoteWriteAttempted": false,
+    "activationPerformed": false
+  },
+  "finalAudit": {
+    "approved": true,
+    "updatedAt": "2026-11-17T03:32:29.189Z",
+    "remainingCorrections": 0,
+    "backendUrlsExact": 10,
+    "outgoingBackendCredentialsExact": 9,
+    "incomingCredentialsExact": 3,
+    "priceProviderCredentialAbsent": true,
+    "priceProviderAuthentication": "none-default",
+    "reviewedDifferenceFromOriginalProviderPlaceholder": true,
+    "allOtherFieldsPreserved": true
+  },
+  "activation": {
+    "active": true,
+    "observedAt": "2026-11-17T03:36:36Z",
+    "snapshotId": "mws_8bPYfMc15pnM",
+    "report": "docs/releases/n8n-activation-20261117.json",
+    "firstAutomaticExecution": {
+      "evidence": "n8n workflow_statistics scoped to this workflow",
+      "event": "production_success",
+      "count": 1,
+      "rootCount": 1,
+      "completedAt": "2026-11-17T03:45:42.967Z",
+      "completedLocalTime": "2026-11-17 00:45:42.967 America/Sao_Paulo",
+      "automaticClockAttribution": "first scheduled window after activation; no manual or external test events sent",
+      "executionId": null,
+      "detailedNodeResultsRetained": false,
+      "individualHttpStatusCaptured": false,
+      "productionErrorEvents": 0
+    }
+  },
+  "postWindowVerification": {
+    "tablesCompared": 35,
+    "unchangedFingerprints": 35,
+    "businessRowChanges": 0,
+    "notificationsCreated": 0,
+    "reviewsCreated": 0,
+    "renderErrorLogsReturned": 0,
+    "individualHttpStatusCaptured": false
+  }
 }

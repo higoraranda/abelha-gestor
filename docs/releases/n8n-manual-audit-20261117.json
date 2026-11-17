@@ -1,0 +1,444 @@
+{
+  "date": "2026-11-17",
+  "status": "LAUNCHED_WITH_PENDING_VALIDATIONS",
+  "workflowId": "n20DNyb13Aaw3nq5",
+  "infrastructureId": "infra_fxJeupUPo3oD",
+  "remoteUpdatedAt": "2026-11-17T03:32:29.189Z",
+  "active": true,
+  "baselineFile": ".abelha-homologacao/go-live-n8n-before-20261116.json",
+  "fullFieldComparison": true,
+  "nodeCount": 62,
+  "affectedNodes": 0,
+  "correctionsRequired": 0,
+  "urlsIncorrect": 0,
+  "credentialReferencesIncorrect": 0,
+  "settingsPreserved": true,
+  "binaryModePreserved": true,
+  "connectionsPreserved": true,
+  "codeNodesPreserved": true,
+  "idsTypesPositionsPreserved": true,
+  "automaticOperation": "tick",
+  "clockMinutes": 15,
+  "pricesEnabled": false,
+  "backupWorkflowsInactive": 7,
+  "remoteCorrectionApplied": false,
+  "automaticApprovalReviewRejectedWrite": true,
+  "rejectionReason": "Risk of malformed URLs and credential bindings when replacing all62 nodes",
+  "postRejectionRemoteUnchanged": true,
+  "activationPerformed": true,
+  "firstAutomaticExecution": null,
+  "production": {
+    "sha": "c421abbdc8bde703bd10e179f8715c56371c369c",
+    "renderDeploymentId": "dep-dbtp8lpsrm7s73dkttag",
+    "renderState": "live",
+    "healthStatus": 200,
+    "bearerAccepted": true,
+    "priceProviderMissingExpectedStatus": 503,
+    "githubHmacPingStatus": 200,
+    "authCheckedAt": "2026-11-17T03:11:29.753Z",
+    "tables": 35,
+    "indexes": 92,
+    "invalidIndexes": 0,
+    "invalidConstraints": 0,
+    "snapshotId": "snap-silent-fog-acdvwgeu",
+    "snapshotPreserved": true,
+    "commercialWrites": 0,
+    "manualTicks": 0
+  },
+  "findings": [],
+  "report": "docs/AUDITORIA-N8N-MANUAL-20261117.md",
+  "recheck": {
+    "at": "2026-11-17T03:23:29.457Z",
+    "active": false,
+    "initialCorrections": 20,
+    "correctionsVerified": 18,
+    "remainingCorrections": 2,
+    "backendUrlsExact": 10,
+    "incomingCredentialsExact": 3,
+    "outgoingBackendCredentialsExact": 8,
+    "otherFieldsPreserved": true,
+    "findings": [
+      {
+        "nodeId": "b9079bfb-2f70-c87d-19ae-6a0bfe088789",
+        "node": "PROJETOS · Registrar relatório pendente",
+        "field": "credentials.httpHeaderAuth",
+        "found": {
+          "id": "nm0JbSU2k2mKgMoA",
+          "name": "Abelha — Entrada Produção"
+        },
+        "expected": {
+          "id": "Abd3Qw4AX18sLF7N",
+          "name": "Abelha — Backend Produção"
+        }
+      },
+      {
+        "nodeId": "05a164e3-cade-d618-5a42-c84c7ea8f5c5",
+        "node": "PREÇOS · Consultar API autorizada",
+        "field": "credentials",
+        "found": {
+          "httpHeaderAuth": {
+            "id": "Abd3Qw4AX18sLF7N",
+            "name": "Abelha — Backend Produção"
+          }
+        },
+        "expected": null
+      }
+    ],
+    "remoteWriteAttempted": false,
+    "activationPerformed": false
+  },
+  "initialAudit": {
+    "remoteUpdatedAt": "2026-11-17T03:05:44.848Z",
+    "affectedNodes": 14,
+    "correctionsRequired": 20,
+    "urlsIncorrect": 11,
+    "credentialReferencesIncorrect": 9,
+    "findings": [
+      {
+        "nodeId": "e27e5910-8f2f-fe29-c995-32b8f06d04c2",
+        "node": "CAPTURA · Receber captura",
+        "field": "credentials",
+        "found": {
+          "httpHeaderAuth": {
+            "id": "CeqLKV97ExiedyRT",
+            "name": "Abelha — Entrada Homologação"
+          }
+        },
+        "expected": {
+          "httpHeaderAuth": {
+            "id": "nm0JbSU2k2mKgMoA",
+            "name": "Abelha — Entrada Produção"
+          }
+        },
+        "before": {
+          "httpHeaderAuth": {
+            "id": "CeqLKV97ExiedyRT",
+            "name": "Abelha — Entrada Homologação"
+          }
+        },
+        "origin": "required-production-change-not-applied"
+      },
+      {
+        "nodeId": "482ddccf-8611-e172-707d-b68a5a8f4474",
+        "node": "CAPTURA · Enviar captura para revisão",
+        "field": "parameters.url",
+        "found": "https://abelha-gestor-api.onrender.com",
+        "expected": "https://abelha-gestor-api.onrender.com/api/v1/integrations/leads/capture",
+        "before": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/leads/capture",
+        "origin": "introduced-during-manual-edit"
+      },
+      {
+        "nodeId": "482ddccf-8611-e172-707d-b68a5a8f4474",
+        "node": "CAPTURA · Enviar captura para revisão",
+        "field": "credentials",
+        "found": {
+          "httpHeaderAuth": {
+            "id": "nm0JbSU2k2mKgMoA",
+            "name": "Abelha — Entrada Produção"
+          }
+        },
+        "expected": {
+          "httpHeaderAuth": {
+            "id": "Abd3Qw4AX18sLF7N",
+            "name": "Abelha — Backend Produção"
+          }
+        },
+        "before": {
+          "httpHeaderAuth": {
+            "id": "8grkf0DNvjMOO0UB",
+            "name": "Abelha — Backend Homologação"
+          }
+        },
+        "origin": "introduced-during-manual-edit"
+      },
+      {
+        "nodeId": "3d1ad10e-1b83-0cf0-a1c7-fa23b9ad5780",
+        "node": "BUSCA · Receber busca",
+        "field": "credentials",
+        "found": {
+          "httpHeaderAuth": {
+            "id": "CeqLKV97ExiedyRT",
+            "name": "Abelha — Entrada Homologação"
+          }
+        },
+        "expected": {
+          "httpHeaderAuth": {
+            "id": "nm0JbSU2k2mKgMoA",
+            "name": "Abelha — Entrada Produção"
+          }
+        },
+        "before": {
+          "httpHeaderAuth": {
+            "id": "CeqLKV97ExiedyRT",
+            "name": "Abelha — Entrada Homologação"
+          }
+        },
+        "origin": "required-production-change-not-applied"
+      },
+      {
+        "nodeId": "d7d6dc50-1276-9387-5e25-81147caf3548",
+        "node": "BUSCA · Consultar Overpass pelo backend",
+        "field": "parameters.url",
+        "found": "https://abelha-gestor-api.onrender.com",
+        "expected": "https://abelha-gestor-api.onrender.com/api/v1/integrations/leads/search",
+        "before": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/leads/search",
+        "origin": "introduced-during-manual-edit"
+      },
+      {
+        "nodeId": "d7d6dc50-1276-9387-5e25-81147caf3548",
+        "node": "BUSCA · Consultar Overpass pelo backend",
+        "field": "credentials",
+        "found": {
+          "httpHeaderAuth": {
+            "id": "nm0JbSU2k2mKgMoA",
+            "name": "Abelha — Entrada Produção"
+          }
+        },
+        "expected": {
+          "httpHeaderAuth": {
+            "id": "Abd3Qw4AX18sLF7N",
+            "name": "Abelha — Backend Produção"
+          }
+        },
+        "before": {
+          "httpHeaderAuth": {
+            "id": "8grkf0DNvjMOO0UB",
+            "name": "Abelha — Backend Homologação"
+          }
+        },
+        "origin": "introduced-during-manual-edit"
+      },
+      {
+        "nodeId": "ef57a005-4595-bed8-393e-05da7fc7438d",
+        "node": "BUSCA · Guardar candidato público",
+        "field": "parameters.url",
+        "found": "https://abelha-gestor-api.onrender.com",
+        "expected": "https://abelha-gestor-api.onrender.com/api/v1/integrations/leads/stage",
+        "before": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/leads/stage",
+        "origin": "introduced-during-manual-edit"
+      },
+      {
+        "nodeId": "ef57a005-4595-bed8-393e-05da7fc7438d",
+        "node": "BUSCA · Guardar candidato público",
+        "field": "credentials",
+        "found": {
+          "httpHeaderAuth": {
+            "id": "nm0JbSU2k2mKgMoA",
+            "name": "Abelha — Entrada Produção"
+          }
+        },
+        "expected": {
+          "httpHeaderAuth": {
+            "id": "Abd3Qw4AX18sLF7N",
+            "name": "Abelha — Backend Produção"
+          }
+        },
+        "before": {
+          "httpHeaderAuth": {
+            "id": "8grkf0DNvjMOO0UB",
+            "name": "Abelha — Backend Homologação"
+          }
+        },
+        "origin": "introduced-during-manual-edit"
+      },
+      {
+        "nodeId": "4be92a9c-ddf5-8d7c-32a7-6b160026f231",
+        "node": "FINANCEIRO · Executar tick completo",
+        "field": "parameters.url",
+        "found": "https://abelha-gestor-api.onrender.com",
+        "expected": "https://abelha-gestor-api.onrender.com/api/v1/integrations/tick",
+        "before": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/tick",
+        "origin": "introduced-during-manual-edit"
+      },
+      {
+        "nodeId": "5a28bb78-37c6-76eb-acb0-f02c3938a9e0",
+        "node": "CONTAS · Conferir pendências pelo tick",
+        "field": "parameters.url",
+        "found": "https://abelha-gestor-api.onrender.com",
+        "expected": "https://abelha-gestor-api.onrender.com/api/v1/integrations/tick",
+        "before": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/tick",
+        "origin": "introduced-during-manual-edit"
+      },
+      {
+        "nodeId": "2a2f9a30-9e33-0c63-fb2f-724cf37ea40c",
+        "node": "PREÇOS · Listar monitores devidos",
+        "field": "parameters.url",
+        "found": "https://abelha-gestor-api.onrender.com",
+        "expected": "https://abelha-gestor-api.onrender.com/api/v1/integrations/prices/due",
+        "before": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/prices/due",
+        "origin": "introduced-during-manual-edit"
+      },
+      {
+        "nodeId": "05a164e3-cade-d618-5a42-c84c7ea8f5c5",
+        "node": "PREÇOS · Consultar API autorizada",
+        "field": "parameters.url",
+        "found": "=https://abelha-gestor-api.onrender.com",
+        "expected": "={{ $json.provider_url }}",
+        "before": "={{ $json.provider_url }}",
+        "origin": "introduced-during-manual-edit"
+      },
+      {
+        "nodeId": "05a164e3-cade-d618-5a42-c84c7ea8f5c5",
+        "node": "PREÇOS · Consultar API autorizada",
+        "field": "credentials",
+        "found": {
+          "httpHeaderAuth": {
+            "id": "Abd3Qw4AX18sLF7N",
+            "name": "Abelha — Backend Produção"
+          }
+        },
+        "expected": null,
+        "before": null,
+        "origin": "introduced-during-manual-edit"
+      },
+      {
+        "nodeId": "bf20cee0-8f35-ccca-d8f3-fbc98c319d93",
+        "node": "PREÇOS · Registrar observação",
+        "field": "parameters.url",
+        "found": "={{ \"https://abelha-gestor-api.onrender.com\" + encodeURIComponent($json.watch_id) + \"/observations\" }}",
+        "expected": "={{ \"https://abelha-gestor-api.onrender.com/api/v1/integrations/prices/\" + encodeURIComponent($json.watch_id) + \"/observations\" }}",
+        "before": "={{ \"https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/prices/\" + encodeURIComponent($json.watch_id) + \"/observations\" }}",
+        "origin": "introduced-during-manual-edit"
+      },
+      {
+        "nodeId": "72262e8f-2476-2d4d-d7e5-fbea2e93104d",
+        "node": "PROJETOS · Receber relatório Codex",
+        "field": "credentials",
+        "found": {
+          "httpHeaderAuth": {
+            "id": "CeqLKV97ExiedyRT",
+            "name": "Abelha — Entrada Homologação"
+          }
+        },
+        "expected": {
+          "httpHeaderAuth": {
+            "id": "nm0JbSU2k2mKgMoA",
+            "name": "Abelha — Entrada Produção"
+          }
+        },
+        "before": {
+          "httpHeaderAuth": {
+            "id": "CeqLKV97ExiedyRT",
+            "name": "Abelha — Entrada Homologação"
+          }
+        },
+        "origin": "required-production-change-not-applied"
+      },
+      {
+        "nodeId": "b9079bfb-2f70-c87d-19ae-6a0bfe088789",
+        "node": "PROJETOS · Registrar relatório pendente",
+        "field": "parameters.url",
+        "found": "={{ \"https://https://abelha-gestor-api.onrender.com/\" + encodeURIComponent($json.project_id) + \"/reports\" }}",
+        "expected": "={{ \"https://abelha-gestor-api.onrender.com/api/v1/integrations/projects/\" + encodeURIComponent($json.project_id) + \"/reports\" }}",
+        "before": "={{ \"https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/projects/\" + encodeURIComponent($json.project_id) + \"/reports\" }}",
+        "origin": "introduced-during-manual-edit"
+      },
+      {
+        "nodeId": "b9079bfb-2f70-c87d-19ae-6a0bfe088789",
+        "node": "PROJETOS · Registrar relatório pendente",
+        "field": "credentials",
+        "found": {
+          "httpHeaderAuth": {
+            "id": "nm0JbSU2k2mKgMoA",
+            "name": "Abelha — Entrada Produção"
+          }
+        },
+        "expected": {
+          "httpHeaderAuth": {
+            "id": "Abd3Qw4AX18sLF7N",
+            "name": "Abelha — Backend Produção"
+          }
+        },
+        "before": {
+          "httpHeaderAuth": {
+            "id": "8grkf0DNvjMOO0UB",
+            "name": "Abelha — Backend Homologação"
+          }
+        },
+        "origin": "introduced-during-manual-edit"
+      },
+      {
+        "nodeId": "34818dac-e083-d0a6-fac9-b4859c71ff1c",
+        "node": "PROJETOS · Encaminhar GitHub assinado",
+        "field": "parameters.url",
+        "found": "https://abelha-gestor-api.onrender.com",
+        "expected": "https://abelha-gestor-api.onrender.com/api/v1/integrations/github",
+        "before": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/github",
+        "origin": "introduced-during-manual-edit"
+      },
+      {
+        "nodeId": "78ce2cd7-56eb-b09d-3d82-c02dbfd9673f",
+        "node": "REVISÃO · Gerar revisão parcial",
+        "field": "parameters.url",
+        "found": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/weekly-review",
+        "expected": "https://abelha-gestor-api.onrender.com/api/v1/integrations/weekly-review",
+        "before": "https://abelha-gestor-api-hml.onrender.com/api/v1/integrations/weekly-review",
+        "origin": "required-production-change-not-applied"
+      },
+      {
+        "nodeId": "78ce2cd7-56eb-b09d-3d82-c02dbfd9673f",
+        "node": "REVISÃO · Gerar revisão parcial",
+        "field": "credentials",
+        "found": {
+          "httpHeaderAuth": {
+            "id": "8grkf0DNvjMOO0UB",
+            "name": "Abelha — Backend Homologação"
+          }
+        },
+        "expected": {
+          "httpHeaderAuth": {
+            "id": "Abd3Qw4AX18sLF7N",
+            "name": "Abelha — Backend Produção"
+          }
+        },
+        "before": {
+          "httpHeaderAuth": {
+            "id": "8grkf0DNvjMOO0UB",
+            "name": "Abelha — Backend Homologação"
+          }
+        },
+        "origin": "required-production-change-not-applied"
+      }
+    ]
+  },
+  "finalAudit": {
+    "approved": true,
+    "updatedAt": "2026-11-17T03:32:29.189Z",
+    "remainingCorrections": 0,
+    "backendUrlsExact": 10,
+    "outgoingBackendCredentialsExact": 9,
+    "incomingCredentialsExact": 3,
+    "priceProviderCredentialAbsent": true,
+    "priceProviderAuthentication": "none-default",
+    "reviewedDifferenceFromOriginalProviderPlaceholder": true,
+    "allOtherFieldsPreserved": true
+  },
+  "activation": {
+    "active": true,
+    "observedAt": "2026-11-17T03:36:36Z",
+    "snapshotId": "mws_8bPYfMc15pnM",
+    "report": "docs/releases/n8n-activation-20261117.json",
+    "firstAutomaticExecution": {
+      "evidence": "n8n workflow_statistics scoped to this workflow",
+      "event": "production_success",
+      "count": 1,
+      "rootCount": 1,
+      "completedAt": "2026-11-17T03:45:42.967Z",
+      "completedLocalTime": "2026-11-17 00:45:42.967 America/Sao_Paulo",
+      "automaticClockAttribution": "first scheduled window after activation; no manual or external test events sent",
+      "executionId": null,
+      "detailedNodeResultsRetained": false,
+      "individualHttpStatusCaptured": false,
+      "productionErrorEvents": 0
+    }
+  },
+  "postWindowVerification": {
+    "tablesCompared": 35,
+    "unchangedFingerprints": 35,
+    "businessRowChanges": 0,
+    "notificationsCreated": 0,
+    "reviewsCreated": 0,
+    "renderErrorLogsReturned": 0,
+    "individualHttpStatusCaptured": false
+  }
+}

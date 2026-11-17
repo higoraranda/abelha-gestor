@@ -1,0 +1,193 @@
+{
+  "date": "2026-11-16",
+  "status": "LAUNCHED_WITH_PENDING_VALIDATIONS",
+  "phase4Authorized": true,
+  "frontend": {
+    "sha": "c421abbdc8bde703bd10e179f8715c56371c369c",
+    "deploymentId": "dpl_HwTzfyY5J84T6NMS2VWom8PHcjN2",
+    "state": "READY"
+  },
+  "backend": {
+    "sha": "c421abbdc8bde703bd10e179f8715c56371c369c",
+    "deploymentId": "dep-dbtp8lpsrm7s73dkttag",
+    "state": "live",
+    "plan": "free",
+    "environmentMergeOnly": true,
+    "variables": [
+      "ABELHA_INTEGRATION_TOKEN",
+      "ABELHA_INTEGRATION_ORGANIZATION_ID",
+      "ABELHA_INTEGRATION_USER_ID",
+      "GITHUB_WEBHOOK_SECRET"
+    ]
+  },
+  "approvedApplicationCodeSha": "94ccaa03b24f402f1519b3654219f54070c77bec",
+  "codeEquivalent": true,
+  "neon": {
+    "tables": 35,
+    "indexes": 92,
+    "invalidIndexes": 0,
+    "invalidConstraints": 0,
+    "recipientMatchesPrivateProposal": true,
+    "snapshotId": "snap-silent-fog-acdvwgeu",
+    "snapshotPreserved": true,
+    "readOnly": true
+  },
+  "n8n": {
+    "infrastructure": "socialbaboon",
+    "id": "n20DNyb13Aaw3nq5",
+    "nodes": 62,
+    "active": true,
+    "backendTargetsHml": 0,
+    "productionCredentialsCreated": [
+      "Abelha — Backend Produção",
+      "Abelha — Entrada Produção"
+    ],
+    "productionCredentialsBound": true,
+    "remoteDefinitionUnchangedAfterHttp400": true,
+    "oldWorkflowsInactive": 7,
+    "clockMinutes": 15,
+    "automaticOperation": "tick",
+    "pricesEnabled": false,
+    "firstAutomaticExecution": {
+      "evidence": "n8n workflow_statistics scoped to this workflow",
+      "event": "production_success",
+      "count": 1,
+      "rootCount": 1,
+      "completedAt": "2026-11-17T03:45:42.967Z",
+      "completedLocalTime": "2026-11-17 00:45:42.967 America/Sao_Paulo",
+      "automaticClockAttribution": "first scheduled window after activation; no manual or external test events sent",
+      "executionId": null,
+      "detailedNodeResultsRetained": false,
+      "individualHttpStatusCaptured": false,
+      "productionErrorEvents": 0
+    },
+    "authenticatedProductionProbes": {
+      "at": "2026-11-17T03:11:29.753Z",
+      "localTime": "2026-11-17 00:11:29 America/Sao_Paulo",
+      "bearerAccepted": true,
+      "ownerValidated": true,
+      "priceProviderMissingExpectedStatus": 503,
+      "githubHmacPingStatus": 200,
+      "githubReceived": true,
+      "commercialWrites": 0,
+      "manualTicks": 0,
+      "priorAuthorizationBlockResolved": true
+    },
+    "editorUpdate": "manual-corrections-approved-provider-default-none-and-activated",
+    "computerUse": "kernel-initialization-failed",
+    "validatedProductionBackendUrls": 10
+  },
+  "verification": {
+    "publicGetChecksPassed": 9,
+    "localSessionPwaPushTestsPassed": 21,
+    "newRenderErrorLogsReturned": 0,
+    "physicalPushVerified": false,
+    "vapidRuntimeConfirmed": false,
+    "productionPushSubscriptionsAtPreflight": 0,
+    "syntheticProductionWrites": 0,
+    "manualTicks": 0,
+    "productionIntegrationBearerValidated": true,
+    "productionGithubHmacPingValidated": true
+  },
+  "report": "docs/AUDITORIA-N8N-MANUAL-20261117.md",
+  "git": {
+    "commitPerformed": false,
+    "pushPerformed": false,
+    "branchCreated": false
+  },
+  "manualAudit": {
+    "date": "2026-11-17",
+    "approved": false,
+    "report": "docs/AUDITORIA-N8N-MANUAL-20261117.md",
+    "details": "docs/releases/n8n-manual-audit-20261117.json",
+    "correctionsRequired": 20,
+    "affectedNodes": 14,
+    "incorrectUrls": 11,
+    "incorrectCredentialReferences": 9,
+    "remoteUpdatedAt": "2026-11-17T03:05:44.848Z",
+    "correctiveWriteRejectedByAutomaticReview": true,
+    "remoteUnchangedAfterRejection": true,
+    "active": false,
+    "firstAutomaticExecution": null
+  },
+  "recheck": {
+    "at": "2026-11-17T03:23:29.457Z",
+    "active": false,
+    "initialCorrections": 20,
+    "correctionsVerified": 18,
+    "remainingCorrections": 2,
+    "backendUrlsExact": 10,
+    "incomingCredentialsExact": 3,
+    "outgoingBackendCredentialsExact": 8,
+    "otherFieldsPreserved": true,
+    "findings": [
+      {
+        "nodeId": "b9079bfb-2f70-c87d-19ae-6a0bfe088789",
+        "node": "PROJETOS · Registrar relatório pendente",
+        "field": "credentials.httpHeaderAuth",
+        "found": {
+          "id": "nm0JbSU2k2mKgMoA",
+          "name": "Abelha — Entrada Produção"
+        },
+        "expected": {
+          "id": "Abd3Qw4AX18sLF7N",
+          "name": "Abelha — Backend Produção"
+        }
+      },
+      {
+        "nodeId": "05a164e3-cade-d618-5a42-c84c7ea8f5c5",
+        "node": "PREÇOS · Consultar API autorizada",
+        "field": "credentials",
+        "found": {
+          "httpHeaderAuth": {
+            "id": "Abd3Qw4AX18sLF7N",
+            "name": "Abelha — Backend Produção"
+          }
+        },
+        "expected": null
+      }
+    ],
+    "remoteWriteAttempted": false,
+    "activationPerformed": false
+  },
+  "finalAudit": {
+    "approved": true,
+    "updatedAt": "2026-11-17T03:32:29.189Z",
+    "remainingCorrections": 0,
+    "backendUrlsExact": 10,
+    "outgoingBackendCredentialsExact": 9,
+    "incomingCredentialsExact": 3,
+    "priceProviderCredentialAbsent": true,
+    "priceProviderAuthentication": "none-default",
+    "reviewedDifferenceFromOriginalProviderPlaceholder": true,
+    "allOtherFieldsPreserved": true
+  },
+  "activation": {
+    "active": true,
+    "observedAt": "2026-11-17T03:36:36Z",
+    "snapshotId": "mws_8bPYfMc15pnM",
+    "report": "docs/releases/n8n-activation-20261117.json",
+    "firstAutomaticExecution": {
+      "evidence": "n8n workflow_statistics scoped to this workflow",
+      "event": "production_success",
+      "count": 1,
+      "rootCount": 1,
+      "completedAt": "2026-11-17T03:45:42.967Z",
+      "completedLocalTime": "2026-11-17 00:45:42.967 America/Sao_Paulo",
+      "automaticClockAttribution": "first scheduled window after activation; no manual or external test events sent",
+      "executionId": null,
+      "detailedNodeResultsRetained": false,
+      "individualHttpStatusCaptured": false,
+      "productionErrorEvents": 0
+    }
+  },
+  "postWindowVerification": {
+    "tablesCompared": 35,
+    "unchangedFingerprints": 35,
+    "businessRowChanges": 0,
+    "notificationsCreated": 0,
+    "reviewsCreated": 0,
+    "renderErrorLogsReturned": 0,
+    "individualHttpStatusCaptured": false
+  }
+}
