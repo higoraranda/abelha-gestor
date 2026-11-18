@@ -13,25 +13,46 @@ export function normalizeOverpass(elements:any[],niche:string,now=new Date().toI
   })
 }
 const searches=new Map<string,number>()
+const OVERPASS_ENDPOINTS=['https://overpass-api.de/api/interpreter','https://overpass.private.coffee/api/interpreter']
 export async function searchLeads(org:string,niche:string,city:string,limit:number,fetcher:typeof fetch=fetch) {
   const query=overpassQuery(niche,city,limit)
   if(Date.now()-(searches.get(org)||0)<60000)throw new InputError('Aguarde um minuto antes de uma nova consulta pública.',429)
   if(searches.size>1000) for(const [key,time]of searches)if(Date.now()-time>60000)searches.delete(key)
   searches.set(org,Date.now())
-  let raw:string
-  try {
-    const response=await fetcher('https://overpass-api.de/api/interpreter',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','User-Agent':'AbelhaCRM/1.0 (OpenStreetMap business search)'},body:new URLSearchParams({data:query}),signal:AbortSignal.timeout(25000)})
-    if(!response.ok)throw new InputError('A fonte pública está ocupada ou indisponível. Tente novamente mais tarde.',503)
-    raw=await response.text()
-  } catch(error:any) {
-    if(error instanceof InputError)throw error
-    if(['TimeoutError','AbortError'].includes(error?.name))throw new InputError('A fonte pública não respondeu no prazo. Aguarde um minuto antes de tentar novamente.',504)
-    throw new InputError('Não foi possível consultar a fonte pública. Tente novamente mais tarde.',503)
+  // Keep both attempts within the 35-second browser and integration deadlines.
+  const deadline=Date.now()+30000
+  let failure=new InputError('Não foi possível consultar a fonte pública. Tente novamente mais tarde.',503)
+  for(const endpoint of OVERPASS_ENDPOINTS) {
+    const remaining=deadline-Date.now()
+    if(remaining<=0)break
+    let retryable=true,status:number|undefined
+    try {
+      const response=await fetcher(endpoint,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','User-Agent':'AbelhaCRM/1.0 (OpenStreetMap business search)'},body:new URLSearchParams({data:query}),signal:AbortSignal.timeout(Math.min(25000,remaining))})
+      status=response.status
+      if(!response.ok) {
+        retryable=status===429||status>=500
+        await response.body?.cancel()
+        throw new InputError('A fonte pública está ocupada ou indisponível. Tente novamente mais tarde.',503)
+      }
+      const raw=await response.text()
+      if(raw.length>2000000) {
+        retryable=false
+        throw new InputError('A consulta retornou dados demais. Reduza a quantidade.',503)
+      }
+      let data:any;try{data=JSON.parse(raw)}catch{throw new InputError('A fonte pública retornou uma resposta inválida.',503)}
+      if(!data||data.remark||!Array.isArray(data.elements))throw new InputError('A consulta pública não foi concluída. Tente novamente mais tarde.',503)
+      return {items:normalizeOverpass(data.elements,niche).slice(0,limit),attribution:'© OpenStreetMap contributors — ODbL',source_url:'https://www.openstreetmap.org/copyright',queried_at:new Date().toISOString()}
+    } catch(error:any) {
+      const timedOut=['TimeoutError','AbortError'].includes(error?.name)
+      failure=error instanceof InputError?error:timedOut
+        ?new InputError('A fonte pública não respondeu no prazo. Aguarde um minuto antes de tentar novamente.',504)
+        :new InputError('Não foi possível consultar a fonte pública. Tente novamente mais tarde.',503)
+      const code=error?.cause?.code
+      console.warn('[lead-search] Overpass request failed',{host:new URL(endpoint).hostname,status,kind:timedOut?'timeout':error instanceof InputError?'response':'network',...(typeof code==='string'&&/^[A-Z0-9_]{1,60}$/.test(code)?{code}:{})})
+      if(!retryable)throw failure
+    }
   }
-  if(raw.length>2000000)throw new InputError('A consulta retornou dados demais. Reduza a quantidade.',503)
-  let data:any;try{data=JSON.parse(raw)}catch{throw new InputError('A fonte pública retornou uma resposta inválida.',503)}
-  if(data.remark||!Array.isArray(data.elements))throw new InputError('A consulta pública não foi concluída. Tente novamente mais tarde.',503)
-  return {items:normalizeOverpass(data.elements,niche).slice(0,limit),attribution:'© OpenStreetMap contributors — ODbL',source_url:'https://www.openstreetmap.org/copyright',queried_at:new Date().toISOString()}
+  throw failure
 }
 export const SERVICE_TEMPLATES=[
   {id:'landing-page',name:'Landing page',days:10,description:'Uma página com objetivo e conversão definidos.',deliverables:['Briefing e objetivo','Estrutura e texto','Layout responsivo','Formulário e contatos','Testes e publicação revisada']},

@@ -22,7 +22,9 @@ Quando uma versão nova fica pronta, o app oferece **Atualizar e recarregar**. A
 
 Permissão só é solicitada após clicar **Ativar neste dispositivo**. Negar não impede o uso normal. Avisos na tela bloqueada são genéricos; abra o app para ler detalhes. Clique no lembrete da fatura abre a tela de registro.
 
-VAPID, migration e workflow de tick precisam estar configurados. Sem eles, salvar horários não agenda execução externa. A entrega fora do app depende do navegador/sistema e não foi validada em aparelho físico nesta execução. Contas, marcos e valores não são modificados por receber um aviso.
+VAPID, migration e workflow de tick precisam estar configurados. Sem eles, salvar horários não agenda execução externa. A entrega fora do app depende do navegador/sistema. Contas, marcos e valores não são modificados por receber um aviso.
+
+Verificação em **18/11/2026**: VAPID configurado no backend de produção, com deploy concluído e botão **Ativar neste dispositivo** habilitado. O usuário confirmou a ativação no iPhone 14 Pro pelo ícone instalado; uma inscrição Apple foi encontrada no banco. Um único aviso de teste foi aceito pela Apple com HTTP `201`, sem gravações de teste no banco, e o usuário confirmou seu recebimento no aparelho. Isso valida a entrega física desse teste; os avisos agendados continuam sujeitos à execução da automação e às condições do sistema. O workflow de automações permanece ativo; horários salvos: diário às 07:40 e domingos às 08:00, em Brasília. As chaves são persistentes e não devem ser geradas novamente a cada publicação.
 
 Se as chaves VAPID mudarem, reabra o app e ative novamente em cada aparelho: a ação explícita substitui a inscrição com chave antiga. Se a API falhar ao salvar uma nova inscrição, ela é revogada no navegador e a tela não informa sucesso. Confira os passos de teste físico em [CHECKLIST-ATIVACAO.md](CHECKLIST-ATIVACAO.md).
 
