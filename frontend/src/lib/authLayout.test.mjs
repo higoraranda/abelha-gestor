@@ -32,7 +32,8 @@ async function pageModule(name, signupState) {
     '@/store/auth': { useAuthStore: () => () => {} },
     '@/lib/personalAccess': { personalAccess:false },
     './RegisterPage.css': {},
-    './AuthLayout': name === 'AuthLayout' ? undefined : await pageModule('AuthLayout'),
+    './PasswordField': name === 'LoginPage' || name === 'ResetPasswordPage' ? await pageModule('PasswordField') : undefined,
+    './AuthLayout': name === 'AuthLayout' || name === 'PasswordField' ? undefined : await pageModule('AuthLayout'),
   }
   new Function('require','exports',outputText)(id=>id in deps ? deps[id] : require(id),output.exports)
   return output.exports
@@ -46,6 +47,8 @@ test('signup reuses the same left panel as login and places registration and OTP
   assert.match(login,/<section class="login-form-side"><form class="login-form">/)
   assert.match(login,/Entre no Abelha/)
   assert.match(login,/autoComplete="current-password"/i)
+  assert.match(login,/<button[^>]+type="button"[^>]+aria-label="Mostrar senha"/)
+  assert.match(login,/href="\/redefinir-senha"[^>]*>Esqueci minha senha/)
   const intro=login.match(/<section class="login-intro"[\s\S]*?<\/section>/)[0]
   const details={name:'Pessoa Teste',email:'convidado@example.invalid',password:'senha-sintetica'}
   const {default:Register}=await pageModule('RegisterPage',{details,challenge:null,code:''})

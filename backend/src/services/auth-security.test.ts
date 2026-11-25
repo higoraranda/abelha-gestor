@@ -49,6 +49,36 @@ test('production auth preserves credential login, CSRF, secure cookies, legacy s
     const cookie=login.headers.getSetCookie().find(value=>value.startsWith('__Secure-authjs.session-token='));assert.ok(cookie,'Existing production cookie name must be preserved');assert.match(cookie,/HttpOnly/i);assert.match(cookie,/; Secure/i);assert.match(cookie,/SameSite=Lax/i)
     const protectedResponse=await request('/protected?organization_id=ffffffff-ffff-4fff-8fff-ffffffffffff');assert.equal(protectedResponse.status,200);assert.deepEqual(await protectedResponse.json(),{id:legacy.payload.userId,organizationId:legacy.payload.organizationId})
     const session=await (await request('/api/auth/session')).json() as any;assert.equal(session.user.id,legacy.payload.userId);assert.equal(session.user.organizationId,legacy.payload.organizationId)
+    await pg.exec('ALTER TABLE users DROP COLUMN account_role')
+    const withoutRole=await request('/api/auth/session',undefined,new Map(jar))
+    assert.equal((await withoutRole.json())?.user?.id,undefined,'The published login cannot finalize a session before the account-role migration')
+    await pg.exec("ALTER TABLE users ADD COLUMN account_role text NOT NULL DEFAULT 'owner'; ALTER TABLE users ADD COLUMN email_verified_at timestamptz")
+    await pg.exec(fs.readFileSync('src/db/migrations/20261125_password_reset.sql','utf8'))
+    const {createAccountRouter}=await import('../routes/account')
+    const {postgresDatabase}=await import('./platform-db')
+    const mailbox:string[]=[]
+    app.use('/api/v1/account',createAccountRouter(postgresDatabase(sql),createAuthMiddleware(config,sql),undefined,{
+      origin:'https://abelha.example',ownerEmail:'synthetic@example.invalid',send:async delivery=>{mailbox.push(delivery.link)},
+    }))
+    const reset=async (action:string,body:Record<string,string>,clientHeader=true)=>fetch(base+'/api/v1/account/password/reset/'+action,{
+      method:'POST',headers:{'Content-Type':'application/json',...(clientHeader?{'X-Abelha-Client':'web'}:{})},body:JSON.stringify(body),
+    })
+    assert.equal((await reset('request',{email:'synthetic@example.invalid'},false)).status,403)
+    const unknown=await reset('request',{email:'unknown@example.invalid'})
+    const known=await reset('request',{email:'synthetic@example.invalid'})
+    assert.equal(known.status,202);assert.equal(unknown.status,202);assert.deepEqual(await known.json(),await unknown.json())
+    assert.equal(mailbox.length,1)
+    const token=new URLSearchParams(new URL(mailbox[0]).hash.slice(1)).get('token')!
+    assert.equal((await reset('confirm',{token,password:'new-synthetic-password'})).status,200)
+    assert.equal((await reset('confirm',{token,password:'new-synthetic-password'})).status,400)
+    assert.equal((await request('/protected')).status,401,'A reset revokes previously authenticated sessions')
+    assert.equal((await request('/protected',undefined,new Map([[legacy.salt,legacy.token]]))).status,401,'A reset also revokes legacy sessions')
+    csrf=await (await request('/api/auth/csrf')).json() as {csrfToken:string}
+    await request('/api/auth/callback/credentials',{csrfToken:csrf.csrfToken,email:'synthetic@example.invalid',password:'synthetic-password',redirect:'false'})
+    assert.equal((await request('/protected')).status,401,'The previous password is rejected')
+    csrf=await (await request('/api/auth/csrf')).json() as {csrfToken:string}
+    await request('/api/auth/callback/credentials',{csrfToken:csrf.csrfToken,email:'synthetic@example.invalid',password:'new-synthetic-password',redirect:'false'})
+    assert.equal((await request('/protected')).status,200,'The new password gives access through the standard login')
     csrf=await (await request('/api/auth/csrf')).json() as {csrfToken:string}
     await request('/api/auth/signout',{csrfToken:csrf.csrfToken,redirect:'false'});assert.equal((await request('/protected')).status,401)
   } finally {if(server){server.closeAllConnections();await new Promise<void>(resolve=>server!.close(()=>resolve()))}if(sql)await sql.end({timeout:2});if(wire)await wire.stop();await pg.close()}

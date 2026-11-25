@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import AppPage from './pages/AppPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 import MemberHome from './pages/personal/MemberHome'
 import ProtectedRoute from './components/ui/ProtectedRoute'
 import { personalAccess } from './lib/personalAccess'
@@ -22,7 +23,7 @@ export default function App() {
   const clearAuth = useAuthStore(state => state.clearAuth)
   const prepareAccess = useCallback(async (signal: AbortSignal) => {
     const pathname = window.location.pathname
-    if (personalAccess || (pathname === '/login' || pathname === '/cadastro')) return
+    if (personalAccess || (pathname === '/login' || pathname === '/cadastro' || pathname === '/redefinir-senha')) return
     const user = await getSession(signal)
     signal.throwIfAborted()
     if (user) setAuth(user)
@@ -40,6 +41,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/cadastro" element={<RegisterPage />} />
+          <Route path="/redefinir-senha" element={personalAccess ? <Navigate to="/" replace /> : <ResetPasswordPage />} />
           <Route path="/login" element={personalAccess ? <Navigate to="/" replace /> : <LoginPage />} />
           <Route path="/*" element={personalAccess ? <AppPage /> : <ProtectedRoute initialSession={initialSession} onInitialSessionUsed={consumeInitialSession}><AccountWorkspace /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -82,7 +82,14 @@ export default async function handler(request, response) {
 
     if (isAuthRedirect) {
       response.setHeader('content-type', 'application/json; charset=utf-8')
-      response.end(JSON.stringify({ url: '/' }))
+      // Keep only the auth outcome; never forward an arbitrary redirect URL.
+      let error = ''
+      try {
+        error = new URL(upstream.headers.get('location'), targetUrl).searchParams.get('error') || ''
+      } catch {
+        error = 'Configuration'
+      }
+      response.end(JSON.stringify({ url: error ? '/?error=' + encodeURIComponent(error) : '/' }))
       return
     }
 

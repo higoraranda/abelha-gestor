@@ -40,6 +40,9 @@ Navegação superior: Visão geral, Clientes, Entregas, Pipeline, Financeiro, Ag
 O seletor CRM/Personal fica junto à marca. CRM acrescenta Buscar leads e Templates. Personal: Meu dia, Projetos, Faturas e metas, Contas, Preços, Revisão semanal e Preferências. Trocar ambiente limpa o registro anterior e troca menu, ações e central de avisos; links antigos continuam CRM. O gesto característico do Personal é o ritual da fatura no painel verde já usado nos próximos passos do CRM.
 Em celular: navegação rolável no topo, rail inferior, cards empilhados e quadros/tabelas com rolagem própria. O pipeline mantém suas quatro colunas em uma mesma faixa horizontal. O calendário exibe os sete dias na largura disponível e o painel abaixo mantém o texto completo dos compromissos. Não ocultar rolagem de formulários para fazer tabelas caberem.
 
+## Autenticação
+O login e a recuperação compartilham o painel direito do mesmo layout. Campos de senha começam ocultos, com botão explícito de mostrar/ocultar e foco visível. A recuperação exibe a mesma instrução de caixa de entrada para todo e-mail válido e não autentica automaticamente após salvar. Nenhuma alteração no formulário em duas etapas do cadastro.
+
 ## Padrões reutilizados
 - Modal.tsx: Radix, foco preso, Escape, título e restauração de foco.
 - DataState.tsx: carregamento, erro com tentativa e vazio com orientação.

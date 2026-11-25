@@ -81,19 +81,24 @@ function verificationMessage(code:string) {
   }
 }
 
-export function resendSignupEmail():SignupEmail {
-  const secret=signupSecret(), key=process.env.ABELHA_OTP_RESEND_API_KEY, from=process.env.ABELHA_OTP_FROM
-  if(!key||!from)throw new InputError('O envio de códigos por e-mail ainda não está configurado.',503)
-  return {secret,send:async(email,code,challenge)=>{
+export function resendMailer() {
+  const key=process.env.ABELHA_OTP_RESEND_API_KEY, from=process.env.ABELHA_OTP_FROM
+  if(!key||!from)throw new InputError('O envio por e-mail ainda não está configurado.',503)
+  return async (email:string,idempotencyKey:string,message:{subject:string;text:string;html:string}) => {
     const response=await fetch('https://api.resend.com/emails',{
       method:'POST',redirect:'error',signal:AbortSignal.timeout(8000),
-      headers:{Authorization:'Bearer '+key,'Content-Type':'application/json','Idempotency-Key':'abelha-signup-'+challenge},
+      headers:{Authorization:'Bearer '+key,'Content-Type':'application/json','Idempotency-Key':idempotencyKey},
       body:JSON.stringify({
-        from,to:[email],...verificationMessage(code)
+        from,to:[email],...message
       })
     })
     if(!response.ok)throw new Error('O serviço de e-mail não aceitou o envio.')
     const result=await response.json() as {id?:string}
     if(!result.id)throw new Error('O serviço de e-mail não confirmou o envio.')
-  }}
+  }
+}
+
+export function resendSignupEmail():SignupEmail {
+  const secret=signupSecret(), send=resendMailer()
+  return {secret,send:(email,code,challenge)=>send(email,'abelha-signup-'+challenge,verificationMessage(code))}
 }

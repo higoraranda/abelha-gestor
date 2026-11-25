@@ -23,7 +23,8 @@ export function createAuthConfig(database:typeof db=db,isProduction=process.env.
           if (!email || !password) return null
 
           const users = await database`
-            SELECT id, organization_id, name, email, password_hash
+            SELECT id, organization_id, name, email, password_hash,
+              to_jsonb(users)->>'password_reset_version' AS password_reset_version
             FROM users
             WHERE lower(btrim(email)) = ${email}
           `
@@ -39,10 +40,11 @@ export function createAuthConfig(database:typeof db=db,isProduction=process.env.
             email: user.email as string,
             name: user.name as string,
             organizationId: user.organization_id as string,
+            passwordResetVersion: user.password_reset_version as string | null,
           }
-        } catch (err) {
-          console.error("[auth] erro no authorize:", err)
-          return null
+        } catch {
+          // Do not convert a database failure into an invalid-password response.
+          throw new Error("Falha ao consultar a conta.")
         }
       },
     }),
@@ -54,6 +56,7 @@ export function createAuthConfig(database:typeof db=db,isProduction=process.env.
       if (user) {
         token.userId = user.id as string
         token.organizationId = (user as any).organizationId
+        token.passwordResetVersion = (user as {passwordResetVersion?: string | null}).passwordResetVersion ?? null
       }
       return token
     },
@@ -62,10 +65,11 @@ export function createAuthConfig(database:typeof db=db,isProduction=process.env.
     async session({ session, token }: { session: Session; token: JWT }) {
       if (session.user && typeof token.userId === "string" && typeof token.organizationId === "string") {
         const [account] = await database`
-          SELECT account_role FROM users
+          SELECT account_role, to_jsonb(users)->>'password_reset_version' AS password_reset_version FROM users
           WHERE id = ${token.userId} AND organization_id = ${token.organizationId}
         `
-        if (account?.account_role === "owner" || account?.account_role === "member") {
+        if ((account?.account_role === "owner" || account?.account_role === "member") &&
+            (account.password_reset_version ?? null) === (token.passwordResetVersion ?? null)) {
           Object.assign(session.user,{id:token.userId,organizationId:token.organizationId,role:account.account_role})
         }
       }

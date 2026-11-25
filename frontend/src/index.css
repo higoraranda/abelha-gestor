@@ -1405,7 +1405,8 @@ textarea:focus-visible {
   gap: 7px;
 }
 
-.login-field > span {
+.login-field > span,
+.login-field-label {
   color: var(--ink-soft);
   font-size: 12px;
   font-weight: 600;
@@ -1423,6 +1424,41 @@ textarea:focus-visible {
   font-size: 13px;
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
+
+.login-password-group { display: grid; gap: 4px; }
+.password-field { position: relative; }
+.password-field input { width: 100%; box-sizing: border-box; padding-inline-end: 56px; }
+.password-field input::-ms-reveal { display: none; }
+.password-toggle {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 3px;
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.password-toggle:hover { color: var(--accent-yellow); }
+.password-toggle:focus-visible, .login-text-link:focus-visible {
+  outline: 2px solid var(--accent-yellow);
+  outline-offset: -2px;
+}
+.login-text-link {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 8px;
+  width: fit-content;
+  min-height: 44px;
+  color: var(--accent-yellow);
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
+.login-text-link:hover { text-decoration: underline; }
 
 .login-field input:focus {
   border-color: var(--accent-border);

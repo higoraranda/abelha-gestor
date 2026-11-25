@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 let moduleId = 0
-async function invoke(environment, backend, method = 'POST') {
+async function invoke(environment, backend, method = 'POST', target='v1/personal/tasks', upstream) {
   const previous = { environment: process.env.VERCEL_ENV, backend: process.env.BACKEND_URL, fetch: globalThis.fetch }
   process.env.VERCEL_ENV = environment
   if (backend === undefined) delete process.env.BACKEND_URL
@@ -10,12 +10,13 @@ async function invoke(environment, backend, method = 'POST') {
   const calls = []
   globalThis.fetch = async (...args) => {
     calls.push(args)
+    if (upstream) return upstream
     return new Response('{"ok":true}', { status: 200, headers: { 'content-type': 'application/json' } })
   }
   const response = { headers: {}, setHeader(name, value) { this.headers[name] = value }, end(body) { this.body = String(body) } }
   try {
     const { default: handler } = await import(`../../api/proxy.js?test=${++moduleId}`)
-    await handler({ method, query: { target: 'v1/personal/tasks', limit: '2' }, headers: { host: 'preview.vercel.app', 'content-type': 'application/json', cookie: 'synthetic=session' }, body: { title: 'Synthetic' } }, response)
+    await handler({ method, query: { target, limit: '2' }, headers: { host: 'preview.vercel.app', 'content-type': 'application/json', cookie: 'synthetic=session' }, body: { title: 'Synthetic' } }, response)
     return { calls, response }
   } finally {
     if (previous.environment === undefined) delete process.env.VERCEL_ENV
@@ -51,4 +52,11 @@ test('production keeps the existing default backend and GET has no body', async 
   assert.equal(response.statusCode, 200)
   assert.equal(new URL(calls[0][0]).origin, 'https://abelha-gestor-api.onrender.com')
   assert.equal(calls[0][1].body, undefined)
+})
+
+test('production keeps the error code delivered in a credentials redirect', async () => {
+  const upstream = new Response(null, {status:302,headers:{Location:'https://abelha.example/api/auth/error?error=CredentialsSignin'}})
+  const { response } = await invoke('production', undefined, 'POST', 'auth/callback/credentials', upstream)
+  assert.equal(response.statusCode,200)
+  assert.match(JSON.parse(response.body).url,/\?error=CredentialsSignin$/)
 })

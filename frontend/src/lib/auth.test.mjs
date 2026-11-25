@@ -64,6 +64,19 @@ test('login rejects wrong account even if a previous session still exists', asyn
   await assert.rejects(login('guest@example.invalid','synthetic password'),/Email ou senha/)
 })
 
+test('login distinguishes a missing session and an unavailable server from invalid credentials', async (t) => {
+  const original = globalThis.window
+  globalThis.window = { location: { origin: 'http://127.0.0.1' } }
+  t.after(() => { if (original === undefined) delete globalThis.window; else globalThis.window = original })
+  const responses = [
+    Response.json({csrfToken:'synthetic'}),Response.json({url:'/'}),Response.json(null),
+    Response.json({csrfToken:'synthetic'}),Response.json({url:'/?error=Configuration'}),
+  ]
+  t.mock.method(globalThis,'fetch',async()=>responses.shift())
+  await assert.rejects(login('example@example.invalid','synthetic password'),/confirmar a sessão/)
+  await assert.rejects(login('example@example.invalid','synthetic password'),/servidor não conseguiu/)
+})
+
 test('login rejects an Auth.js callback error even with HTTP 200', async (t) => {
   const original = globalThis.window
   globalThis.window = { location: { origin: 'http://127.0.0.1' } }

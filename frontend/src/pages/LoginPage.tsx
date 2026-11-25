@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { ArrowRight, LockKeyhole } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { login } from '@/lib/auth'
 import { useAuthStore } from '@/store/auth'
 import AuthLayout from './AuthLayout'
+import PasswordField from './PasswordField'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -52,17 +53,18 @@ export default function LoginPage() {
           />
         </label>
 
-        <label className="login-field">
-          <span>Senha</span>
-          <input
-            type="password"
+        <div className="login-password-group">
+          <PasswordField
+            label="Senha"
+            name="password"
             autoComplete="current-password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             placeholder="Digite sua senha"
             required
           />
-        </label>
+          <Link to="/redefinir-senha" className="login-text-link">Esqueci minha senha</Link>
+        </div>
 
         {error ? <p className="login-error" role="alert">{error}</p> : null}
 
