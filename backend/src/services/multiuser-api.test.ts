@@ -29,6 +29,7 @@ test('real sessions redeem invitations and remain isolated across three workspac
     await pg.query("WITH o AS (INSERT INTO organizations(name) VALUES('Original') RETURNING id) INSERT INTO users(organization_id,name,email,password_hash) SELECT id,'Owner','Owner@Example.invalid',$1 FROM o",[await bcrypt.hash(ownerPassword,4)])
     await pg.exec(load('migrations/20261111_personal_platform.sql'))
     await pg.exec(load('migrations/20261125_account_invites.sql'))
+    await pg.exec(load('migrations/20261125_signup_email.sql'))
     await pg.exec(load('migrations/20261125_quote_models.sql'))
     wire=new PGLiteSocketServer({db:pg,host:'127.0.0.1',port:0});await wire.start()
     sql=postgres('postgresql://postgres:postgres@'+wire.getServerConn()+'/postgres',{ssl:false,max:3})
@@ -39,7 +40,11 @@ test('real sessions redeem invitations and remain isolated across three workspac
     const app=express()
     app.use(express.json(),express.urlencoded({extended:true}))
     app.use('/api/auth/*',ExpressAuth(config))
-    app.use('/api/v1/account',createAccountRouter(database,auth))
+    const mailbox=new Map<string,string>()
+    app.use('/api/v1/account',createAccountRouter(database,auth,{
+      secret:'synthetic-only-secret-for-signup-verification',
+      send:async(email:string,code:string)=>{mailbox.set(email,code)}
+    }))
     app.use('/api/v1/quote-models',createQuoteModelsRouter(database,auth))
     app.use('/api/v1/personal',createPersonalRouter(database,[auth,tenantMiddleware]))
     app.get('/api/events',auth,requireOwner,(_req,res)=>res.status(200).end())
@@ -84,7 +89,19 @@ test('real sessions redeem invitations and remain isolated across three workspac
       const email='friend'+index+'@example.invalid',password='synthetic member password'
       const response=await owner(invites,{email});assert.equal(response.status,201)
       const {token}=await response.json() as {token:string}
-      assert.equal((await request('/api/v1/account/register',{token,email:email.toUpperCase(),name:'Convidado '+index,password})).status,201)
+      const registration={token,email:email.toUpperCase(),name:'Convidado '+index,password}
+      assert.equal((await request('/api/v1/account/register',registration)).status,400)
+      const codeRequest=await request('/api/v1/account/register/code',{token,email:email.toUpperCase()})
+      assert.equal(codeRequest.status,200)
+      const challenge=await codeRequest.json() as {challengeId:string;code?:string}
+      assert.equal(challenge.code,undefined)
+      assert.match(mailbox.get(email)??'',/^\d{6}$/)
+      assert.equal((await request('/api/v1/account/register/code',{email,token})).status,429)
+      const attempt={...registration,challengeId:challenge.challengeId,code:mailbox.get(email)}
+      const wrong=attempt.code==='000000'?'000001':'000000'
+      assert.equal((await request('/api/v1/account/register',{...attempt,code:wrong})).status,400)
+      assert.equal((await request('/api/v1/account/register',attempt)).status,201)
+      assert.equal((await request('/api/v1/account/register',attempt)).status,400)
       const session=await signIn(request,email.toUpperCase(),password)
       assert.equal(session.role,'member');sessions.push(session)
       assert.equal((await request('/api/events')).status,403)

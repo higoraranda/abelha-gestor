@@ -1,0 +1,19 @@
+.signup-card .login-helper strong{overflow-wrap:anywhere;color:var(--ink)}
+.signup-card .register-fields{margin:0;gap:20px}
+.signup-card .register-fields .login-submit{justify-self:stretch}
+.signup-badge--success{background:var(--context-green);color:var(--context-ink);border-color:var(--context-green);animation:signup-confirm .44s ease both}
+.signup-label{display:block;font-weight:700;margin-bottom:.45rem;color:var(--ink)}
+.signup-otp-field{position:relative;display:block}
+.signup-otp-boxes{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(.26rem,1vw,.55rem)}
+.signup-otp-boxes>span{display:grid;place-items:center;min-height:clamp(2.55rem,9vw,3.65rem);border:1px solid var(--line-strong);border-radius:var(--radius-control);background:var(--canvas);font-size:clamp(1.16rem,4vw,1.8rem);font-weight:700;font-variant-numeric:tabular-nums;transition:background-color .24s ease,color .24s ease,border-color .24s ease}
+.signup-otp-field input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:text}
+.signup-otp-field:focus-within .signup-otp-next{border-color:var(--accent-yellow);box-shadow:0 0 0 2px var(--accent-yellow)}
+.signup-otp--error .signup-otp-boxes>span{border-style:dashed}
+.signup-otp--success .signup-otp-boxes>span{background:var(--success-muted);color:var(--success);border-color:var(--success-border);animation:signup-otp-confirm .42s ease both}
+.signup-links{display:flex;gap:.75rem 1.25rem;flex-wrap:wrap}
+.signup-links button:disabled{opacity:.64;cursor:not-allowed}
+.signup-notice{color:var(--ink-soft);font-size:.9rem}
+.signup-notice--success{color:var(--context-ink)}
+@keyframes signup-confirm{from{transform:translateY(2px) scale(.97)}48%{transform:translateY(-3px) scale(1.06)}to{transform:none}}
+@keyframes signup-otp-confirm{from{transform:translateY(2px) scale(.97);background:var(--canvas);color:var(--ink);border-color:var(--line-strong)}48%{transform:translateY(-3px) scale(1.06)}to{transform:none}}
+@media(prefers-reduced-motion:reduce){.signup-badge--success,.signup-otp--success .signup-otp-boxes>span{animation:none}.signup-otp-boxes>span{transition:none}}
