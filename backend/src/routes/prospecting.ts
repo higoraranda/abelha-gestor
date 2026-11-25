@@ -1,6 +1,6 @@
 import { Router, type RequestHandler } from 'express'
 import { db } from '../db'
-import { authMiddleware } from '../middleware/auth'
+import { ownerAuthMiddleware } from '../middleware/auth'
 import { tenantMiddleware } from '../middleware/tenant'
 import { endpoint, mutationGuard } from './personal'
 import { postgresDatabase, type Database } from '../services/platform-db'
@@ -8,7 +8,7 @@ import { InputError, text, uuid, integer, publicUrl, NICHES } from '../services/
 import { SERVICE_TEMPLATES, searchLeads } from '../services/leads'
 import { stagePublicLead, publicLeadInput } from '../services/lead-candidates'
 
-export function createProspectingRouter(sql:Database=postgresDatabase(db),middleware:RequestHandler[]=[authMiddleware,tenantMiddleware]) {
+export function createProspectingRouter(sql:Database=postgresDatabase(db),middleware:RequestHandler[]=[ownerAuthMiddleware,tenantMiddleware]) {
   const router=Router();router.use(...middleware,mutationGuard)
   router.get('/leads/niches',(_req,res)=>res.json(Object.entries(NICHES).map(([id,value])=>({id,label:value.label}))))
   router.post('/leads/search',endpoint(async(req,res)=>{res.json(await searchLeads(req.organizationId!,text(req.body.niche,80),text(req.body.city,100),integer(req.body.limit,1,50)))}))

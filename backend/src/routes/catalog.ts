@@ -1,10 +1,10 @@
 import { Router } from "express"
-import { authMiddleware } from "../middleware/auth"
+import { ownerAuthMiddleware } from "../middleware/auth"
 import { tenantMiddleware } from "../middleware/tenant"
 import { db } from "../db/index"
 
 const router = Router()
-router.use(authMiddleware, tenantMiddleware)
+router.use(ownerAuthMiddleware, tenantMiddleware)
 
 const ITEM_TYPES = new Set(["service", "package", "plan", "addon", "option"])
 

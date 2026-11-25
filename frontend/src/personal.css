@@ -38,3 +38,12 @@
 .skip-link { position:fixed; top:-100px; left:20px; z-index:100; padding:12px; background:var(--accent-yellow); border-radius:12px; color:var(--on-accent); }.skip-link:focus { top:10px; }
 @media(max-width:800px) { .personal-grid { grid-template-columns:1fr; gap:16px; }.personal-row { align-items:flex-start; }.personal-morning { padding:25px; align-items:flex-start; flex-direction:column; }.personal-morning h2 { font-size:25px; }.personal-banner { flex-wrap:wrap; }.lead-search-form { grid-template-columns:1fr; }.personal-facts { grid-template-columns:1fr 1fr; }.personal-row .crm-toolbar { width:100%; }.quick-rail { margin-bottom:env(safe-area-inset-bottom,0px); }.space-switch { margin-left:auto; }.workspace-account { margin-left:0; }.workspace-account .personal-avatar { display:none; } }
 @media(max-width:430px) { .workspace-brand strong { font-size:22px; }.workspace-brand img { width:33px; height:33px; }.space-switch button { padding:8px 10px; min-height:38px; }.workspace-header { gap:9px; }.personal-metrics { grid-template-columns:1fr; } }
+
+.register-fields { display: grid; gap: .9rem; min-width: 0; padding: 0; margin: 1rem 0; border: 0; }
+.register-fields .button { justify-self: start; }
+.register-fields .login-field { min-width: 0; }
+.register-fields input { width: 100%; box-sizing: border-box; }
+.register-fields small { font-size: .82rem; }
+.member-shell { max-width: 880px; margin-inline: auto; padding: clamp(1rem, 4vw, 3rem); }
+.member-shell > header { margin-bottom: clamp(1rem, 4vw, 2.5rem); gap: 1rem; flex-wrap: wrap; }
+.member-shell .personal-section { margin-bottom: 1rem; overflow-wrap: anywhere; }

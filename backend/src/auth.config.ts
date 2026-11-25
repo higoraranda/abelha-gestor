@@ -4,6 +4,7 @@ import type { JWT } from "@auth/core/jwt"
 import type { Session, User } from "@auth/core/types"
 import bcrypt from "bcryptjs"
 import { db } from "./db/index"
+import { canonicalEmail } from "./services/account-email"
 
 // Dependency injection keeps the production configuration unchanged while exercising
 // the real credential flow against an isolated database in compatibility tests.
@@ -16,7 +17,7 @@ export function createAuthConfig(database:typeof db=db,isProduction=process.env.
       },
       authorize: async (credentials) => {
         try {
-          const email = credentials?.email as string
+          const email = canonicalEmail(credentials?.email)
           const password = credentials?.password as string
 
           if (!email || !password) return null
@@ -24,7 +25,7 @@ export function createAuthConfig(database:typeof db=db,isProduction=process.env.
           const users = await database`
             SELECT id, organization_id, name, email, password_hash
             FROM users
-            WHERE email = ${email}
+            WHERE lower(btrim(email)) = ${email}
           `
 
           const user = users[0]
@@ -53,18 +54,20 @@ export function createAuthConfig(database:typeof db=db,isProduction=process.env.
       if (user) {
         token.userId = user.id as string
         token.organizationId = (user as any).organizationId
-        token.role = (user as any).role
       }
       return token
     },
     // Chamado quando o frontend chama GET /api/auth/session
     // Expõe os campos do JWT para o cliente
-    session({ session, token }: { session: Session; token: JWT }) {
-      if (session.user) {
-        const u = session.user as any
-        u.id = token.userId as string
-        u.organizationId = token.organizationId as string
-        u.role = token.role as string
+    async session({ session, token }: { session: Session; token: JWT }) {
+      if (session.user && typeof token.userId === "string" && typeof token.organizationId === "string") {
+        const [account] = await database`
+          SELECT account_role FROM users
+          WHERE id = ${token.userId} AND organization_id = ${token.organizationId}
+        `
+        if (account?.account_role === "owner" || account?.account_role === "member") {
+          Object.assign(session.user,{id:token.userId,organizationId:token.organizationId,role:account.account_role})
+        }
       }
       return session
     },

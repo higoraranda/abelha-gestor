@@ -27,12 +27,13 @@ export async function login(email: string, password: string): Promise<LoginResul
     body: body.toString(),
     credentials: 'include',
   })
-  if (!callbackRes.ok) throw new Error('Email ou senha inválidos')
+  const callback = await callbackRes.json().catch(() => null) as { url?: string } | null
+  if (!callbackRes.ok || !callback?.url || new URL(callback.url, window.location.origin).searchParams.has('error')) throw new Error('Email ou senha inválidos')
 
   const sessionRes = await fetch(`${API_BASE_URL}/api/auth/session`, { credentials: 'include' })
   const session = await sessionRes.json() as { user?: LoginResult['user'] }
 
-  if (!session?.user?.id) throw new Error('Email ou senha inválidos')
+  if (!session?.user?.id || session.user.email.trim().toLowerCase() !== email.trim().toLowerCase()) throw new Error('Email ou senha inválidos')
 
   return { user: session.user }
 }
@@ -49,7 +50,7 @@ export async function getSession(signal?: AbortSignal): Promise<LoginResult['use
 export async function logout(): Promise<void> {
   const csrfRes = await fetch(`${API_BASE_URL}/api/auth/csrf`, { credentials: 'include' })
   const { csrfToken } = await csrfRes.json() as { csrfToken: string }
-  await fetch(`${API_BASE_URL}/api/auth/signout`, {
+  const response = await fetch(`${API_BASE_URL}/api/auth/signout`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -58,4 +59,5 @@ export async function logout(): Promise<void> {
     body: new URLSearchParams({ csrfToken, redirect: 'false' }).toString(),
     credentials: 'include',
   })
+  if (!response.ok) throw new Error('Não foi possível sair da conta.')
 }

@@ -1,12 +1,12 @@
 import { Router } from "express"
-import { authMiddleware } from "../middleware/auth"
+import { ownerAuthMiddleware } from "../middleware/auth"
 import { tenantMiddleware } from "../middleware/tenant"
 import { addClient, removeClient } from "../services/sseManager"
 
 const router = Router()
 
 // GET /api/events — stream SSE por organização
-router.get("/", authMiddleware, tenantMiddleware, (req, res) => {
+router.get("/", ownerAuthMiddleware, tenantMiddleware, (req, res) => {
   const orgId = req.organizationId!
 
   res.setHeader("Content-Type", "text/event-stream")

@@ -14,6 +14,8 @@ import financeRouter from "./routes/finance"
 import webhooksRouter from "./routes/webhooks"
 import crmRouter from "./routes/crm"
 import { createPersonalRouter } from "./routes/personal"
+import { createAccountRouter } from "./routes/account"
+import { createQuoteModelsRouter } from "./routes/quote-models"
 import { createProspectingRouter } from "./routes/prospecting"
 import { createIntegrationsRouter, githubJsonParser } from "./routes/integrations"
 
@@ -33,6 +35,8 @@ app.use(express.urlencoded({ extended: true }))
 app.use("/api/v1", (_req, res, next) => { res.set("Cache-Control", "no-store"); next() })
 
 app.use("/api/auth/*", ExpressAuth(authConfig))
+app.use("/api/v1/account", createAccountRouter())
+app.use("/api/v1/quote-models", createQuoteModelsRouter())
 
 app.use("/api/v1/conversations", conversationsRouter)
 app.use("/api/v1/messages", messagesRouter)

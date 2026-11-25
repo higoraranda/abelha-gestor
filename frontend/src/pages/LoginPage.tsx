@@ -50,7 +50,7 @@ export default function LoginPage() {
           <div>
             <p className="eyebrow">Área privada</p>
             <h2>Entre no Abelha</h2>
-            <p className="login-helper">Use seu email e senha cadastrados no CRM.</p>
+            <p className="login-helper">Use o email e a senha da sua conta.</p>
           </div>
 
           <label className="login-field">

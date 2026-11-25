@@ -36,7 +36,12 @@ export async function notice(sql:Database,owner:Scope,key:string,title:string,de
   await sql.query('INSERT INTO personal_notifications(organization_id,user_id,event_key,title,detail,url) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(organization_id,user_id,event_key) DO NOTHING',[owner.org,owner.user,key,title,detail,safePersonalUrl(url)])
 }
 export function createPersonalRouter(sql:Database=postgresDatabase(db),middleware:RequestHandler[]=[authMiddleware,tenantMiddleware]) {
-  const router=Router(); router.use(...middleware,mutationGuard,ownerMiddleware(sql))
+  const router=Router(); router.use(...middleware,mutationGuard,(req,res,next)=>{
+    if(req.user?.role!=='member')return next()
+    if(req.path==='/projects' && req.method==='GET')return next()
+    if(req.path==='/projects' && req.method==='POST' && req.body && Object.keys(req.body).every(key=>key==='name'||key==='next_step'))return next()
+    res.status(403).json({error:'Recurso não disponível nesta conta.'})
+  },ownerMiddleware(sql))
   router.get('/preferences',endpoint(async(_req,res)=>{
     const {org,user}=scope(res)
     const [preferences]=await sql.query('SELECT morning_time,weekly_time,timezone FROM personal_preferences WHERE organization_id=$1 AND user_id=$2',[org,user])

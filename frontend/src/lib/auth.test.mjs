@@ -9,7 +9,7 @@ const originModule = 'data:text/javascript,' + encodeURIComponent('export const 
 const compiled = ts.transpileModule(source, {
   compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
 }).outputText.replace(/(['"])@\/lib\/apiBase\1/, JSON.stringify(originModule))
-const { getSession } = await import('data:text/javascript;base64,' + Buffer.from(compiled).toString('base64'))
+const { getSession, login } = await import('data:text/javascript;base64,' + Buffer.from(compiled).toString('base64'))
 
 test('an anonymous Auth.js null session reaches the login flow without throwing', async (t) => {
   t.mock.method(globalThis, 'fetch', async (url, options) => {
@@ -49,4 +49,26 @@ test('startup cancellation aborts the actual session request', async (t) => {
   controller.abort()
   assert.equal(requestSignal.aborted, true)
   await assert.rejects(pending, { name: 'AbortError' })
+})
+
+test('login rejects wrong account even if a previous session still exists', async (t) => {
+  const original = globalThis.window
+  globalThis.window = { location: { origin: 'http://127.0.0.1' } }
+  t.after(() => { if (original === undefined) delete globalThis.window; else globalThis.window = original })
+  const responses = [
+    Response.json({csrfToken:'synthetic'}),
+    Response.json({url:'http://127.0.0.1/'}),
+    Response.json({user:{id:'old-owner',email:'owner@example.invalid'}}),
+  ]
+  t.mock.method(globalThis,'fetch',async()=>responses.shift())
+  await assert.rejects(login('guest@example.invalid','synthetic password'),/Email ou senha/)
+})
+
+test('login rejects an Auth.js callback error even with HTTP 200', async (t) => {
+  const original = globalThis.window
+  globalThis.window = { location: { origin: 'http://127.0.0.1' } }
+  t.after(() => { if (original === undefined) delete globalThis.window; else globalThis.window = original })
+  const responses = [Response.json({csrfToken:'synthetic'}),Response.json({url:'/api/auth/error?error=CredentialsSignin'})]
+  t.mock.method(globalThis,'fetch',async()=>responses.shift())
+  await assert.rejects(login('guest@example.invalid','synthetic password'),/Email ou senha/)
 })

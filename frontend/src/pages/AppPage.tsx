@@ -12,6 +12,7 @@ import { usePwa } from '@/hooks/usePwa'
 import type { PersonalNotice } from '@/types/personal'
 import { PersonalNotifications, PersonalSettings } from '@/components/personal/PersonalSettings'
 import PersonalHome from './personal/PersonalHome'
+import AccountInvites from '@/components/personal/AccountInvites'
 import PersonalProjects from './personal/PersonalProjects'
 import PersonalFinance from './personal/PersonalFinance'
 import PersonalSubscriptions from './personal/PersonalSubscriptions'
@@ -19,6 +20,7 @@ import PersonalPrices from './personal/PersonalPrices'
 import PersonalReview from './personal/PersonalReview'
 import LeadsPage from './LeadsPage'
 import TemplatesPage from './TemplatesPage'
+import QuoteModelsPage from './QuoteModelsPage'
 import { api } from '@/lib/api'
 import { SearchPanel, NotificationsPanel, ExportPanel } from '@/components/layout/GlobalPanels'
 import { ErrorState, LoadingState } from '@/components/ui/DataState'
@@ -35,6 +37,7 @@ export default function AppPage() {
   const navigate=useNavigate();const [params,setParams]=useSearchParams();const clearAuth=useAuthStore(state=>state.clearAuth)
   const {space,view}=resolveNavigation(params.get('space'),params.get('view'));const record=params.get('record')||undefined;const contract=params.get('contract')||undefined
   const pwa=usePwa()
+  const isOwner=useAuthStore(state=>state.user?.role==='owner')
   const [panel,setPanel]=useState<'search'|'notifications'|'export'|null>(null);const [showClient,setShowClient]=useState(false)
   const clients=useRemote<Client[]>(view==='agenda'?'/api/v1/clients?limit=100':null);const reminders=useRemote<Reminder[]>(view==='agenda'?'/api/v1/reminders':null);const notices=useRemote<Notice[]>(space==='crm'?'/api/v1/crm/notifications':null)
   const personalNotices=useRemote<PersonalNotice[]>(space==='personal'?'/api/v1/personal/notifications':null)
@@ -54,9 +57,10 @@ export default function AppPage() {
   else if(view==='personal-subscriptions')content=<PersonalSubscriptions/>
   else if(view==='personal-prices')content=<PersonalPrices focusId={record} onClear={()=>open('personal-prices')}/>
   else if(view==='personal-review')content=<PersonalReview onProject={id=>open('personal-projects',id)}/>
-  else if(view==='personal-settings')content=<PersonalSettings pwa={pwa}/>
+  else if(view==='personal-settings')content=<><PersonalSettings pwa={pwa}/>{isOwner&&<AccountInvites/>}</>
   else if(view==='leads')content=<LeadsPage onClient={id=>open('clients',id)}/>
   else if(view==='templates')content=<TemplatesPage/>
+  else if(view==='quote-models')content=<QuoteModelsPage key={view}/>
   else if(view==='overview')content=<DashboardPage onNewClient={()=>setShowClient(true)} onOpenClients={id=>open('clients',id)} onOpenFinance={()=>open('finance')} onOpenReminders={()=>open('agenda')}/>
   else if(view==='clients')content=<ClientsPage key={record} focusId={record} onOpenTasks={id=>open('deliveries',undefined,id)}/>
   else if(view==='deliveries')content=<TasksPage key={(record||'')+(contract||'')} focusId={record} contractId={contract}/>

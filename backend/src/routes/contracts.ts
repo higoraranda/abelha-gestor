@@ -1,12 +1,12 @@
 import { Router } from "express"
-import { authMiddleware } from "../middleware/auth"
+import { ownerAuthMiddleware } from "../middleware/auth"
 import { tenantMiddleware } from "../middleware/tenant"
 import { db } from "../db/index"
 import { buildContractSchedule } from "../services/contracts"
 import { mapContract, resolveContractInput } from "../services/contract-store"
 
 const router = Router()
-router.use(authMiddleware, tenantMiddleware)
+router.use(ownerAuthMiddleware, tenantMiddleware)
 
 const STRUCTURE_FIELDS = new Set([
   "catalogItemId", "serviceName", "grossAmount", "paymentMethod", "monthlyFee", "monthlyDueDay",

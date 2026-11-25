@@ -1,6 +1,6 @@
 import { Router, Request, Response, RequestHandler } from 'express'
 import { db } from '../db/index'
-import { authMiddleware } from '../middleware/auth'
+import { ownerAuthMiddleware } from '../middleware/auth'
 import { tenantMiddleware } from '../middleware/tenant'
 import { insertContract } from '../services/contract-store'
 import { transitionTask, probability, weightedValue, businessDay, notificationItems, EXPORT_FIELDS, exportBusinessRows, csvCell } from '../services/crm'
@@ -11,7 +11,7 @@ function text(value:unknown,max=240):string { const result=String(value ?? '').t
 function date(value:unknown,optional=false):string|null { if (!value && optional) return null; const result=String(value || ''); if (!/^\d{4}-\d{2}-\d{2}$/.test(result) || !Number.isFinite(Date.parse(result+'T00:00:00Z')) || new Date(result+'T00:00:00Z').toISOString().slice(0,10)!==result) throw new HttpError(400,'Data inválida'); return result }
 function amount(value:unknown):number { const result=Number(value); if (!Number.isFinite(result) || result<=0 || result>9999999999.99) throw new HttpError(400,'Informe um valor positivo válido'); return Math.round(result*100)/100 }
 function pagination(req:Request) { return {limit:Math.min(100,Math.max(1,Number(req.query.limit)||50)),offset:(Math.max(1,Number(req.query.page)||1)-1)*Math.min(100,Math.max(1,Number(req.query.limit)||50))} }
-export function createCrmRouter(sql:any=db,middleware:RequestHandler[]=[authMiddleware,tenantMiddleware]) {
+export function createCrmRouter(sql:any=db,middleware:RequestHandler[]=[ownerAuthMiddleware,tenantMiddleware]) {
   const router=Router(); router.use(...middleware)
   const endpoint=(handler:(req:Request,res:Response)=>Promise<unknown>):RequestHandler => (req,res)=> { void handler(req,res).catch((error:any)=>{
     if (error instanceof HttpError) { res.status(error.status).json({error:error.message}); return }

@@ -1,12 +1,12 @@
 import { Router } from "express"
-import { authMiddleware } from "../middleware/auth"
+import { ownerAuthMiddleware } from "../middleware/auth"
 import { tenantMiddleware } from "../middleware/tenant"
 import { db } from "../db/index"
 import { businessDay } from "../services/crm"
 import { mapReceivable } from "../services/contract-store"
 
 const router = Router()
-router.use(authMiddleware, tenantMiddleware)
+router.use(ownerAuthMiddleware, tenantMiddleware)
 
 const EXPENSE_CATEGORIES = new Set(["subscriptions", "ads", "tools", "taxes", "services", "infrastructure", "other"])
 

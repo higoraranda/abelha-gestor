@@ -1,12 +1,12 @@
 import { Router } from "express"
-import { authMiddleware } from "../middleware/auth"
+import { ownerAuthMiddleware } from "../middleware/auth"
 import { tenantMiddleware } from "../middleware/tenant"
 import { db } from "../db/index"
 import { sendText } from "../services/evolutionApi"
 import { emit } from "../services/sseManager"
 
 const router = Router()
-router.use(authMiddleware, tenantMiddleware)
+router.use(ownerAuthMiddleware, tenantMiddleware)
 
 // POST /api/v1/messages
 router.post("/", async (req, res) => {

@@ -19,16 +19,16 @@ test('production auth preserves credential login, CSRF, secure cookies, legacy s
   const legacy=JSON.parse(fs.readFileSync('src/services/fixtures/auth-v035-session.json','utf8'))
   process.env.AUTH_SECRET=legacy.secret;process.env.AUTH_URL='https://abelha.example';process.env.NODE_ENV='production'
   const {createAuthConfig,authConfig}=await import('../auth.config');authConfig.logger={error(){},warn(){},debug(){}}
-  const {authMiddleware}=await import('../middleware/auth')
+  const {createAuthMiddleware}=await import('../middleware/auth')
   const {tenantMiddleware}=await import('../middleware/tenant')
   const pg=new PGlite();let wire:PGLiteSocketServer|undefined;let sql:ReturnType<typeof postgres>|undefined;let server:ReturnType<express.Express['listen']>|undefined
   try {
-    await pg.exec('CREATE TABLE users(id uuid primary key,organization_id uuid,name text,email text,password_hash text)')
-    await pg.query('INSERT INTO users VALUES($1,$2,$3,$4,$5)',[legacy.payload.userId,legacy.payload.organizationId,'Synthetic auth user','synthetic@example.invalid',await bcrypt.hash('synthetic-password',4)])
+    await pg.exec('CREATE TABLE users(id uuid primary key,organization_id uuid,name text,email text,password_hash text, account_role text NOT NULL)')
+    await pg.query('INSERT INTO users VALUES($1,$2,$3,$4,$5,$6)',[legacy.payload.userId,legacy.payload.organizationId,'Synthetic auth user','synthetic@example.invalid',await bcrypt.hash('synthetic-password',4),'owner'])
     wire=new PGLiteSocketServer({db:pg,host:'127.0.0.1',port:0});await wire.start();sql=postgres('postgresql://postgres:postgres@'+wire.getServerConn()+'/postgres',{ssl:false,max:1})
     const config=createAuthConfig(sql,true);config.logger={error(){},warn(){},debug(){}}
     const app=express();app.use(express.json());app.use(express.urlencoded({extended:true}));app.use('/api/auth/*',ExpressAuth(config))
-    app.get('/protected',authMiddleware,tenantMiddleware,(req,res)=>res.json({id:req.user?.userId,organizationId:req.organizationId}))
+    app.get('/protected',createAuthMiddleware(config,sql),tenantMiddleware,(req,res)=>res.json({id:req.user?.userId,organizationId:req.organizationId}))
     server=app.listen(0,'127.0.0.1');await new Promise<void>(resolve=>server!.once('listening',resolve));const base='http://127.0.0.1:'+(server.address() as any).port
     const jar=new Map<string,string>()
     async function request(path:string,body?:Record<string,string>,cookies=jar){
