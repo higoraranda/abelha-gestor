@@ -256,30 +256,32 @@ async function startScreencast(context, page) {
       } finally { await s.context.close() }
     })
 
-    await record('reduced motion: explicit explanation, opt-in flight, device changes and fast accessible finish', async () => {
-      const s = await scenario({ reducedMotion: 'reduce' })
+    await record('automatic motion: no flight button, mobile and desktop, gentler reduced-motion variant', async () => {
+      const noToggle = page => page.getByRole('button', { name: /Ativar voo|Pausar voo/ }).count()
+      for (const width of [390, 1440]) {
+        const s = await scenario({ width })
+        try {
+          const { page } = s
+          assert.equal(await noToggle(page), 0)
+          await page.waitForFunction(() => document.querySelector('.bee-loader__bee').getAnimations().some(a => Number(a.currentTime) > 100))
+          await page.emulateMedia({ reducedMotion: 'reduce' })
+          await page.locator('.bee-loader[data-motion=reduced]').waitFor()
+          await page.waitForFunction(() => document.querySelector('.bee-loader__bee').getAnimations().length === 0)
+          await page.waitForFunction(() => document.querySelector('.bee-loader__bee img').getAnimations().some(a => Number(a.currentTime) > 100))
+          assert.equal(await noToggle(page), 0)
+          assert.equal(await page.locator('.bee-loader__bee img').evaluate(el => getComputedStyle(el).transform), 'none')
+          assert.deepEqual(s.errors, [])
+        } finally { await s.context.close() }
+      }
+      const reduced = await scenario({ reducedMotion: 'reduce' })
       try {
-        await s.page.getByText('Movimento reduzido no dispositivo.').waitFor()
-        assert.equal(await s.page.locator('.bee-loader__bee').evaluate(el => el.getAnimations().length), 0)
-        await s.page.getByRole('button', { name: 'Ativar voo' }).click()
-        await s.page.waitForTimeout(300)
-        assert.equal(await s.page.locator('.bee-loader__bee').evaluate(el => el.getAnimations().length), 1)
-        await s.page.getByRole('button', { name: 'Pausar voo' }).click()
-        const first = await s.page.locator('.bee-loader__bee').evaluate(el => getComputedStyle(el).transform)
-        await s.page.waitForTimeout(200)
-        assert.equal(await s.page.locator('.bee-loader__bee').evaluate(el => getComputedStyle(el).transform), first)
-        s.health.mode = 'ready'
-        await s.page.locator('.login-form').waitFor()
-        assert.deepEqual(s.errors, [])
-      } finally { await s.context.close() }
-      const dynamic = await scenario()
-      try {
-        await dynamic.page.emulateMedia({ reducedMotion: 'reduce' })
-        await dynamic.page.getByText('Movimento reduzido no dispositivo.').waitFor()
-        assert.equal(await dynamic.page.locator('.bee-loader__bee').evaluate(el => el.getAnimations().length), 0)
-        await dynamic.page.emulateMedia({ reducedMotion: 'no-preference' })
-        await dynamic.page.waitForFunction(() => document.querySelector('.bee-loader__bee').getAnimations().length === 1)
-      } finally { await dynamic.context.close() }
+        await reduced.page.locator('.bee-loader[data-motion=reduced]').waitFor()
+        assert.equal(await noToggle(reduced.page), 0)
+        await reduced.page.waitForFunction(() => document.querySelector('.bee-loader__bee img').getAnimations().length === 1)
+        reduced.health.mode = 'ready'
+        await reduced.page.locator('.login-form').waitFor()
+        assert.deepEqual(reduced.errors, [])
+      } finally { await reduced.context.close() }
     })
 
     await record('essential asset: failed image blocks completion and retry recovers without repeating successful health', async () => {

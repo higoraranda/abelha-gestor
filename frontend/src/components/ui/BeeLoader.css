@@ -32,12 +32,17 @@
 .bee-loader__status p { max-width: 350px; margin: 0 auto; color: var(--ink-soft); font-size: 14px; line-height: 1.65; }
 .bee-loader__recovery { display: flex; justify-content: center; min-height: 44px; margin-top: 12px; }
 .bee-loader__recovery button { min-height: 44px; cursor: pointer; }
-.bee-loader__motion { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 2px 10px; min-height: 44px; margin-top: 4px; color: var(--ink-faint); font-size: 12px; }
-.bee-loader__motion button { min-height: 44px; padding: 0 8px; border: 0; border-radius: var(--radius-control); background: transparent; color: var(--ink-soft); font: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
-.bee-loader__motion button:hover { color: var(--ink); background: var(--surface); }
-.bee-loader__motion button:active { background: var(--card-surface); }
-.bee-loader__recovery button:focus-visible, .bee-loader__motion button:focus-visible { outline: 2px solid var(--accent-yellow); outline-offset: 4px; }
+.bee-loader__recovery button:focus-visible { outline: 2px solid var(--accent-yellow); outline-offset: 4px; }
 .bee-loader-app { animation: bee-loader-in 180ms ease both; }
 @keyframes bee-loader-in { from { opacity: 0; } to { opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .bee-loader-app { animation: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .bee-loader-app { animation: none; }
+  .bee-loader[data-state="loading"][data-motion="reduced"] .bee-loader__bee img {
+    animation: bee-loader-breathe 2s ease-in-out infinite alternate;
+    /* Keep only this non-positional loading signal under the global motion reset. */
+    animation-duration: 2s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
+@keyframes bee-loader-breathe { from { opacity: 1; } to { opacity: .76; } }
 @media (max-height: 650px) { .bee-loader { padding-block: 20px; } .bee-loader__scene { margin-block: 8px 12px; } }

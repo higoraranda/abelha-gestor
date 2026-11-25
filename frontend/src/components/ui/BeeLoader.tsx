@@ -49,9 +49,8 @@ export default function BeeLoader({ children, healthUrl = `${API_BASE_URL}/api/v
   const [imageReady, setImageReady] = useState(false)
   const [imageError, setImageError] = useState(false)
   const [imageAttempt, setImageAttempt] = useState(0)
-  const [motionOverride, setMotionOverride] = useState<boolean | null>(null)
   const reduced = useSyncExternalStore(subscribeMotion, reducedSnapshot, () => true)
-  const flying = motionOverride ?? !reduced
+  const flying = !reduced
   const state: 'loading' | 'finishing' | 'done' = done ? 'done' : backend.ready && imageReady ? 'finishing' : 'loading'
   const beeRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<HTMLDivElement>(null)
@@ -161,12 +160,7 @@ export default function BeeLoader({ children, healthUrl = `${API_BASE_URL}/api/v
         <div className="bee-loader__recovery">
           {state === 'loading' && (error || backend.slow || backend.offline) && <button className="button button-secondary" type="button" onClick={retry}>Tentar novamente</button>}
         </div>
-        <div className="bee-loader__motion">
-          {state === 'loading' && <>
-            {reduced && motionOverride === null && <span>Movimento reduzido no dispositivo.</span>}
-            <button type="button" aria-pressed={flying} onClick={() => setMotionOverride(!flying)}>{flying ? 'Pausar voo' : 'Ativar voo'}</button>
-          </>}
-        </div>
+
       </div>
     </main>
   )
