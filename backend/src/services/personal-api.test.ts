@@ -13,6 +13,7 @@ import { createHmac } from 'node:crypto'
 import webpush from 'web-push'
 import { sendPendingPush, weeklyReview, automationTick } from './personal-automation'
 import vm from 'node:vm'
+import { spawn } from 'node:child_process'
 import {homologationFixture} from '../integration/homologation-fixture'
 
 function workflowNode(key:string,name:string,json:any,extra:Record<string,unknown>={}) {
@@ -41,6 +42,29 @@ test('Personal API isolates users, validates mutations and keeps reports pending
     assert.equal((await request('/projects/'+project.body.id,'GET',undefined,other)).status,404)
     const milestone=await request('/projects/'+project.body.id+'/milestones','POST',{title:'Backend',acceptance:'Testes verdes e revisão'});assert.equal(milestone.status,201)
     assert.equal((await request('/projects')).body[0].current_milestone,'Backend')
+    const projectPath='/projects/'+project.body.id
+    assert.equal((await request(projectPath,'PATCH',{status:'active',next_step:'Revisar testes',blockers:'Aguardando revisão'})).status,200)
+    assert.equal((await request(projectPath,'PATCH',{status:'paused'},other)).status,404)
+    assert.equal((await request(projectPath,'PATCH',{status:'imaginary'})).status,400)
+    assert.equal((await request(projectPath,'PATCH',{status:'done'})).status,400)
+    const stage=await request(projectPath,'PATCH',{status:'paused'})
+    assert.equal(stage.status,200)
+    assert.equal(stage.body.status,'paused')
+    assert.equal(stage.body.next_step,'Revisar testes')
+    assert.equal(stage.body.blockers,'Aguardando revisão')
+    await pg.exec(readFileSync('src/db/migrations/20261127_project_pipeline.sql','utf8'))
+    assert.equal((await request(projectPath)).body.project.pipeline_stage,null)
+    assert.equal((await request(projectPath+'/pipeline','PATCH',{stage:'testing',expected_stage:null},other)).status,404)
+    assert.equal((await request(projectPath+'/pipeline','PATCH',{stage:'completed',expected_stage:null})).status,400)
+    const pipeline=await request(projectPath+'/pipeline','PATCH',{stage:'testing',expected_stage:null})
+    assert.equal(pipeline.status,200)
+    assert.equal(pipeline.body.status,'paused')
+    assert.equal(pipeline.body.blockers,'Aguardando revisão')
+    assert.equal((await request(projectPath+'/pipeline','PATCH',{stage:'production',expected_stage:null})).status,409)
+    assert.equal((await request(projectPath+'/links','PATCH',{development:'http://example.invalid',staging:'',production:''})).status,400)
+    assert.equal((await request(projectPath+'/links','PATCH',{development:'https://example.invalid/dev',staging:'',production:''})).status,200)
+    assert.equal((await request(projectPath)).body.project.pipeline_links.development,'https://example.invalid/dev')
+    assert.equal((await request('/projects')).body[0].latest_update_kind,'decision')
     const report={schema_version:1,event_id:'run-123',summary:'Backend validado',commit:'a'.repeat(40),tests:[{name:'API',command:'node --test',result:'passed',evidence_url:'https://github.com/example/project/actions/runs/123'}],acceptance:['Testes verdes'],next_step:'Revisar',blockers:[]}
     const receipt=await request('/projects/'+project.body.id+'/reports','POST',report);assert.equal(receipt.status,201);assert.equal(receipt.body.report.commit,'a'.repeat(40),'postgres.js must persist a JSON object, not a JSON string')
     const replay=await request('/projects/'+project.body.id+'/reports','POST',report);assert.equal(replay.body.id,receipt.body.id)
@@ -75,6 +99,55 @@ test('Personal API isolates users, validates mutations and keeps reports pending
     await database.query("UPDATE personal_price_watches SET last_checked_at=now()-interval '61 minutes' WHERE id=$1",[watch.body.id]);assert.equal((await due()).some(row=>row.id===watch.body.id),true,'Individual monitor interval belongs to the backend, not every scheduler tick')
     async function integration(path:string,body:any,token=process.env.ABELHA_INTEGRATION_TOKEN){const response=await fetch(`http://127.0.0.1:${port}/api/v1/integrations${path}`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify(body)});const raw=await response.text();return {status:response.status,body:response.headers.get('content-type')?.includes('application/json')?JSON.parse(raw):raw}}
     assert.equal((await integration('/tick',{},'bad-token')).status,401)
+    assert.equal((await integration('/codex/report',report)).status,503)
+    process.env.ABELHA_CODEX_REPORT_TOKEN='synthetic-dedicated-report-token-only'
+    process.env.ABELHA_CODEX_PROJECT_ID=project.body.id
+    assert.equal((await integration('/codex/report',report)).status,401)
+    assert.equal((await integration('/tick',{},process.env.ABELHA_CODEX_REPORT_TOKEN)).status,401)
+    const codex=await integration('/codex/report',report,process.env.ABELHA_CODEX_REPORT_TOKEN)
+    assert.equal(codex.status,201)
+    assert.deepEqual(codex.body,{report_id:receipt.body.id,status:'pending_review'})
+    const mcp=spawn(process.execPath,['scripts/abelha-project-mcp.cjs'],{
+      stdio:['pipe','pipe','pipe'],windowsHide:true,
+      env:{...process.env,ABELHA_CODEX_ORIGIN:'http://127.0.0.1:'+port,ABELHA_CODEX_ALLOW_LOOPBACK:'true'},
+    })
+    const records=await new Promise<any[]>((resolve,reject)=>{
+      let output=''
+      const timer=setTimeout(()=>{mcp.kill();reject(new Error('MCP fixture timeout'))},12000)
+      mcp.stdout.on('data',chunk=>{output+=chunk})
+      mcp.once('error',error=>{clearTimeout(timer);reject(error)})
+      mcp.once('close',code=>{
+        clearTimeout(timer)
+        try{assert.equal(code,0);resolve(output.trim().split('\n').map(line=>JSON.parse(line)))}catch(error){reject(error)}
+      })
+      const requests=[
+        {id:1,method:'initialize',params:{protocolVersion:'2025-11-25'}},
+        {method:'notifications/initialized'},
+        {id:2,method:'tools/list'},
+        {id:3,method:'tools/call',params:{name:'abelha_entregar_relatorio',arguments:{report}}},
+      ]
+      mcp.stdin.end(requests.map(request=>JSON.stringify({jsonrpc:'2.0',...request})).join('\n')+'\n')
+    })
+    assert.equal(records.find(x=>x.id===1).result.protocolVersion,'2025-11-25')
+    assert.equal(records.find(x=>x.id===2).result.tools.length,2)
+    assert.deepEqual(JSON.parse(records.find(x=>x.id===3).result.content[0].text),codex.body)
+    const second=await request('/projects','POST',{name:'Segundo projeto sintético',repository:'https://github.com/example/second'})
+    assert.equal(second.status,201)
+    process.env.ABELHA_CODEX_PROJECTS_JSON=JSON.stringify([{id:project.body.id,repository:'https://github.com/example/project'},{id:second.body.id,repository:'https://github.com/example/second'}])
+    const listed=await fetch('http://127.0.0.1:'+port+'/api/v1/integrations/codex/projects',{headers:{Authorization:'Bearer '+process.env.ABELHA_CODEX_REPORT_TOKEN}})
+    assert.equal(listed.status,200)
+    assert.deepEqual((await listed.json()).projects.map((p:any)=>p.repository).sort(),['https://github.com/example/project','https://github.com/example/second'])
+    assert.equal((await integration('/codex/report',report,process.env.ABELHA_CODEX_REPORT_TOKEN)).status,400)
+    const envelope={project:{id:second.body.id,repository:'https://github.com/example/second'},report:{...report,tests:report.tests.map(item=>({...item,evidence_url:item.evidence_url.replace('/example/project/','/example/second/')}))}}
+    const secondReceipt=await integration('/codex/report',envelope,process.env.ABELHA_CODEX_REPORT_TOKEN)
+    assert.equal(secondReceipt.status,201)
+    const duplicates=await Promise.all([integration('/codex/report',envelope,process.env.ABELHA_CODEX_REPORT_TOKEN),integration('/codex/report',envelope,process.env.ABELHA_CODEX_REPORT_TOKEN)])
+    assert.ok(duplicates.every(duplicate=>duplicate.body.report_id===secondReceipt.body.report_id))
+    assert.equal((await integration('/codex/report',{...envelope,project:{id:second.body.id,repository:'https://github.com/example/project'}},process.env.ABELHA_CODEX_REPORT_TOKEN)).status,404)
+    assert.equal((await integration('/codex/report',{...envelope,project:{id:'33333333-3333-4333-8333-333333333333'}},process.env.ABELHA_CODEX_REPORT_TOKEN)).status,404)
+    delete process.env.ABELHA_CODEX_REPORT_TOKEN
+    delete process.env.ABELHA_CODEX_PROJECT_ID
+    delete process.env.ABELHA_CODEX_PROJECTS_JSON
     const observation=workflowNode('price-monitor','Validar cotação real',{statusCode:200,body:{event_id:'obs-1',store:'Loja teste',product_url:'https://shop.example/product',price:100,currency:'BRL',observed_at:new Date().toISOString()}},{$:()=>({item:{json:{watch_id:watch.body.id,product_url:'https://shop.example/product'}}})}).json
     const firstPrice=await integration('/prices/'+watch.body.id+'/observations',observation);assert.equal(firstPrice.status,201,JSON.stringify(firstPrice.body))
     assert.equal((await integration('/prices/'+watch.body.id+'/observations',observation)).body.id,firstPrice.body.id)

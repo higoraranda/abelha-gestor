@@ -30,11 +30,20 @@ test('price alert detects real drops and target crossings without alerts on unch
   assert.equal(priceAlert(80,80,100).notify,false)
   assert.equal(priceAlert(null,100,100).notify,true)
 })
-test('Overpass query escapes city input and enforces supported niches and bounded results', () => {
+test('Overpass supports free text, Portuguese categories and optional state without interpolating operators', () => {
   assert.match(overpassQuery('dentists','Campinas',30), /dentist/)
-  assert.throws(()=>overpassQuery('anything','Campinas',30))
+  assert.match(overpassQuery('CLÍNICAS ODONTOLÓGICAS','campinas',30), /dentist/)
+  assert.match(overpassQuery('Padaria','Campinas, sp',30), /"shop"="bakery"/)
+  const custom=overpassQuery('Ar Condicionado & Cia','São Paulo, SP',30)
+  assert.match(custom, /"ISO3166-2"="BR-SP"/)
+  assert.match(custom, /\[~"\^\(name\|brand\|description\|/)
+  assert.match(custom, /\.city out ids 2;/)
+  assert.match(custom, /out tags 30;/)
+  assert.throws(()=>overpassQuery('".*";out','Campinas',30))
   assert.throws(()=>overpassQuery('dentists','Campinas',1000))
   assert.throws(()=>overpassQuery('dentists','Campinas";out;',30))
+  assert.throws(()=>overpassQuery('dentists','Campinas, ZZ',30))
+  assert.throws(()=>overpassQuery('  ','Campinas',30))
 })
 test('personal recurrence preserves its original billing day after a short month',()=>{
   assert.equal(nextRecurringDate('2026-01-31','monthly',31),'2026-02-28')

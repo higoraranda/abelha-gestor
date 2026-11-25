@@ -5,7 +5,7 @@ import { useRemote } from '@/hooks/useRemote'
 import { useAuthStore } from '@/store/auth'
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/DataState'
 import { emptyModel, example, modelingPrompt, scaled, type QuoteModel, type QuoteLine, type SavedModel, type Quote } from '@/lib/quoteModels'
-import './QuoteModelsPage.css'
+import QuoteProposals, { type QuoteSimulation } from './QuoteProposals'
 
 const endpoint='/api/v1/quote-models'
 const money=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'})
@@ -37,11 +37,12 @@ function Summary({quote}:{quote:Quote}){
 
 export default function QuoteModelsPage(){
   const userId=useAuthStore(state=>state.user?.id)
+  const isOwner=useAuthStore(state=>state.user?.role==='owner')
   const remote=useRemote<SavedModel[]>(userId?endpoint:null)
   const [editor,setEditor]=useState<Draft|null>(null)
   const [selected,setSelected]=useState<Revision|null>(null)
   const [quantities,setQuantities]=useState<Record<string,string>>({})
-  const [quote,setQuote]=useState<Quote|null>(null)
+  const [simulation,setSimulation]=useState<QuoteSimulation|null>(null)
   const [importText,setImportText]=useState('')
   const [copyFallback,setCopyFallback]=useState(false)
   const [busy,setBusy]=useState('')
@@ -51,10 +52,10 @@ export default function QuoteModelsPage(){
   const working=useRef(false)
 
   function open(model:QuoteModel,saved:Revision|null=null){
-    setSelected(saved);setEditor(asDraft(model));setQuantities({});setQuote(null);setError('');setStatus('')
+    setSelected(saved);setEditor(asDraft(model));setQuantities({});setSimulation(null);setError('');setStatus('')
     window.requestAnimationFrame(()=>editorHeading.current?.focus())
   }
-  function update(values:Partial<Draft>){setEditor(current=>current?{...current,...values}:current);setQuote(null)}
+  function update(values:Partial<Draft>){setEditor(current=>current?{...current,...values}:current);setSimulation(null)}
   function changeLine(id:string,values:Partial<LineDraft>){
     if(editor)update({lines:editor.lines.map(line=>line.id===id?{...line,...values}:line)})
     if('unit' in values)setQuantities(current=>({...current,[id]:''}))
@@ -70,7 +71,8 @@ export default function QuoteModelsPage(){
     if(!editor)return
     void run('calculando',async()=>{
       const values=Object.fromEntries(editor.lines.map(line=>[line.id,scaled(quantities[line.id]??'',3,line.label||'Quantidade')]))
-      setQuote((await preview(asModel(editor),values)).quote)
+      const result=await preview(asModel(editor),values)
+      setSimulation({...result,quantities:values})
     })
   }
   function save(event:React.FormEvent<HTMLFormElement>){
@@ -89,7 +91,7 @@ export default function QuoteModelsPage(){
       let value:unknown
       try{value=JSON.parse(importText)}catch{throw new Error('JSON inválido. Cole somente o conteúdo do modelo, sem as marcações do chat.')}
       const result=await preview(value)
-      open(result.model);setQuote(result.quote);setStatus('Prévia aberta como novo modelo. Confira os valores e salve para confirmar.')
+      open(result.model);setSimulation({...result,quantities:{}});setStatus('Prévia aberta como novo modelo. Confira os valores e salve para confirmar.')
     })
   }
   function readFile(file?:File){
@@ -151,11 +153,12 @@ export default function QuoteModelsPage(){
       </section><section className="crm-panel personal-section">
         <h2>Simular orçamento</h2><p>Inclua só os itens deste trabalho. A simulação não cria contratos nem cobranças.</p>
         <div className="quote-fields">{editor.lines.map((line,index)=><label className="login-field" key={line.id}><span>{line.label||'Item '+(index+1)} {line.unit==='hour'?'(horas)':line.unit==='unit'?'(unidades)':''}</span>
-          {line.unit==='fixed'?<select disabled={!!busy} value={quantities[line.id]??'0'} onChange={event=>{setQuantities({...quantities,[line.id]:event.target.value});setQuote(null)}}><option value="0">Não incluir</option><option value="1">Incluir</option></select>:<input disabled={!!busy} inputMode={line.unit==='hour'?'decimal':'numeric'} value={quantities[line.id]??''} placeholder="0" onChange={event=>{setQuantities({...quantities,[line.id]:event.target.value});setQuote(null)}}/>}
+          {line.unit==='fixed'?<select disabled={!!busy} value={quantities[line.id]??'0'} onChange={event=>{setQuantities({...quantities,[line.id]:event.target.value});setSimulation(null)}}><option value="0">Não incluir</option><option value="1">Incluir</option></select>:<input disabled={!!busy} inputMode={line.unit==='hour'?'decimal':'numeric'} value={quantities[line.id]??''} placeholder="0" onChange={event=>{setQuantities({...quantities,[line.id]:event.target.value});setSimulation(null)}}/>}
         </label>)}</div>
         <button className="button button-primary" type="button" disabled={!!busy} onClick={simulate}><Calculator size={17} aria-hidden="true"/> {busy==='calculando'?'Calculando…':'Calcular'}</button>
-        {quote&&<Summary quote={quote}/>}
+        {simulation&&<Summary quote={simulation.quote}/>}
       </section></div>:<section className="crm-panel personal-section"><EmptyState title="Selecione ou crie um modelo" text="Junte preço fixo, horas, unidades, adicionais e cobranças mensais conforme o seu serviço."/></section>}
     </div>
+    {isOwner&&<QuoteProposals key={userId} simulation={simulation}/>}
   </div>
 }

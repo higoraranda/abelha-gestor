@@ -1,11 +1,12 @@
 import { Router } from "express"
 import { ownerAuthMiddleware } from "../middleware/auth"
 import { tenantMiddleware } from "../middleware/tenant"
+import { mutationGuard } from '../middleware/mutation-guard'
 import { db } from "../db/index"
 import { insertContract, mapContract } from "../services/contract-store"
 
 const router = Router()
-router.use(ownerAuthMiddleware, tenantMiddleware)
+router.use(ownerAuthMiddleware, tenantMiddleware, mutationGuard)
 
 function mapClient(row: Record<string, any>) {
   return {

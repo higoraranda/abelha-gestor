@@ -2,15 +2,39 @@ import { Router } from "express"
 import { ownerAuthMiddleware } from "../middleware/auth"
 import { tenantMiddleware } from "../middleware/tenant"
 import { db } from "../db/index"
+import { postgresDatabase } from '../services/platform-db'
+import { configuredInstance, connectionState, pairingQr } from '../services/evolutionApi'
+import { endpoint, mutationGuard } from './personal'
+import { InputError } from '../services/personal'
 
 const router = Router()
-router.use(ownerAuthMiddleware, tenantMiddleware)
+router.use(ownerAuthMiddleware, tenantMiddleware, mutationGuard)
+
+router.get('/whatsapp/status',endpoint(async(req,res)=>{
+  if(!req.user) throw new InputError('Entre como proprietário para verificar o WhatsApp.',401)
+  const instance=await configuredInstance(postgresDatabase(db),req.organizationId!)
+  const status=instance ? await connectionState(instance) : 'unconfigured'
+  res.json({status})
+}))
+
+router.post('/whatsapp/pair',endpoint(async(req,res)=>{
+  if(!req.user) throw new InputError('Entre como proprietário para conectar o WhatsApp.',401)
+  const instance=await configuredInstance(postgresDatabase(db),req.organizationId!)
+  if(!instance) throw new InputError('Ainda não existe uma instância do WhatsApp para esta conta.',503)
+  if(await connectionState(instance)==='connected') {
+    res.json({status:'connected',qr:null})
+    return
+  }
+  const qr=await pairingQr(instance)
+  if(!qr) throw new InputError('O provedor ainda não disponibilizou um QR. Confira a instância e tente novamente.',503)
+  res.json({status:'connecting',qr})
+}))
 
 // GET /api/v1/conversations
 router.get("/", async (req, res) => {
   const orgId = req.organizationId!
   const page  = Math.max(1, parseInt(req.query.page as string) || 1)
-  const limit = Math.min(50, parseInt(req.query.limit as string) || 20)
+  const limit = Math.max(1, Math.min(50, parseInt(req.query.limit as string) || 20))
   const offset = (page - 1) * limit
 
   try {
@@ -26,7 +50,7 @@ router.get("/", async (req, res) => {
         cl.name       AS client_name,
         cl.whatsapp   AS client_whatsapp
       FROM conversations c
-      LEFT JOIN clients cl  ON cl.id = c.client_id
+      LEFT JOIN clients cl  ON cl.id = c.client_id AND cl.organization_id = c.organization_id
       WHERE c.organization_id = ${orgId}
       ORDER BY c.last_message_at DESC NULLS LAST
       LIMIT ${limit} OFFSET ${offset}
@@ -73,7 +97,7 @@ router.get("/:id", async (req, res) => {
         cl.name       AS client_name,
         cl.whatsapp   AS client_whatsapp
       FROM conversations c
-      LEFT JOIN clients cl  ON cl.id = c.client_id
+      LEFT JOIN clients cl  ON cl.id = c.client_id AND cl.organization_id = c.organization_id
       WHERE c.id = ${id} AND c.organization_id = ${orgId}
     `
 

@@ -223,6 +223,8 @@ async function startScreencast(context, page) {
         await page.waitForTimeout(100)
         await page.clock.fastForward(45001)
         await page.getByText(/O serviço ainda não enviou uma resposta válida/).waitFor()
+        await page.locator('.bee-loader[data-state=recovering]').waitFor()
+        assert.equal(await page.locator('.bee-loader__bee').evaluate(el=>el.getAnimations().length),0,'A persistent outage must stop the loading animation')
         assert.equal(health.sessionCalls, 0)
         assert.ok(health.calls < 12)
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false)
@@ -245,7 +247,7 @@ async function startScreencast(context, page) {
       const s = await scenario({ mode: 'ready', session: 'error', persistedUser: true })
       try {
         await s.page.getByText(/Não foi possível verificar seu acesso/).waitFor()
-        assert.equal(await s.page.locator('.bee-loader[data-state=loading]').count(), 1)
+        assert.equal(await s.page.locator('.bee-loader[data-state=recovering]').count(), 1)
         assert.equal(await s.page.evaluate(() => JSON.parse(localStorage.getItem('abelha-auth')).state.user.id), user.id)
         assert.equal(s.health.dataCalls, 0)
         s.health.session = 'anonymous'

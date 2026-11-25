@@ -1,12 +1,13 @@
 import { Router } from "express"
 import { ownerAuthMiddleware } from "../middleware/auth"
 import { tenantMiddleware } from "../middleware/tenant"
+import { mutationGuard } from '../middleware/mutation-guard'
 import { db } from "../db/index"
 import { businessDay } from "../services/crm"
 import { mapReceivable } from "../services/contract-store"
 
 const router = Router()
-router.use(ownerAuthMiddleware, tenantMiddleware)
+router.use(ownerAuthMiddleware, tenantMiddleware, mutationGuard)
 
 const EXPENSE_CATEGORIES = new Set(["subscriptions", "ads", "tools", "taxes", "services", "infrastructure", "other"])
 
@@ -315,7 +316,7 @@ router.patch("/receivables/:receivableId", async (req, res) => {
     if (!row) return res.status(404).json({ error: "Cobrança não encontrada" })
     const [related] = await db`
       SELECT cl.name AS client_name, cc.service_name
-      FROM clients cl JOIN client_contracts cc ON cc.client_id = cl.id
+      FROM clients cl JOIN client_contracts cc ON cc.client_id = cl.id AND cc.organization_id = cl.organization_id
       WHERE cl.id = ${row.client_id} AND cc.id = ${row.contract_id} AND cl.organization_id = ${orgId}
     `
     res.json({ ...mapReceivable(row), clientName: related.client_name, serviceName: related.service_name })

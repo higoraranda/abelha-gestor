@@ -1,0 +1,10 @@
+.inbox-page{height:100%;display:flex;flex-direction:column;min-width:0}
+.inbox-page>.inbox-shell{flex:1;min-height:0}
+.inbox-connection{background:var(--surface);border-bottom:1px solid var(--line);padding:8px 14px;flex:none}
+.inbox-connection-bar,.inbox-connection-bar>span{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.inbox-connection-bar{justify-content:space-between}
+.inbox-connection-bar small,.inbox-pair-code p{color:var(--ink-soft)}
+.inbox-connection-bar .button,.inbox-pair-code .button{min-height:40px}
+.inbox-pair-code{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:8px 0}
+.inbox-pair-code img{background:white;border-radius:8px}
+.message-composer-feedback{padding:8px 14px;color:var(--ink-soft);margin:0;font-size:13px}

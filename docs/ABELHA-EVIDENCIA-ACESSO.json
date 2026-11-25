@@ -1,0 +1,3879 @@
+{
+  "version": 1,
+  "sourceDigest": "f773c871509587dc724e373699cd232270e9e5d9a51f1cff6b88489bcdc47b3a",
+  "environment": "Express real / Auth.js / PGlite descartável em loopback / e-mail sintético",
+  "auth": [
+    {
+      "case": "GET /api/auth/csrf · proprietário",
+      "status": 200,
+      "verdict": "positive"
+    },
+    {
+      "case": "POST /api/auth/callback/credentials · proprietário",
+      "status": 200,
+      "verdict": "positive"
+    },
+    {
+      "case": "GET /api/auth/session · proprietário",
+      "status": 200,
+      "verdict": "positive"
+    },
+    {
+      "case": "GET /api/auth/csrf · membro A",
+      "status": 200,
+      "verdict": "positive"
+    },
+    {
+      "case": "POST /api/auth/callback/credentials · membro A",
+      "status": 200,
+      "verdict": "positive"
+    },
+    {
+      "case": "GET /api/auth/session · membro A",
+      "status": 200,
+      "verdict": "positive"
+    },
+    {
+      "case": "GET /api/auth/csrf · membro B",
+      "status": 200,
+      "verdict": "positive"
+    },
+    {
+      "case": "POST /api/auth/callback/credentials · membro B",
+      "status": 200,
+      "verdict": "positive"
+    },
+    {
+      "case": "GET /api/auth/session · membro B",
+      "status": 200,
+      "verdict": "positive"
+    },
+    {
+      "case": "GET /api/auth/csrf · conta desativada após login",
+      "status": 200,
+      "verdict": "positive"
+    },
+    {
+      "case": "POST /api/auth/callback/credentials · conta desativada após login",
+      "status": 200,
+      "verdict": "positive"
+    },
+    {
+      "case": "GET /api/auth/session · conta desativada após login",
+      "status": 200,
+      "verdict": "positive"
+    },
+    {
+      "case": "GET /api/auth/csrf · sessão a revogar",
+      "status": 200,
+      "verdict": "positive"
+    },
+    {
+      "case": "POST /api/auth/callback/credentials · sessão a revogar",
+      "status": 200,
+      "verdict": "positive"
+    },
+    {
+      "case": "GET /api/auth/session · sessão a revogar",
+      "status": 200,
+      "verdict": "positive"
+    },
+    {
+      "case": "POST /api/auth/signout · limpeza do cookie",
+      "status": 200,
+      "verdict": "positive"
+    }
+  ],
+  "routes": [
+    {
+      "endpoint": "POST /api/v1/account/invites",
+      "checks": [
+        {
+          "case": "emissão pelo proprietário · membro A",
+          "status": 201,
+          "verdict": "positive"
+        },
+        {
+          "case": "emissão pelo proprietário · membro B",
+          "status": 201,
+          "verdict": "positive"
+        },
+        {
+          "case": "emissão pelo proprietário · conta desativada após login",
+          "status": 201,
+          "verdict": "positive"
+        },
+        {
+          "case": "emissão pelo proprietário · sessão a revogar",
+          "status": 201,
+          "verdict": "positive"
+        },
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "edição exclusiva dos convites próprios",
+          "status": 201,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/account/invites",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "listagem do emissor",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/account/invites/expire",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "revogação de convite pendente próprio",
+          "status": 204,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/account/register/code",
+      "checks": [
+        {
+          "case": "OTP simulado do convite · membro A",
+          "status": 200,
+          "verdict": "positive"
+        },
+        {
+          "case": "OTP simulado do convite · membro B",
+          "status": 200,
+          "verdict": "positive"
+        },
+        {
+          "case": "OTP simulado do convite · conta desativada após login",
+          "status": 200,
+          "verdict": "positive"
+        },
+        {
+          "case": "OTP simulado do convite · sessão a revogar",
+          "status": 200,
+          "verdict": "positive"
+        },
+        {
+          "case": "token ausente ou inválido",
+          "status": 400,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/account/register",
+      "checks": [
+        {
+          "case": "resgate sintético · membro A",
+          "status": 201,
+          "verdict": "positive"
+        },
+        {
+          "case": "resgate sintético · membro B",
+          "status": 201,
+          "verdict": "positive"
+        },
+        {
+          "case": "resgate sintético · conta desativada após login",
+          "status": 201,
+          "verdict": "positive"
+        },
+        {
+          "case": "resgate sintético · sessão a revogar",
+          "status": 201,
+          "verdict": "positive"
+        },
+        {
+          "case": "token ausente ou inválido",
+          "status": 400,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/account/password/reset/request",
+      "checks": [
+        {
+          "case": "resposta neutra para e-mail fictício",
+          "status": 202,
+          "verdict": "positive"
+        },
+        {
+          "case": "e-mail inválido",
+          "status": 400,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/account/password/reset/confirm",
+      "checks": [
+        {
+          "case": "token ausente ou inválido",
+          "status": 400,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/catalog",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/catalog",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/catalog/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "DELETE /api/v1/catalog/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/clients",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/clients/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/clients",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/clients/:clientId/contracts",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/clients/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "DELETE /api/v1/clients/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/contracts/:contractId",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/conversations/whatsapp/status",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/conversations/whatsapp/pair",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/conversations",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/conversations/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/conversations/:id/read",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/crm/contracts",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/crm/overview",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/crm/tasks",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/crm/tasks",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/crm/tasks/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "DELETE /api/v1/crm/tasks/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/crm/opportunities",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/crm/opportunities",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/crm/opportunities/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/crm/opportunities/:id/convert",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/crm/relationships/:clientId",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/crm/relationships/:clientId/notes",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/crm/relationships/:clientId/next-action",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/crm/search",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/crm/notifications",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/crm/notifications",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/crm/reports",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/crm/export",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/events",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/finance/summary",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/finance/clients",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/finance/clients/:clientId",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/finance/expenses",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/finance/expenses",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/finance/expenses/:expenseId",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/finance/receivables",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/finance/receivables/:receivableId",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/integrations/github",
+      "checks": [
+        {
+          "case": "credencial ausente",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "credencial inválida",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "ping sintético assinado",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/integrations/codex/projects",
+      "checks": [
+        {
+          "case": "credencial ausente",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "credencial inválida",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "token válido de outra integração",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "token dedicado no projeto permitido",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/integrations/codex/report",
+      "checks": [
+        {
+          "case": "credencial ausente",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "credencial inválida",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "token válido de outra integração",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "token válido para projeto incompatível",
+          "status": 404,
+          "verdict": "negative"
+        },
+        {
+          "case": "relatório do Codex no escopo correto",
+          "status": 201,
+          "verdict": "positive"
+        },
+        {
+          "case": "replay idempotente de relatório autorizado",
+          "status": 201,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/integrations/projects/:id/reports",
+      "checks": [
+        {
+          "case": "credencial ausente",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "credencial inválida",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "token válido de outra integração",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "automação válida não alcança projeto de outro titular",
+          "status": 404,
+          "verdict": "negative"
+        },
+        {
+          "case": "automação válida na sua carteira",
+          "status": 201,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/integrations/leads/search",
+      "checks": [
+        {
+          "case": "credencial ausente",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "credencial inválida",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "token válido de outra integração",
+          "status": 401,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/integrations/leads/stage",
+      "checks": [
+        {
+          "case": "credencial ausente",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "credencial inválida",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "token válido de outra integração",
+          "status": 401,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/integrations/tick",
+      "checks": [
+        {
+          "case": "credencial ausente",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "credencial inválida",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "token válido de outra integração",
+          "status": 401,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/integrations/weekly-review",
+      "checks": [
+        {
+          "case": "credencial ausente",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "credencial inválida",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "token válido de outra integração",
+          "status": 401,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/integrations/prices/due",
+      "checks": [
+        {
+          "case": "credencial ausente",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "credencial inválida",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "token válido de outra integração",
+          "status": 401,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/integrations/prices/:id/observations",
+      "checks": [
+        {
+          "case": "credencial ausente",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "credencial inválida",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "token válido de outra integração",
+          "status": 401,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/integrations/leads/capture",
+      "checks": [
+        {
+          "case": "credencial ausente",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "credencial inválida",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "token válido de outra integração",
+          "status": 401,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/member-modules/me",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "proprietário não é titular membro",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A consulta preferências próprias",
+          "status": 200,
+          "verdict": "positive"
+        },
+        {
+          "case": "membro B consulta permissões próprias",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/member-modules/me/preferences",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "proprietário não é titular membro",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro altera visibilidade própria",
+          "status": 200,
+          "verdict": "positive"
+        },
+        {
+          "case": "tentativa de autoatribuir permissão rejeitada",
+          "status": 400,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/member-modules/members/:id/status",
+      "checks": [
+        {
+          "case": "proprietário desativa convidado",
+          "status": 200,
+          "verdict": "positive"
+        },
+        {
+          "case": "proprietário desativa convidado",
+          "status": 200,
+          "verdict": "positive"
+        },
+        {
+          "case": "proprietário reativa sem restaurar JWT",
+          "status": 200,
+          "verdict": "positive"
+        },
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/member-modules/members",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "lista administrada pelo emissor",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/member-modules/members/:id",
+      "checks": [
+        {
+          "case": "módulos permitidos para A",
+          "status": 200,
+          "verdict": "positive"
+        },
+        {
+          "case": "módulos desabilitados para B",
+          "status": 200,
+          "verdict": "positive"
+        },
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "libera Finanças para verificar separação também com B autorizado",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/messages",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/personal/finance",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "módulo desabilitado",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro com módulo habilitado",
+          "status": 200,
+          "verdict": "positive"
+        },
+        {
+          "case": "outro membro autorizado não recebe o ciclo de A",
+          "status": 200,
+          "verdict": "positive"
+        },
+        {
+          "case": "proprietário não recebe o ciclo privado de A",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/personal/finance/cycles",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "módulo desabilitado",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro cria ciclo privado",
+          "status": 201,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/personal/finance/entries",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "módulo desabilitado",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro registra fatura própria",
+          "status": 201,
+          "verdict": "positive"
+        },
+        {
+          "case": "ciclo pertence a A mesmo com B habilitado",
+          "status": 404,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/personal/finance/plans",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "módulo desabilitado",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro registra meta própria",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/personal/subscriptions",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "módulo desabilitado",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro com módulo habilitado",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/personal/subscriptions",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "módulo desabilitado",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro registra assinatura própria",
+          "status": 201,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/personal/subscriptions/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "módulo desabilitado",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro atualiza assinatura própria",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/personal/subscriptions/:id/payments",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "módulo desabilitado",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "registro local de pagamento da própria assinatura",
+          "status": 201,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/personal/prices",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "módulo desabilitado",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro com módulo habilitado",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/personal/prices",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "módulo desabilitado",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "cadastro privado sem consulta externa",
+          "status": 201,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/personal/prices/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "módulo desabilitado",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "pausa monitor privado",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/personal/preferences",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/personal/preferences",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/personal/push-subscriptions",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "DELETE /api/v1/personal/push-subscriptions",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/personal/notifications",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/personal/notifications/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/personal/projects",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "módulo desabilitado",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro lista projetos próprios",
+          "status": 200,
+          "verdict": "positive"
+        },
+        {
+          "case": "proprietário lista apenas projetos próprios",
+          "status": 200,
+          "verdict": "positive"
+        },
+        {
+          "case": "projeto se mantém após negativas de terceiros",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/personal/projects",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "módulo desabilitado",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "criação na própria carteira",
+          "status": 201,
+          "verdict": "positive"
+        },
+        {
+          "case": "campo de propriedade recusado",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/personal/projects/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "proprietário não lê/muta projeto de membro",
+          "status": 404,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta do projeto próprio",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/personal/projects/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "proprietário não lê/muta projeto de membro",
+          "status": 404,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/personal/projects/:id/pipeline",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/personal/projects/:id/links",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "DELETE /api/v1/personal/projects/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "proprietário não lê/muta projeto de membro",
+          "status": 404,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/personal/projects/:id/milestones",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/personal/projects/:id/decisions",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/personal/projects/:id/reports",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/personal/projects/:id/milestones/:milestone/complete",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/personal/reviews",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/personal/reviews",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/prospecting/leads/niches",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/prospecting/leads/search",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/prospecting/leads/candidates",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/prospecting/leads/import",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/prospecting/leads/candidates/:id/approve",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/prospecting/templates",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/prospecting/drafts",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/prospecting/drafts",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/prospecting/drafts/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/quote-models",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "módulo desabilitado",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro com módulo habilitado",
+          "status": 200,
+          "verdict": "positive"
+        },
+        {
+          "case": "cliente após logout",
+          "status": 401,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/quote-models/preview",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "módulo desabilitado",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "cálculo de modelo próprio",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/quote-models",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "módulo desabilitado",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "persistência do modelo próprio",
+          "status": 201,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/quote-models/proposals",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/quote-models/proposals",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/quote-models/proposals/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/quote-models/proposals/:id/approve",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/quote-models/proposals/:id/refuse",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/quote-models/proposals/:id/prompt",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/quote-models/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "módulo desabilitado",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "edição do modelo privado",
+          "status": 200,
+          "verdict": "positive"
+        },
+        {
+          "case": "proprietário não altera modelo de convidado",
+          "status": 404,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/reminders",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "consulta autenticada do proprietário",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/reminders",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "PATCH /api/v1/reminders/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "DELETE /api/v1/reminders/:id",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /webhooks/evolution",
+      "checks": [
+        {
+          "case": "credencial ausente",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "credencial inválida",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "evento sintético autenticado e inerte",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /health",
+      "checks": [
+        {
+          "case": "health sem sessão",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/health",
+      "checks": [
+        {
+          "case": "health sem sessão",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    }
+  ]
+}

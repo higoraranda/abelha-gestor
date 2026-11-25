@@ -8,6 +8,7 @@ process.env.DATABASE_URL='postgres://synthetic:synthetic@127.0.0.1:1/never_conne
 process.env.VAPID_PRIVATE_KEY='';process.env.VAPID_PUBLIC_KEY='';process.env.VAPID_SUBJECT=''
 const {createPersonalRouter}=require('../dist/routes/personal')
 const {createProspectingRouter}=require('../dist/routes/prospecting')
+const {createQuoteModelsRouter}=require('../dist/routes/quote-models')
 const {createIntegrationsRouter}=require('../dist/routes/integrations')
 const {postgresDatabase}=require('../dist/services/platform-db')
 const org='10000000-0000-4000-8000-000000000001',user='20000000-0000-4000-8000-000000000001'
@@ -19,10 +20,16 @@ process.env.GITHUB_WEBHOOK_SECRET='synthetic-preview-github-secret-not-for-produ
   INSERT INTO organizations VALUES('${org}');INSERT INTO users VALUES('${user}','${org}');INSERT INTO clients(organization_id,name) VALUES('${org}','Contato sintético de validação');`)
   await pg.exec('CREATE TABLE reminders(id uuid primary key,organization_id uuid,title text,due_at timestamptz,completed boolean)')
   await pg.exec(fs.readFileSync(path.join(__dirname,'../src/db/migrations/20261111_personal_platform.sql'),'utf8'))
+  await pg.exec(fs.readFileSync(path.join(__dirname,'../src/db/migrations/20261125_quote_models.sql'),'utf8'))
+  await pg.exec(fs.readFileSync(path.join(__dirname,'../src/db/migrations/20261126_quote_proposals.sql'),'utf8'))
+  await pg.exec(fs.readFileSync(path.join(__dirname,'../src/db/migrations/20261127_quote_proposal_decisions.sql'),'utf8'))
+  await pg.exec(fs.readFileSync(path.join(__dirname,'../src/db/migrations/20261127_project_pipeline.sql'),'utf8'))
   const wire=new PGLiteSocketServer({db:pg,host:'127.0.0.1',port:0});await wire.start()
   const sql=postgres('postgresql://postgres:postgres@'+wire.getServerConn()+'/postgres',{ssl:false,max:1});const database=postgresDatabase(sql)
   const app=express();app.use(express.json({verify:(req,_res,buffer)=>{req.githubRawBody=Buffer.from(buffer)}}));app.use('/api',(_req,res,next)=>{res.set('Cache-Control','no-store');next()})
-  const auth=(req,_res,next)=>{req.organizationId=org;req.user={userId:user,organizationId:org,role:'user'};next()}
+  const auth=(req,_res,next)=>{req.organizationId=org;req.user={userId:user,organizationId:org,role:'owner'};next()}
+  app.get('/api/v1/health',(_req,res)=>res.json({status:'ok'}))
+  app.use('/api/v1/quote-models',createQuoteModelsRouter(database,auth))
   app.get('/api/auth/session',(_req,res)=>res.json({user:{id:user,organizationId:org,name:'Validação sintética',email:'synthetic@example.invalid',role:'owner'}}))
   app.get('/api/v1/clients',async(_req,res)=>res.json((await pg.query('SELECT * FROM clients')).rows.map(client=>({...client,createdAt:new Date().toISOString()}))))
   app.get('/api/v1/crm/notifications',(_req,res)=>res.json([]))

@@ -1,0 +1,11 @@
+# Buscar leads: nicho livre
+
+A tela **CRM → Buscar leads** aceita um nicho digitado e a cidade, preferencialmente com UF (por exemplo, `Padaria` e `Salto, SP`). O backend reconhece aliases comuns em português e os identificadores legados do n8n. Nos demais termos, usa texto de nome, marca, descrição ou etiqueta de categoria de estabelecimentos mapeados. É uma busca em dados públicos, não um catálogo exaustivo. Um resultado sem telefone, site ou rede social significa apenas que a fonte não forneceu essa informação.
+
+- Nomes de cidade são comparados sem exigir caixa ou acentos exatos. Quando houver homônimo, envie a UF em vez de misturar os resultados de municípios diferentes.
+- Se o município não for resolvido, a API retorna 422 com orientação. Se ele foi resolvido mas não tem resultados para o nicho, retorna 200 com lista vazia. Falha/transporte indisponível retorna 503/504; o limite de uma consulta por minuto por organização e 1 a 50 registros permanece.
+- A pesquisa não importa prospect nem envia contato. A gravação existente continua a depender da seleção explícita pelo usuário e preserva atribuição e referência do OpenStreetMap. Não há cadastro, credencial ou provedor pago adicional.
+- Uma consulta vai para a instância primária com no máximo 14 s de transporte, e uma alternativa pode receber até 16 s, sempre dentro do limite global de 30 s. O limite de execução da consulta em cada Overpass foi reduzido para 10 s; consultas respondidas ou recusadas por validação não são reexecutadas. Logs não guardam cidade, nicho, organização ou dados de contato.
+- A validação automatizada usa respostas sintéticas, incluindo indisponibilidade, tempo esgotado, município ausente ou ambíguo, sucesso vazio, resultado normalizado e texto livre. A única tentativa pública de teste de uma consulta pequena no workspace expirou; isso não comprova o comportamento do provedor a partir do Render nem permite declarar a produção corrigida. O gate do provedor é uma consulta real, sem importar resultados, após a publicação autorizada.
+
+Referências técnicas: [modo de saída](https://dev.overpass-api.de/overpass-doc/en/targets/formats.html), [filtros por área](https://dev.overpass-api.de/overpass-doc/en/full_data/area.html) e [`map_to_area`](https://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_QL#Map_relation_to_area_(map_to_area)).

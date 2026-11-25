@@ -1,28 +1,23 @@
 import { Router } from "express"
+import { createHash,timingSafeEqual } from 'node:crypto'
 import { processIncomingMessage } from "../services/webhookProcessor"
 
-const router = Router()
+const router=Router()
+const digest=(text:string)=>createHash('sha256').update(text).digest()
 
-// POST /webhooks/evolution
-// Recebido da Evolution API quando chega uma mensagem.
-// Não usa JWT — autenticado pelo EVOLUTION_WEBHOOK_SECRET no header.
-router.post("/evolution", async (req, res) => {
-  const secret = req.headers["x-evolution-secret"]
-  if (!secret || secret !== process.env.EVOLUTION_WEBHOOK_SECRET) {
-    return res.status(401).json({ error: "Unauthorized" })
+router.post('/evolution',async(req,res)=>{
+  const secret=req.get('x-evolution-secret'), expected=process.env.EVOLUTION_WEBHOOK_SECRET
+  if(!secret||!expected||!timingSafeEqual(digest(secret),digest(expected))) {
+    res.status(401).json({error:'Unauthorized'})
+    return
   }
-
-  // Responde imediatamente para a Evolution API não retentar
-  res.status(200).json({ ok: true })
-
-  const { event } = req.body
-  if (event !== "messages.upsert") return
-
+  const event=typeof req.body?.event==='string' ? req.body.event.toLowerCase().replaceAll('_','.') : ''
   try {
-    await processIncomingMessage(req.body)
-  } catch (err) {
-    console.error("[webhook] erro ao processar mensagem:", err)
+    if(event==='messages.upsert') await processIncomingMessage(req.body)
+    res.json({ok:true})
+  } catch {
+    console.error('[webhook] falha ao persistir mensagem')
+    res.status(503).json({error:'Não foi possível registrar a mensagem.'})
   }
 })
-
 export default router

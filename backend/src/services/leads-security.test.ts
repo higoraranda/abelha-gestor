@@ -7,9 +7,23 @@ test('Overpass timeout becomes an explicit retryable error rather than an empty 
   await assert.rejects(searchLeads('synthetic-timeout','dentists','Campinas',1,unavailable),(error:any)=>error.status===504&&/prazo/.test(error.message))
 })
 
+test('canceling a public search aborts transport without starting another provider',async()=>{
+  const controller=new AbortController()
+  let calls=0
+  const fetcher:typeof fetch=async(_input,init)=>{
+    calls++
+    controller.abort()
+    init?.signal?.throwIfAborted()
+    throw Error('The transport signal should already be canceled')
+  }
+  await assert.rejects(searchLeads('synthetic-cancel','padaria','Salto, SP',1,fetcher,controller.signal),{name:'AbortError'})
+  assert.equal(calls,1)
+})
+
 const primary='https://overpass-api.de/api/interpreter'
 const fallback='https://overpass.private.coffee/api/interpreter'
-const validResponse=()=>Response.json({elements:[{type:'node',id:123,tags:{name:'Clínica de teste','contact:phone':'+55 19 0000-0000'}}]})
+const area={type:'area',id:3600000123}
+const validResponse=()=>Response.json({elements:[area,{type:'node',id:123,tags:{name:'Clínica de teste','contact:phone':'+55 19 0000-0000'}}]})
 
 for(const failure of ['network','busy','timeout','invalid-json','incomplete'] as const) {
   test(`Overpass ${failure} on primary recovers through another instance`,async t=>{
@@ -18,7 +32,7 @@ for(const failure of ['network','busy','timeout','invalid-json','incomplete'] as
     const fetcher:typeof fetch=async(input,init)=>{
       calls.push(String(input))
       assert.equal(init?.method,'POST')
-      assert.match(String(init?.body),/Campinas/)
+      assert.match(new URLSearchParams(String(init?.body)).get('data')??'',/"boundary"="administrative"/)
       assert.ok(init?.signal)
       if(String(input)===fallback)return validResponse()
       assert.equal(String(input),primary)
@@ -41,7 +55,7 @@ for(const failure of ['network','busy','timeout','invalid-json','incomplete'] as
 
 test('successful primary and genuine empty results do not query another instance',async()=>{
   let calls=0
-  const fetcher:typeof fetch=async()=>{calls++;return Response.json({elements:[]})}
+  const fetcher:typeof fetch=async()=>{calls++;return Response.json({elements:[area]})}
   assert.deepEqual((await searchLeads('synthetic-empty','dentists','Campinas',1,fetcher)).items,[])
   assert.equal(calls,1)
 })
@@ -76,11 +90,42 @@ test('the fallback timeout uses only the time left in the shared request budget'
   t.mock.method(AbortSignal,'timeout',(ms:number)=>{timeouts.push(ms);return new AbortController().signal})
   const fetcher:typeof fetch=async()=>{
     calls++
-    if(calls===1){now+=25000;throw new DOMException('timeout','TimeoutError')}
+    if(calls===1){now+=14000;throw new DOMException('timeout','TimeoutError')}
     return validResponse()
   }
   assert.equal((await searchLeads('synthetic-budget','dentists','Campinas',1,fetcher)).items.length,1)
-  assert.deepEqual(timeouts,[25000,5000])
+  assert.deepEqual(timeouts,[14000,16000])
+})
+
+test('a free niche keeps its readable label and skips malformed and duplicate provider records',async()=>{
+  const malformed = [{type:'way',id:45,tags:{name:'   '}},{type:'node',id:88,tags:{name:'a'.repeat(241)}}, {type:'node',id:123,tags:{name:'Loja especializada'}}, {type:'node',id:123,tags:{name:'Duplicata'}},null]
+  const fetcher:typeof fetch=async()=>Response.json({elements:[area,...malformed]})
+  const response=await searchLeads('synthetic-custom','  Ar condicionado  ','Campinas',5,fetcher)
+  assert.deepEqual(response.items.map(i=>[i.name,i.niche]),[['Loja especializada','Ar condicionado']])
+})
+
+test('unknown and ambiguous municipalities are not reported as having zero establishments',async()=>{
+  let calls=0
+  const none:typeof fetch=async()=>{calls++;return Response.json({elements:[]})}
+  await assert.rejects(searchLeads('synthetic-area-missing','padaria','Cidade Fantasma',5,none),(error:any)=>error.status===422&&/não encontrada/i.test(error.message))
+  const duplicate:typeof fetch=async()=>{calls++;return Response.json({elements:[area,{type:'area',id:3600001100}]})}
+  await assert.rejects(searchLeads('synthetic-area-ambiguous','padaria','Santa Helena',5,duplicate),(error:any)=>error.status===422&&/UF/.test(error.message))
+  assert.equal(calls,2)
+})
+
+test('a response over the byte limit is stopped while streaming without retry',async t=>{
+  t.mock.method(console,'warn',()=>{})
+  let calls=0,cancelled=false
+  const fetcher:typeof fetch=async()=>{
+    calls++
+    return new Response(new ReadableStream<Uint8Array>({
+      start(controller){controller.enqueue(new Uint8Array(1_900_001));controller.enqueue(new Uint8Array(100_000))},
+      cancel(){cancelled=true},
+    }))
+  }
+  await assert.rejects(searchLeads('synthetic-cap','dentists','Campinas',1,fetcher),(error:any)=>error.status===503&&/dados demais/.test(error.message))
+  assert.equal(calls,1)
+  assert.equal(cancelled,true)
 })
 
 test('a rejected query is not resent to another instance',async t=>{

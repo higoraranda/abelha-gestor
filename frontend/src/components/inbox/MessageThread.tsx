@@ -11,30 +11,32 @@ interface Props {
   messages:     Message[]
   loading:      boolean
   sending:      boolean
-  onSend:       (content: string) => void
+  canSend:      boolean
+  error?:       string
+  onSend:       (content: string) => Promise<boolean>
 }
 
-export default function MessageThread({ conversation, messages, loading, sending, onSend }: Props) {
+export default function MessageThread({ conversation, messages, loading, sending, canSend, error, onSend }: Props) {
   const [input, setInput]     = useState('')
   const bottomRef             = useRef<HTMLDivElement>(null)
   const textareaRef           = useRef<HTMLTextAreaElement>(null)
 
+  const lastMessageId = messages.at(-1)?.id
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
-  }, [messages])
+  }, [lastMessageId])
 
-  function submit() {
+  async function submit() {
     const trimmed = input.trim()
-    if (!trimmed || sending) return
-    onSend(trimmed)
-    setInput('')
+    if (!trimmed || sending || !canSend) return
+    if (await onSend(trimmed)) setInput(current=>current===input?'':current)
     textareaRef.current?.focus()
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      submit()
+      void submit()
     }
   }
 
@@ -60,10 +62,12 @@ export default function MessageThread({ conversation, messages, loading, sending
         ))}
         <div ref={bottomRef} />
       </div>
+      {error&&<p className="message-composer-feedback login-error" role="alert">{error}</p>}
+      {!canSend&&<p className="message-composer-feedback">Conecte o WhatsApp antes de enviar mensagens.</p>}
       <div className="message-composer">
-        <textarea className="resize-none" ref={textareaRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown}
+        <textarea className="resize-none" maxLength={4096} disabled={!canSend} ref={textareaRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown}
           aria-label="Mensagem" placeholder="Digite uma mensagem... (Enter para enviar, Shift+Enter para nova linha)" rows={1} />
-        <button type="button" className="button button-primary" onClick={submit} disabled={!input.trim() || sending} aria-label={sending ? 'Enviando mensagem' : 'Enviar mensagem'}><Send size={16} /></button>
+        <button type="button" className="button button-primary" onClick={()=>void submit()} disabled={!input.trim() || sending || !canSend} aria-label={sending ? 'Enviando mensagem' : 'Enviar mensagem'}><Send size={16} /></button>
       </div>
     </div>
   )

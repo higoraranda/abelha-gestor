@@ -91,9 +91,72 @@ export function nextRecurringDate(current:string,frequency:string,billingDay:num
   next.setUTCDate(Math.min(last,billingDay));return next.toISOString().slice(0,10)
 }
 export const NICHES:Record<string,{label:string;tag:string}>={dentists:{label:'Clínicas odontológicas',tag:'"amenity"="dentist"'},clinics:{label:'Clínicas',tag:'"amenity"="clinic"'},restaurants:{label:'Restaurantes',tag:'"amenity"="restaurant"'},beauty:{label:'Salões de beleza',tag:'"shop"="beauty"'},gyms:{label:'Academias',tag:'"leisure"="fitness_centre"'},shops:{label:'Lojas',tag:'"shop"'}}
+
+const accentless=(value:string)=>value.normalize('NFD').replace(/\p{M}/gu,'').toLowerCase()
+const POSIX_SPECIAL=/[\\.^$|?*+()[\]{}]/g
+const letterFamilies:Record<string,string>={a:'aáàâãä',e:'eéêèë',i:'iíîìï',o:'oóôõòö',u:'uúûùü',c:'cç'}
+function osmLiteral(value:string, flexibleSpaces=false):string {
+  return Array.from(accentless(value),char=>{
+    if(char===' '&&flexibleSpaces)return '[[:space:]_-]+'
+    const family=letterFamilies[char]
+    return family ? '['+family+family.toUpperCase()+']' : char.replace(POSIX_SPECIAL,'\\$&')
+  }).join('')
+}
+
+const TYPES:ReadonlyArray<readonly [string,string,readonly string[]]>=[
+  ['amenity','dentist',['dentista','dentistas','odontologia','clinica odontologica','clinicas odontologicas','consultorio odontologico']],
+  ['amenity','clinic',['clinica','clinicas','clinica medica','clinicas medicas']],
+  ['amenity','restaurant',['restaurante','restaurantes']],
+  ['shop','beauty',['salao de beleza','saloes de beleza','estetica','clinica de estetica']],
+  ['shop','hairdresser',['barbeiro','barbearia','barbearias','cabeleireiro','cabeleireiros']],
+  ['leisure','fitness_centre',['academia','academias','musculacao']],
+  ['shop','bakery',['padaria','padarias','panificadora']],
+  ['shop','pastry',['confeitaria','confeitarias']],
+  ['shop','pet',['pet shop','pet shops','petshop']],
+  ['amenity','veterinary',['veterinaria','clinica veterinaria','veterinario','veterinarios']],
+  ['shop','car_repair',['oficina','oficina mecanica','oficinas mecanicas','mecanica automotiva']],
+  ['shop','supermarket',['supermercado','supermercados']],
+  ['amenity','pharmacy',['farmacia','farmacias','drogaria','drogarias']],
+  ['amenity','cafe',['cafe','cafes','cafeteria','cafeterias']],
+  ['tourism','hotel',['hotel','hoteis']],
+  ['office','estate_agent',['imobiliaria','imobiliarias']],
+  ['office','lawyer',['advocacia','advogado','advogados','escritorio de advocacia']],
+  ['amenity','school',['escola','escolas','colegio','colegios']],
+  ['shop','optician',['otica','oticas']],
+  ['shop','stationery',['papelaria','papelarias']],
+  ['craft','electrician',['eletricista','eletricistas']],
+  ['shop','furniture',['moveis','loja de moveis','lojas de moveis']],
+  ['amenity','bank',['banco','bancos','agencia bancaria']],
+]
+const BRAZIL_STATES=new Set('AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO'.split(' '))
+
+export function resolveLeadNiche(raw:string) {
+  const label=text(raw,80).normalize('NFC').replace(/\p{Zs}+/gu,' ')
+  if(!/^[\p{L}\p{M}\p{N} .&+'’(),/-]+$/u.test(label)||!/\p{L}/u.test(label))throw new InputError('Informe um nicho de negócio válido.')
+  const key=accentless(label)
+  if(Object.hasOwn(NICHES,key))return NICHES[key]
+  const mapped=TYPES.find(([, ,aliases])=>aliases.includes(key))
+  if(mapped)return {label,tag:JSON.stringify(mapped[0])+'='+JSON.stringify(mapped[1])}
+  const pattern='(^|[^[:alnum:]])'+osmLiteral(label,true)+'([^[:alnum:]]|$)'
+  const categoryKeys='shop|craft|office|healthcare|amenity|leisure|tourism'
+  return {label,tag:'~"^(name|brand|description|'+categoryKeys+')$"~'+JSON.stringify(pattern)+',i]["name"][~"^('+categoryKeys+')$"~"."'}
+}
+
 export function overpassQuery(niche:string,city:string,limit:number) {
-  if(!NICHES[niche]) throw new InputError('Escolha um nicho disponível.')
-  text(city,100);integer(limit,1,50)
-  if(/[";\\\n\r\[\]{}()]/.test(city)) throw new InputError('Informe somente o nome da cidade.')
-  return `[out:json][timeout:20];area["name"=${JSON.stringify(city.trim())}]["boundary"="administrative"]["admin_level"="8"]->.city;nwr[${NICHES[niche].tag}](area.city);out center tags ${limit};`
+  const {tag}=resolveLeadNiche(niche)
+  integer(limit,1,50)
+  const location=text(city,100).normalize('NFC').replace(/\p{Zs}+/gu,' ')
+  const stateSuffix=location.match(/^(.*?)[ ]*(?:,|\/| - )[ ]*([a-z]{2})$/i)
+  const municipality=(stateSuffix?.[1]??location).trim()
+  const state=stateSuffix?.[2]?.toUpperCase()
+  if(!/^[\p{L}\p{M}\p{N} .'’()-]+$/u.test(municipality)||!/\p{L}/u.test(municipality)||state&&!BRAZIL_STATES.has(state)) {
+    throw new InputError('Informe uma cidade válida. Exemplo: Campinas, SP.')
+  }
+  const region=state
+    ? 'area["ISO3166-2"="BR-'+state+'"]["boundary"="administrative"]["admin_level"="4"]->.region;'
+    : ''
+  const cityFilters='["boundary"="administrative"]["admin_level"="8"]["name"~'+JSON.stringify('^'+osmLiteral(municipality)+'$')+',i]'
+  // A filter by area is supported on relations, not on already derived areas.
+  const locality=state?'rel'+cityFilters+'(area.region);map_to_area->.city;':'area'+cityFilters+'->.city;'
+  return '[out:json][timeout:10];'+region+locality+'.city out ids 2;nwr['+tag+']["name"](area.city);out tags '+limit+';'
 }

@@ -11,7 +11,16 @@ import { stagePublicLead, publicLeadInput } from '../services/lead-candidates'
 export function createProspectingRouter(sql:Database=postgresDatabase(db),middleware:RequestHandler[]=[ownerAuthMiddleware,tenantMiddleware]) {
   const router=Router();router.use(...middleware,mutationGuard)
   router.get('/leads/niches',(_req,res)=>res.json(Object.entries(NICHES).map(([id,value])=>({id,label:value.label}))))
-  router.post('/leads/search',endpoint(async(req,res)=>{res.json(await searchLeads(req.organizationId!,text(req.body.niche,80),text(req.body.city,100),integer(req.body.limit,1,50)))}))
+  router.post('/leads/search',endpoint(async(req,res)=>{
+    const work=new AbortController()
+    const cancel=()=>{if(!res.writableEnded)work.abort()}
+    res.once('close',cancel)
+    try{
+      const result=await searchLeads(req.organizationId!,text(req.body.niche,80),text(req.body.city,100),integer(req.body.limit,1,50),fetch,work.signal)
+      if(!work.signal.aborted)res.json(result)
+    }catch(error){if(!work.signal.aborted)throw error}
+    finally{res.off('close',cancel)}
+  }))
   router.get('/leads/candidates',endpoint(async(req,res)=>{res.json(await sql.query('SELECT id,source,data,client_id,reviewed_at,created_at FROM crm_lead_candidates WHERE organization_id=$1 AND client_id IS NULL AND reviewed_at IS NULL ORDER BY created_at,id LIMIT 100',[req.organizationId!]))}))
   router.post('/leads/import',endpoint(async(req,res)=>{
     const org=req.organizationId!;const {key}=publicLeadInput(req.body)

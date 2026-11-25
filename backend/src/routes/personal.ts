@@ -1,3 +1,4 @@
+import { mutationGuard } from '../middleware/mutation-guard'
 import { Router, type RequestHandler, type Request, type Response } from 'express'
 import { randomUUID } from 'node:crypto'
 import { db } from '../db'
@@ -8,6 +9,8 @@ import { InputError, uuid, text, githubRepo, reportInput, subscriptionInput, has
 import { registerPersonalFinance } from './personal-finance'
 import { registerPersonalPrices } from './personal-prices'
 import { weeklyReview } from '../services/personal-automation'
+import { pipelineMove, pipelineLinks, stageLabel, type PipelineStage } from '../services/project-pipeline'
+import { memberModuleAllowed, moduleForMemberRoute } from '../services/member-modules'
 
 export type Scope={org:string;user:string}
 export function endpoint(handler:(req:Request,res:Response)=>Promise<unknown>):RequestHandler {
@@ -28,19 +31,19 @@ export function ownerMiddleware(sql:Database):RequestHandler {
     res.locals.personal={org,user:users[0].id};next()
   })().catch(error=>{res.status(error instanceof InputError?error.status:503).json({error:error instanceof InputError?error.message:'Não foi possível acessar sua conta.'})})}
 }
-export const mutationGuard:RequestHandler=(req,res,next)=>{
-  if(!['GET','HEAD','OPTIONS'].includes(req.method) && req.get('X-Abelha-Client')!=='web') {res.status(403).json({error:'Origem da operação não reconhecida.'});return}
-  next()
-}
+export { mutationGuard } from '../middleware/mutation-guard'
 export async function notice(sql:Database,owner:Scope,key:string,title:string,detail:string,url:string) {
   await sql.query('INSERT INTO personal_notifications(organization_id,user_id,event_key,title,detail,url) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(organization_id,user_id,event_key) DO NOTHING',[owner.org,owner.user,key,title,detail,safePersonalUrl(url)])
 }
 export function createPersonalRouter(sql:Database=postgresDatabase(db),middleware:RequestHandler[]=[authMiddleware,tenantMiddleware]) {
   const router=Router(); router.use(...middleware,mutationGuard,(req,res,next)=>{
     if(req.user?.role!=='member')return next()
-    if(req.path==='/projects' && req.method==='GET')return next()
-    if(req.path==='/projects' && req.method==='POST' && req.body && Object.keys(req.body).every(key=>key==='name'||key==='next_step'))return next()
-    res.status(403).json({error:'Recurso não disponível nesta conta.'})
+    const module=moduleForMemberRoute(req.method,req.path,req.body)
+    if(!module){res.status(403).json({error:'Recurso não disponível nesta conta.'});return}
+    void memberModuleAllowed(sql,req.user,module).then(allowed=>{
+      if(allowed)next()
+      else res.status(403).json({error:'O módulo não está habilitado nesta conta.'})
+    }).catch(()=>{res.status(503).json({error:'Não foi possível confirmar o acesso a este módulo.'})})
   },ownerMiddleware(sql))
   router.get('/preferences',endpoint(async(_req,res)=>{
     const {org,user}=scope(res)
@@ -67,7 +70,7 @@ export function createPersonalRouter(sql:Database=postgresDatabase(db),middlewar
     const [row]=await sql.query('UPDATE personal_notifications SET read_at=CASE WHEN $4::boolean IS NULL THEN read_at WHEN $4 THEN now() ELSE NULL END,dismissed=COALESCE($5::boolean,dismissed) WHERE organization_id=$1 AND user_id=$2 AND id=$3 RETURNING id',[org,user,uuid(req.params.id),req.body.read??null,req.body.dismissed??null]);if(!row)throw new InputError('Aviso não encontrado.',404);res.json(row)
   }))
   router.get('/projects',endpoint(async(_req,res)=>{
-    const {org,user}=scope(res);res.json(await sql.query(`SELECT p.*,count(m.id)::int AS milestone_count,count(m.id) FILTER(WHERE m.completed_at IS NOT NULL)::int AS completed_count,(SELECT title FROM personal_milestones current_stage WHERE current_stage.organization_id=p.organization_id AND current_stage.user_id=p.user_id AND current_stage.project_id=p.id AND current_stage.completed_at IS NULL ORDER BY current_stage.position,current_stage.id LIMIT 1) AS current_milestone FROM personal_projects p LEFT JOIN personal_milestones m ON m.project_id=p.id AND m.organization_id=p.organization_id AND m.user_id=p.user_id WHERE p.organization_id=$1 AND p.user_id=$2 GROUP BY p.id ORDER BY p.updated_at DESC LIMIT 100`,[org,user]))
+    const {org,user}=scope(res);res.json(await sql.query(`SELECT p.*,count(m.id)::int AS milestone_count,count(m.id) FILTER(WHERE m.completed_at IS NOT NULL)::int AS completed_count,(SELECT title FROM personal_milestones current_stage WHERE current_stage.organization_id=p.organization_id AND current_stage.user_id=p.user_id AND current_stage.project_id=p.id AND current_stage.completed_at IS NULL ORDER BY current_stage.position,current_stage.id LIMIT 1) AS current_milestone,(SELECT kind FROM personal_project_updates u WHERE u.organization_id=p.organization_id AND u.user_id=p.user_id AND u.project_id=p.id ORDER BY u.created_at DESC,u.id DESC LIMIT 1) AS latest_update_kind FROM personal_projects p LEFT JOIN personal_milestones m ON m.project_id=p.id AND m.organization_id=p.organization_id AND m.user_id=p.user_id WHERE p.organization_id=$1 AND p.user_id=$2 GROUP BY p.id ORDER BY p.updated_at DESC LIMIT 100`,[org,user]))
   }))
   router.post('/projects',endpoint(async(req,res)=>{
     const {org,user}=scope(res);const b=req.body
@@ -85,8 +88,33 @@ export function createPersonalRouter(sql:Database=postgresDatabase(db),middlewar
     const row=await sql.transaction(async tx=>{
       const [project]=await tx.query('SELECT id FROM personal_projects WHERE organization_id=$1 AND user_id=$2 AND id=$3 FOR UPDATE',[org,user,uuid(req.params.id)]);if(!project)throw new InputError('Projeto não encontrado.',404)
       if(status==='done') {const [counts]=await tx.query('SELECT count(*)::int AS total,count(*) FILTER(WHERE completed_at IS NOT NULL)::int AS completed FROM personal_milestones WHERE organization_id=$1 AND user_id=$2 AND project_id=$3',[org,user,project.id]);if(!counts.total||counts.total!==counts.completed)throw new InputError('Conclua os marcos revisados antes de finalizar o projeto.')}
-      const [row]=await tx.query('UPDATE personal_projects SET status=$4,next_step=$5,blockers=$6,updated_at=now() WHERE organization_id=$1 AND user_id=$2 AND id=$3 RETURNING *',[org,user,project.id,status,text(b.next_step??'',2000,true),text(b.blockers??'',5000,true)]);return row
+      const [row]=await tx.query('UPDATE personal_projects SET status=$4,next_step=COALESCE($5,next_step),blockers=COALESCE($6,blockers),updated_at=now() WHERE organization_id=$1 AND user_id=$2 AND id=$3 RETURNING *',[org,user,project.id,status,b.next_step===undefined?null:text(b.next_step,2000,true),b.blockers===undefined?null:text(b.blockers,5000,true)]);return row
     });res.json(row)
+  }))
+  router.patch('/projects/:id/pipeline',endpoint(async(req,res)=>{
+    const {org,user}=scope(res),id=uuid(req.params.id),input=pipelineMove(req.body)
+    const updated=await sql.transaction(async tx=>{
+      const [project]=await tx.query('SELECT * FROM personal_projects WHERE organization_id=$1 AND user_id=$2 AND id=$3 FOR UPDATE',[org,user,id])
+      if(!project)throw new InputError('Projeto não encontrado.',404)
+      if(!Object.hasOwn(project,'pipeline_stage'))throw new InputError('O quadro de etapas aguarda a atualização do banco de dados.',503)
+      const stage=project.pipeline_stage as PipelineStage|null
+      if(stage===input.stage)return project
+      if(stage!==input.expected)throw new InputError('A etapa mudou em outra sessão. Atualize o quadro e tente novamente.',409)
+      if(input.stage==='completed'){
+        const [counts]=await tx.query('SELECT count(*)::int AS total,count(*) FILTER(WHERE completed_at IS NOT NULL)::int AS completed FROM personal_milestones WHERE organization_id=$1 AND user_id=$2 AND project_id=$3',[org,user,id])
+        if(!counts.total||counts.total!==counts.completed)throw new InputError('Conclua os marcos revisados antes de finalizar o projeto.')
+      }
+      const [row]=await tx.query('UPDATE personal_projects SET pipeline_stage=$4,updated_at=now() WHERE organization_id=$1 AND user_id=$2 AND id=$3 RETURNING *',[org,user,id,input.stage])
+      await tx.query("INSERT INTO personal_project_updates(organization_id,user_id,project_id,event_key,kind,summary) VALUES($1,$2,$3,$4,'decision',$5)",[org,user,id,'pipeline:'+randomUUID(),'Etapa movida: '+stageLabel(stage)+' → '+stageLabel(input.stage)+'.'])
+      return row
+    })
+    res.json(updated)
+  }))
+  router.patch('/projects/:id/links',endpoint(async(req,res)=>{
+    const {org,user}=scope(res),id=uuid(req.params.id),links=pipelineLinks(req.body)
+    const [row]=await sql.query('UPDATE personal_projects SET pipeline_links=$4::text::jsonb,updated_at=now() WHERE organization_id=$1 AND user_id=$2 AND id=$3 RETURNING id,pipeline_links',[org,user,id,JSON.stringify(links)])
+    if(!row)throw new InputError('Projeto não encontrado.',404)
+    res.json(row)
   }))
   router.delete('/projects/:id',endpoint(async(req,res)=>{
     const {org,user}=scope(res);const id=uuid(req.params.id)
@@ -101,8 +129,8 @@ export function createPersonalRouter(sql:Database=postgresDatabase(db),middlewar
   router.post('/projects/:id/milestones',endpoint(async(req,res)=>{
     const {org,user}=scope(res);const id=uuid(req.params.id)
     const row=await sql.transaction(async tx=>{
-      const [project]=await tx.query('SELECT id,status FROM personal_projects WHERE organization_id=$1 AND user_id=$2 AND id=$3 FOR UPDATE',[org,user,id]);if(!project)throw new InputError('Projeto não encontrado.',404)
-      if(project.status==='done')throw new InputError('Reabra o projeto antes de acrescentar um marco.',409)
+      const [project]=await tx.query("SELECT id,status,to_jsonb(personal_projects)->>'pipeline_stage' AS pipeline_stage FROM personal_projects WHERE organization_id=$1 AND user_id=$2 AND id=$3 FOR UPDATE",[org,user,id]);if(!project)throw new InputError('Projeto não encontrado.',404)
+      if(project.status==='done'||project.pipeline_stage==='completed')throw new InputError('Reabra o projeto antes de acrescentar um marco.',409)
       const [row]=await tx.query('INSERT INTO personal_milestones(organization_id,user_id,project_id,title,acceptance,position) VALUES($1,$2,$3,$4,$5,(SELECT count(*) FROM personal_milestones WHERE organization_id=$1 AND user_id=$2 AND project_id=$3)) RETURNING *',[org,user,id,text(req.body.title),text(req.body.acceptance,5000)])
       await tx.query('UPDATE personal_projects SET updated_at=now() WHERE organization_id=$1 AND user_id=$2 AND id=$3',[org,user,id]);return row
     });res.status(201).json(row)
@@ -130,10 +158,12 @@ export function createPersonalRouter(sql:Database=postgresDatabase(db),middlewar
   router.post('/reviews',endpoint(async(_req,res)=>{res.status(201).json(await weeklyReview(sql,scope(res)))}))
   return router
 }
-export async function receiveReport(sql:Database,owner:Scope,projectId:string,body:unknown) {
+export async function receiveReport(sql:Database,owner:Scope,projectId:string,body:unknown,expectedRepository?:string) {
   return sql.transaction(async tx=>{
     const {org,user}=owner;const [project]=await tx.query('SELECT * FROM personal_projects WHERE organization_id=$1 AND user_id=$2 AND id=$3 FOR UPDATE',[org,user,projectId]);if(!project)throw new InputError('Projeto não encontrado.',404)
     if(!project.repository)throw new InputError('Cadastre o repositório do projeto antes de enviar relatórios.')
+    if(expectedRepository&&githubRepo(project.repository)!==expectedRepository)
+      throw new InputError('Vínculo do repositório alterado. Consulte os projetos autorizados.',409)
     const report=reportInput(body,project.repository)
     const [row]=await tx.query("INSERT INTO personal_project_updates(organization_id,user_id,project_id,event_key,kind,summary,report) VALUES($1,$2,$3,$4,'report',$5,$6::text::jsonb) ON CONFLICT(organization_id,user_id,event_key) DO NOTHING RETURNING *",[org,user,projectId,'report:'+projectId+':'+report.event_id,report.summary,JSON.stringify(report)])
     if(!row) {const [existing]=await tx.query('SELECT * FROM personal_project_updates WHERE organization_id=$1 AND user_id=$2 AND event_key=$3',[org,user,'report:'+projectId+':'+report.event_id]);if(JSON.stringify(existing.report)!==JSON.stringify(report)) {if(hash(JSON.stringify(sortObject(existing.report)))!==hash(JSON.stringify(sortObject(report))))throw new InputError('O identificador do relatório já foi usado com outro conteúdo.',409)}return existing}

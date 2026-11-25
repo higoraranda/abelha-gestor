@@ -39,6 +39,8 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
+.area-content-shell > .data-state { min-height:100svh; }
+
 .sr-only {
   position: absolute;
   width: 1px;

@@ -9,6 +9,7 @@ import { automationTick, weeklyReview } from '../services/personal-automation'
 import { searchLeads } from '../services/leads'
 import { integer } from '../services/personal'
 import { stagePublicLead } from '../services/lead-candidates'
+import { allowedCodexProjects, codexReportAccess, selectCodexProject } from '../services/codex-report-scope'
 
 declare global {namespace Express {interface Request {githubRawBody?:Buffer}}}
 export const githubJsonParser=json({limit:'2mb',verify:(req,_res,buffer)=>{(req as import('express').Request).githubRawBody=Buffer.from(buffer)}})
@@ -44,6 +45,25 @@ export function createIntegrationsRouter(sql:Database=postgresDatabase(db)) {
       return {matched:projects.length,recorded}
     })
     res.json({received:true,matched_projects:result.matched,recorded_updates:result.recorded,completed_milestones:0})
+  }))
+  async function codexContext(header:string) {
+    const access=codexReportAccess(header,process.env)
+    if(!access.configured) throw new InputError('Integração Codex não configurada.',503)
+    if(!access.grants) throw new InputError('Token de relatório inválido.',401)
+    const owner=await integrationOwner(sql)
+    return {owner,access,projects:await allowedCodexProjects(sql,owner,access.grants)}
+  }
+  router.get('/codex/projects',endpoint(async(req,res)=>{
+    const context=await codexContext(req.get('Authorization')||'')
+    res.json({projects:context.projects})
+  }))
+  router.post('/codex/report',endpoint(async(req,res)=>{
+    const {owner,access,projects}=await codexContext(req.get('Authorization')||'')
+    const envelope=req.body && typeof req.body==='object' && Object.hasOwn(req.body,'report')
+    if(!access.legacy&&!envelope)throw new InputError('Informe o projeto e o relatório.',400)
+    const project=selectCodexProject(projects,envelope?req.body.project:undefined,access.legacy)
+    const saved=await receiveReport(sql,owner,project,envelope?req.body.report:req.body,projects.find(row=>row.id===project)?.repository)
+    res.status(201).json({report_id:saved.id,status:'pending_review'})
   }))
   const authorize:RequestHandler=(req,res,next)=>{void (async()=>{
     if(!process.env.ABELHA_INTEGRATION_TOKEN)throw new InputError('Integração não configurada.',503)

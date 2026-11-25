@@ -8,7 +8,7 @@ const base = process.env.ABELHA_TEST_PREVIEW_URL || 'http://127.0.0.1:43170'
 if (new URL(base).hostname !== '127.0.0.1') throw new Error('Use only the synthetic loopback preview.')
 const output = process.env.ABELHA_SCREENSHOT_DIR || path.resolve('test-artifacts/dark-mode')
 fs.mkdirSync(output, { recursive:true })
-const views = ['overview','clients','deliveries','pipeline','finance','agenda','inbox','reports','leads','templates','personal-overview','personal-projects','personal-finance','personal-subscriptions','personal-prices','personal-review','personal-settings']
+const views = ['overview','clients','deliveries','pipeline','finance','agenda','inbox','reports','leads','quote-models','personal-overview','personal-projects','personal-finance','personal-subscriptions','personal-prices','personal-review','personal-settings']
 
 // Contrast uses alpha compositing of CSS backgrounds, matching the rendered text surface.
 // Images/gradients, disabled controls and native popup internals require visual inspection.
@@ -51,6 +51,7 @@ function inspect() {
     if(mode==='loading'&&pathname==='/api/v1/crm/tasks')await new Promise(resolve=>setTimeout(resolve,1400))
     const value=fixtures.response(pathname,url.searchParams)
     if(request.method()==='GET'&&value!==undefined)return route.fulfill({json:value})
+    if(pathname==='/api/v1/conversations/whatsapp/status')return route.fulfill({json:{status:'connected'}})
     if(pathname==='/api/v1/conversations/visual-conversation/read')return route.fulfill({json:{ok:true}})
     // CRM writes are deliberately refused; Personal CRUD is verified by verify-personal.cjs.
     if(!['GET','HEAD'].includes(request.method())&&!pathname.startsWith('/api/v1/personal/')&&!pathname.startsWith('/api/v1/prospecting/'))return route.fulfill({status:503,json:{error:'Gravações comerciais desativadas nesta prévia visual.'}})

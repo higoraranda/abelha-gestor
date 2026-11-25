@@ -1,10 +1,11 @@
 import { Router } from "express"
 import { ownerAuthMiddleware } from "../middleware/auth"
 import { tenantMiddleware } from "../middleware/tenant"
+import { mutationGuard } from '../middleware/mutation-guard'
 import { db } from "../db/index"
 
 const router = Router()
-router.use(ownerAuthMiddleware, tenantMiddleware)
+router.use(ownerAuthMiddleware, tenantMiddleware, mutationGuard)
 
 function mapReminder(r: Record<string, unknown>) {
   return {

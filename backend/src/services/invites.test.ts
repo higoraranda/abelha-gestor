@@ -15,7 +15,7 @@ test('invite signup preserves the legacy owner and grants only an isolated membe
     `)).rows
     await pg.exec(readFileSync('src/db/migrations/20261125_account_invites.sql', 'utf8'))
     await pg.exec(readFileSync('src/db/migrations/20261125_signup_email.sql','utf8'))
-    const { issueInvite, redeemInvite } = await import('./invites')
+    const { issueInvite, redeemInvite, listInvites, expireInvite } = await import('./invites')
     const { requestSignupCode } = await import('./signup-email')
     const adapt = (client: Pick<PGlite,'query'>): Database => ({
       query: async (query, params) => (await client.query(query, params)).rows as never,
@@ -67,9 +67,43 @@ test('invite signup preserves the legacy owner and grants only an isolated membe
     await assert.rejects(redeemInvite(db,{...lockedPayload,...lockChallenge,code:lockCode},secret),{status:400})
     await assert.rejects(requestSignupCode(db,lockedPayload,mail),{status:429})
 
+    const temporary=await issueInvite(db,owner,'temporary@example.invalid')
+    const listed=await listInvites(db,owner)
+    assert.equal(listed.find(row=>row.email==='temporary@example.invalid')?.status,'pending')
+    assert.equal(listed.find(row=>row.email==='guest@example.invalid')?.status,'used')
+    assert.ok(listed.every(row=>!('token_hash' in row)))
+    await expireInvite(db,owner,'temporary@example.invalid')
+    assert.equal((await listInvites(db,owner)).find(row=>row.email==='temporary@example.invalid')?.status,'expired')
+    await assert.rejects(requestSignupCode(db,{...payload,token:temporary.token,email:'temporary@example.invalid'},mail),{status:400})
+
+    await pg.exec(readFileSync('src/db/migrations/20261126_member_modules.sql','utf8'))
+    await pg.exec(readFileSync('src/db/migrations/20261127_managed_accounts.sql','utf8'))
+    const [matched]=await db.query("SELECT redeemed_user_id FROM account_invites WHERE email='guest@example.invalid'")
+    assert.equal(matched.redeemed_user_id,member.id)
+    await assert.rejects(issueInvite(db,owner,'duration@example.invalid',0),{status:400})
+    await assert.rejects(issueInvite(db,owner,'duration@example.invalid',169),{status:400})
+    const timed=await issueInvite(db,owner,'duration@example.invalid',4)
+    assert.ok(Math.abs(new Date(timed.expiresAt).getTime()-Date.now()-4*3600_000)<60000)
+    await expireInvite(db,owner,'duration@example.invalid')
+    assert.equal((await listInvites(db,owner)).find(row=>row.email==='duration@example.invalid')?.status,'revoked')
+    const renewed=await issueInvite(db,owner,'duration@example.invalid',24)
+    assert.equal((await listInvites(db,owner)).find(row=>row.email==='duration@example.invalid')?.status,'pending')
+    await assert.rejects(requestSignupCode(db,{...payload,token:timed.token,email:'duration@example.invalid'},mail),{status:400})
+    const fresh={...payload,token:renewed.token,email:'duration@example.invalid'}
+    const freshChallenge=await requestSignupCode(db,fresh,mail)
+    await redeemInvite(db,{...fresh,...freshChallenge,code:messages.get(fresh.email)},secret)
+    const [freshLink]=await db.query("SELECT redeemed_user_id,revoked_at FROM account_invites WHERE email='duration@example.invalid'")
+    assert.ok(freshLink.redeemed_user_id)
+    assert.equal(freshLink.revoked_at,null)
+    const [differentOwner]=await db.query<{id:string;organization_id:string}>("INSERT INTO users(organization_id,name,email,account_role) VALUES($1,'Outra pessoa','other-owner@example.invalid','owner') RETURNING id,organization_id",[owner.organization_id])
+    await issueInvite(db,owner,'collision@example.invalid')
+    await assert.rejects(issueInvite(db,differentOwner,'collision@example.invalid'),{status:409})
+    await assert.rejects(expireInvite(db,differentOwner,'collision@example.invalid'),{status:404})
+    assert.equal((await listInvites(db,differentOwner)).length,0)
+
     const old=await issueInvite(db,owner,'other@example.invalid')
     await issueInvite(db,owner,'other@example.invalid')
     await assert.rejects(requestSignupCode(db,{...payload,token:old.token,email:'other@example.invalid'},mail),{status:400})
-    assert.equal((await db.query('SELECT id FROM organizations')).length,2)
+    assert.equal((await db.query('SELECT id FROM organizations')).length,3)
   } finally { await pg.close() }
 })

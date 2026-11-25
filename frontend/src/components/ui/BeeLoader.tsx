@@ -51,7 +51,9 @@ export default function BeeLoader({ children, healthUrl = `${API_BASE_URL}/api/v
   const [imageAttempt, setImageAttempt] = useState(0)
   const reduced = useSyncExternalStore(subscribeMotion, reducedSnapshot, () => true)
   const flying = !reduced
-  const state: 'loading' | 'finishing' | 'done' = done ? 'done' : backend.ready && imageReady ? 'finishing' : 'loading'
+  const error = imageError ? 'Não foi possível carregar a imagem. Confira sua conexão e tente novamente.' : backend.error
+  const recovering = Boolean(error || backend.slow || backend.offline)
+  const state = done ? 'done' : backend.ready && imageReady ? 'finishing' : recovering ? 'recovering' : 'loading'
   const beeRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<HTMLDivElement>(null)
   const mainRef = useRef<HTMLElement>(null)
@@ -116,8 +118,9 @@ export default function BeeLoader({ children, healthUrl = `${API_BASE_URL}/api/v
 
   if (state === 'done') return <div className="bee-loader-app">{children}</div>
 
-  const error = imageError ? 'Não foi possível carregar a imagem. Confira sua conexão e tente novamente.' : backend.error
-  const title = state === 'finishing' ? 'Seu espaço está pronto.' : error ? 'Vamos tentar de novo?' : 'Preparando seu espaço'
+  const title = state === 'finishing' ? 'Seu espaço está pronto.'
+    : state !== 'recovering' ? 'Preparando seu espaço'
+      : backend.offline ? 'Sem conexão' : error ? 'Vamos tentar de novo?' : 'Mais tempo que o esperado'
   const diagnostic = backend.failure?.reason === 'invalid'
     ? 'O serviço ainda não enviou uma resposta válida.'
     : backend.failure?.reason === 'http'
@@ -135,7 +138,7 @@ export default function BeeLoader({ children, healthUrl = `${API_BASE_URL}/api/v
   const flower = <g transform="translate(312 180)"><g className="bee-loader__petals">{petals}</g><circle className="bee-loader__flower-center" r="16" /></g>
 
   return (
-    <main ref={mainRef} className="bee-loader" data-state={state} data-motion={flying ? 'full' : 'reduced'} aria-label="Inicializando o Abelha">
+    <main ref={mainRef} className="bee-loader" data-state={state} data-motion={flying ? 'full' : 'reduced'} aria-label={state === 'recovering' ? 'Recuperação de acesso ao Abelha' : 'Inicializando o Abelha'}>
       <div className="bee-loader__content">
         <p className="bee-loader__brand">abelha<span>seu espaço, no seu ritmo</span></p>
         <div ref={sceneRef} className="bee-loader__scene" aria-hidden="true">
@@ -158,7 +161,7 @@ export default function BeeLoader({ children, healthUrl = `${API_BASE_URL}/api/v
           <h1>{title}</h1><p>{message}</p>
         </div>
         <div className="bee-loader__recovery">
-          {state === 'loading' && (error || backend.slow || backend.offline) && <button className="button button-secondary" type="button" onClick={retry}>Tentar novamente</button>}
+          {state === 'recovering' && <button className="button button-secondary" type="button" onClick={retry}>Tentar novamente</button>}
         </div>
 
       </div>

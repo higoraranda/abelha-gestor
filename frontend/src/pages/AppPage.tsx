@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { lazy, useEffect, useState } from 'react'
+import AreaContent from '@/components/ui/AreaContent'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { logout } from '@/lib/auth'
 import { useAuthStore } from '@/store/auth'
@@ -13,14 +14,8 @@ import type { PersonalNotice } from '@/types/personal'
 import { PersonalNotifications, PersonalSettings } from '@/components/personal/PersonalSettings'
 import PersonalHome from './personal/PersonalHome'
 import AccountInvites from '@/components/personal/AccountInvites'
-import PersonalProjects from './personal/PersonalProjects'
-import PersonalFinance from './personal/PersonalFinance'
-import PersonalSubscriptions from './personal/PersonalSubscriptions'
-import PersonalPrices from './personal/PersonalPrices'
 import PersonalReview from './personal/PersonalReview'
-import LeadsPage from './LeadsPage'
-import TemplatesPage from './TemplatesPage'
-import QuoteModelsPage from './QuoteModelsPage'
+import QuoteModelsPage from './LazyQuoteModelsPage'
 import { api } from '@/lib/api'
 import { SearchPanel, NotificationsPanel, ExportPanel } from '@/components/layout/GlobalPanels'
 import { ErrorState, LoadingState } from '@/components/ui/DataState'
@@ -29,10 +24,16 @@ import DashboardPage from './DashboardPage'
 import ClientsPage from './ClientsPage'
 import TasksPage from './TasksPage'
 import PipelinePage from './PipelinePage'
-import ReportsPage from './ReportsPage'
-import FinancePage from './FinancePage'
-import InboxPage from './InboxPage'
-import AgendaPage from './AgendaPage'
+const PersonalProjects = lazy(() => import('./personal/PersonalProjects'))
+const PersonalFinance = lazy(() => import('./personal/PersonalFinance'))
+const PersonalSubscriptions = lazy(() => import('./personal/PersonalSubscriptions'))
+const PersonalPrices = lazy(() => import('./personal/PersonalPrices'))
+const LeadsPage = lazy(() => import('./LeadsPage'))
+const ReportsPage = lazy(() => import('./ReportsPage'))
+const FinancePage = lazy(() => import('./FinancePage'))
+const InboxPage = lazy(() => import('./InboxPage'))
+const AgendaPage = lazy(() => import('./AgendaPage'))
+
 export default function AppPage() {
   const navigate=useNavigate();const [params,setParams]=useSearchParams();const clearAuth=useAuthStore(state=>state.clearAuth)
   const {space,view}=resolveNavigation(params.get('space'),params.get('view'));const record=params.get('record')||undefined;const contract=params.get('contract')||undefined
@@ -59,7 +60,6 @@ export default function AppPage() {
   else if(view==='personal-review')content=<PersonalReview onProject={id=>open('personal-projects',id)}/>
   else if(view==='personal-settings')content=<><PersonalSettings pwa={pwa}/>{isOwner&&<AccountInvites/>}</>
   else if(view==='leads')content=<LeadsPage onClient={id=>open('clients',id)}/>
-  else if(view==='templates')content=<TemplatesPage/>
   else if(view==='quote-models')content=<QuoteModelsPage key={view}/>
   else if(view==='overview')content=<DashboardPage onNewClient={()=>setShowClient(true)} onOpenClients={id=>open('clients',id)} onOpenFinance={()=>open('finance')} onOpenReminders={()=>open('agenda')}/>
   else if(view==='clients')content=<ClientsPage key={record} focusId={record} onOpenTasks={id=>open('deliveries',undefined,id)}/>
@@ -69,7 +69,7 @@ export default function AppPage() {
   else if(view==='finance')content=<FinancePage key={record} focusId={record}/>
   else if(view==='inbox')content=<div className="inbox-workspace crm-panel"><InboxPage/></div>
   else content=(clients.loading&&!clients.data)||(reminders.loading&&!reminders.data)?<LoadingState/>:clients.error||reminders.error?<ErrorState message={clients.error||reminders.error||''} retry={()=>{clients.reload();reminders.reload()}}/>:<AgendaPage key={record} focusId={record} clients={clients.data||[]} reminders={reminders.data||[]} onRemindersChange={reminders.reload}/>
-  return <div className="app-shell"><a className="skip-link" href="#main">Ir para o conteúdo</a><AppSidebar space={space} onSpace={changeSpace} activeView={view} onChange={next=>open(next)} pendingReminders={space==='crm'?notices.data?.filter(n=>!n.read).length||0:personalNotices.data?.filter(n=>!n.read_at).length||0} onLogout={personalAccess?undefined:signOut} onSearch={()=>setPanel('search')} onNotifications={()=>{setPanel('notifications');if(space==='crm')notices.reload();else personalNotices.reload()}} onExport={()=>setPanel('export')} onCreate={()=>setShowClient(true)}/><main className="app-main" id="main"><div className="app-view">{!pwa.online&&<p className="personal-banner" role="status">Você está offline. Reconecte para consultar ou salvar dados. Nenhuma gravação será enviada em segundo plano.</p>}{pwa.waiting&&<div className="personal-banner" role="status"><span>Uma atualização está disponível. Salve seu trabalho antes de recarregar.</span><button className="button button-secondary" onClick={pwa.update}>Atualizar e recarregar</button></div>}{pwa.failure&&<p className="personal-banner" role="status">{pwa.failure}</p>}{content}</div></main>
+  return <div className="app-shell"><a className="skip-link" href="#main">Ir para o conteúdo</a><AppSidebar space={space} onSpace={changeSpace} activeView={view} onChange={next=>open(next)} pendingReminders={space==='crm'?notices.data?.filter(n=>!n.read).length||0:personalNotices.data?.filter(n=>!n.read_at).length||0} onLogout={personalAccess?undefined:signOut} onSearch={()=>setPanel('search')} onNotifications={()=>{setPanel('notifications');if(space==='crm')notices.reload();else personalNotices.reload()}} onExport={()=>setPanel('export')} onCreate={()=>setShowClient(true)}/><main className="app-main" id="main"><div className="app-view">{!pwa.online&&<p className="personal-banner" role="status">Você está offline. Reconecte para consultar ou salvar dados. Nenhuma gravação será enviada em segundo plano.</p>}{pwa.waiting&&<div className="personal-banner" role="status"><span>Uma atualização está disponível. Salve seu trabalho antes de recarregar.</span><button className="button button-secondary" onClick={pwa.update}>Atualizar e recarregar</button></div>}{pwa.failure&&<p className="personal-banner" role="status">{pwa.failure}</p>}<AreaContent key={view}>{content}</AreaContent></div></main>
     {showClient&&<NewClientModal onClose={()=>setShowClient(false)} onCreate={client=>{setShowClient(false);open('clients',client.id)}}/>}
     {panel==='search'&&<SearchPanel onClose={()=>setPanel(null)} onOpen={open}/>}
     {panel==='notifications'&&(space==='personal'?<PersonalNotifications onClose={()=>setPanel(null)} onOpen={url=>navigate(url)}/>:<NotificationsPanel notices={notices.data||[]} loading={notices.loading} error={notices.error} reload={notices.reload} onClose={()=>setPanel(null)} onOpen={open}/>)}

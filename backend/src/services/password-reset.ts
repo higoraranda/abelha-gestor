@@ -18,7 +18,7 @@ export async function issuePasswordReset(db: Database, emailInput: unknown, conf
     UPDATE users SET password_reset_hash=$2, password_reset_requested_at=now(),
       password_reset_expires_at=now()+interval '20 minutes'
     WHERE lower(btrim(email))=$1 AND password_hash IS NOT NULL
-      AND ((account_role='member' AND email_verified_at IS NOT NULL) OR
+      AND ((account_role='member' AND email_verified_at IS NOT NULL AND to_jsonb(users)->>'account_disabled_at' IS NULL) OR
            (account_role='owner' AND lower(btrim(email))=$3))
       AND (password_reset_requested_at IS NULL OR password_reset_requested_at<=now()-interval '5 minutes')
     RETURNING id
@@ -35,7 +35,7 @@ export async function completePasswordReset(db: Database, token: unknown, passwo
     throw new InputError('A senha precisa ter ao menos 12 caracteres e até 72 bytes.')
   }
   const hash = digest(token)
-  const active = 'password_reset_hash=$1 AND password_reset_expires_at>now()'
+  const active = "password_reset_hash=$1 AND password_reset_expires_at>now() AND (account_role='owner' OR (account_role='member' AND to_jsonb(users)->>'account_disabled_at' IS NULL AND password_reset_requested_at >= COALESCE((to_jsonb(users)->>'account_status_changed_at')::timestamptz,'-infinity'::timestamptz)))"
   const [match] = await db.query('SELECT id FROM users WHERE '+active, [hash])
   if (!match) throw invalidLink()
   const passwordHash = await bcrypt.hash(password, 12)
