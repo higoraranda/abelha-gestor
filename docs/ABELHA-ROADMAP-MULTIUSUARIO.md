@@ -1,5 +1,29 @@
 # Abelha | Roadmap multiusuário: entrega e gates
 
+## Atualização Prompt03.3 — encerramento local26/11/2026
+
+O proprietário revogou expressamente a autorização excepcional de commit/push: todas as alterações permanecem sem stage para revisão e commit manual. Sem publicação, mudança de fonte Render ou migration remota. [Verificação completa dos requisitos](ABELHA-REQUISITOS-033.md).
+
+Implementado localmente: workflow comercial de propostas, histórico editável/versionado de prompts aprovados e gerador ampliado; snapshot e regras de preço preservados. Nova migration20261129 validada em PGlite e pendente de HML próprio, sem repetir as nove anteriores. Conversas ganhou busca nas conversas carregadas; página Templates sem uso removida, histórico/endpoints preservados. Integração de entrega persiste comprovante UUID idempotente em nota separada. Busca Lead ganhou fallback406ealias plural veterinárias; controles públicos reais ainda expiram, logo operação externa não foi certificada. Sem número WhatsApp, e-mail real ou trigger automático ativados.
+
+Evidência:93testesbackend e50frontend, lint/build; dois testes dirigidos na retomada (sessão+migration legado), Chrome Calculadora/clipboard/histórico e Conversas390/1440passaram. JS principal267,60kB. [Matriz local atual](ABELHA-MATRIZ-ACESSO-033.md):126rotas,124negativas,66positivas,655asserções; HML03.1 é histórico e não certifica novas rotas/schema. Próximo passo: revisão/commit/push MANUAIS do proprietário, depois homologação remota do candidato e schema novo. Opcionais desligados não bloqueiam artificialmente lançamento; Prompt04 ainda inclui gates essenciais de HML/e-mail antes de publicação.
+
+## Atualização Prompt 03.2 — 25/11/2026
+
+[Relatório operacional](ABELHA-PREVIEW-OPERACIONAL-032.md): manifesto03.1 íntegro e HEAD030976f preservado. Render HML Node/main/auto-deploy off continua94ccaa0; ref remota da branch candidata ausente. Upload Vercel Preview é possível, mas entrega integrada do backend requer transporte autorizado; nenhum deploy realizado. Produção confirmada em leitura: Vercel34918f9/Renderb0442f9, divergência permanece. Catálogo confirma nove migrations novas ainda pendentes exclusivamente em produção, sem aplicação.
+
+Quatro testes direcionados dos scripts de entrega/escopo/recibo/evidência passaram; não equivalem a automação real. Duas consultas externas Overpass de baixo volume terminaram504, sem importação; tratamento existente preservado. Remetente remoto/caixa autorizada, dois projetos sintéticos com gatilho real e transporte Render do candidato continuam BLOCKED. WhatsApp permanece sem teste real autorizado. Sem commit/push/branch nova/configuração/deploy/migration ou escrita em dados. **Prompt04 ainda não pode ser exclusivamente publicação.** Solicitação restante agrupada no relatório.
+
+## Atualização Prompt 03.1 — 25/11/2026
+
+Homologação funcional do candidato local conectado ao Neon HML: **PASS nos contratos/fluxos executados**, com limites explícitos em [relatório integrado](ABELHA-HOMOLOGACAO-INTEGRADA-031.md). Manifesto original íntegro no preflight; checkout já em `030976f`, branch existente preservada. Nenhuma migration repetida. Correção de edição parcial de contrato para datas `Date` do PostgreSQL, com regressão RED/GREEN e verificação HML.
+
+Matriz: 123/123 rotas com positiva, 121 com negativa, 785 asserções e 23 verificações complementares por recurso; quatro positivas usam Overpass/Evolution simulados. Isolamento inclui titulares na mesma organização e filtros por usuário, sem equiparar 403 de papel a isolamento. Chrome integrado em 1440/390 px: cadastro/OTP simulado/login/logout/reset, módulos/preferências, 15 URLs do proprietário, Kanban UI→SQL→reload, troca de conta e cache. PWA na raiz offline/reconexão e limitador SQL de dois pools aprovados; `/login` offline fora do caminho suportado foi corrigido no teste e repetido separadamente.
+
+Regressão: 90 backend, 50 frontend, lint/build; nove grupos do carregador aprovados em execução isolada e divisão de rotas aprovada. JS principal preservado em 267,60 kB. Todas as 39 tabelas iguais ao baseline após limpeza das rodadas; processos/portas temporários encerrados. Sem commit, push, branch nova, deploy ou alteração em produção. Alterações sem stage para revisão manual.
+
+**BLOCKED:** aceite do artefato remoto HTTPS/cold start, e-mail efetivamente entregue, operação real de provedores/integrações e instalação física PWA. Pendência histórica de SHAs produtivos Vercel `34918f9`/Render `b0442f9` preservada, sem assumir que ainda descrevem o remoto atual. Próximo passo: revisar candidato corrigido/manifesto e definir a próxima homologação remota autorizada; não avançar automaticamente para publicação ou ativação. As seções abaixo preservam os gates históricos do Prompt 03.
+
 Base de trabalho: `higoraranda/abelha-gestor`, branch local `feature/phase-01-multi-tenant-foundation`, origem `34918f9`. Nenhum commit, push, deploy, migration remota, credencial, webhook externo ou vínculo de número nesta entrega. A migração pontual de login de 25/11 foi uma operação anterior, com autorização separada.
 
 ## Estado por fase

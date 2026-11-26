@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceDigest": "f773c871509587dc724e373699cd232270e9e5d9a51f1cff6b88489bcdc47b3a",
+  "sourceDigest": "dfd81a1c88bfdf4ba6368a420cb296ebc6b52aeec2c3f2f5f71713ccbc423b9f",
   "environment": "Express real / Auth.js / PGlite descartável em loopback / e-mail sintético",
   "auth": [
     {
@@ -3552,6 +3552,11 @@
           "case": "membro B (outro tenant)",
           "status": 403,
           "verdict": "negative"
+        },
+        {
+          "case": "snapshot de proposta própria",
+          "status": 201,
+          "verdict": "positive"
         }
       ]
     },
@@ -3612,6 +3617,11 @@
           "case": "membro B (outro tenant)",
           "status": 403,
           "verdict": "negative"
+        },
+        {
+          "case": "aprovação explícita da proposta",
+          "status": 200,
+          "verdict": "positive"
         }
       ]
     },
@@ -3672,6 +3682,111 @@
           "case": "membro B (outro tenant)",
           "status": 403,
           "verdict": "negative"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/quote-models/proposals/:id/status",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "proposta própria enviada",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "GET /api/v1/quote-models/proposals/:id/prompts",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "histórico próprio de prompts",
+          "status": 200,
+          "verdict": "positive"
+        }
+      ]
+    },
+    {
+      "endpoint": "POST /api/v1/quote-models/proposals/:id/prompts",
+      "checks": [
+        {
+          "case": "anônimo",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "conta desativada",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "JWT revogado após reativação",
+          "status": 401,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro A (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "membro B (outro tenant)",
+          "status": 403,
+          "verdict": "negative"
+        },
+        {
+          "case": "prompt versionado da proposta aprovada",
+          "status": 201,
+          "verdict": "positive"
         }
       ]
     },

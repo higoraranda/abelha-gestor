@@ -34,6 +34,7 @@ test('Overpass supports free text, Portuguese categories and optional state with
   assert.match(overpassQuery('dentists','Campinas',30), /dentist/)
   assert.match(overpassQuery('CLÍNICAS ODONTOLÓGICAS','campinas',30), /dentist/)
   assert.match(overpassQuery('Padaria','Campinas, sp',30), /"shop"="bakery"/)
+  assert.match(overpassQuery('Clínicas veterinárias','Itu, SP',3), /"amenity"="veterinary"/)
   const custom=overpassQuery('Ar Condicionado & Cia','São Paulo, SP',30)
   assert.match(custom, /"ISO3166-2"="BR-SP"/)
   assert.match(custom, /\[~"\^\(name\|brand\|description\|/)

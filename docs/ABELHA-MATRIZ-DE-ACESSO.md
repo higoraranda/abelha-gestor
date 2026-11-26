@@ -1,10 +1,152 @@
 # Abelha | Inventário de autorização por rota
 
+**Atualização03.3:** o conteúdo HML03.1 abaixo é histórico do candidato anterior. O workflow novo acrescenta três rotas e uma migration ainda não aplicados ao HML. Consulte a [matriz local03.3](ABELHA-MATRIZ-ACESSO-033.md):126rotas/124negativas/66positivas/655asserções; não presumir que o recibo HML anterior cobre o código novo.
+
+<!-- HML031-BEGIN -->
+## Homologação integrada — 25/11/2026
+
+**123/123 rotas com positiva, 121 com negativa; 785 asserções da matriz, mais 23 verificações complementares por recurso.** Auth.js/backend/PostgreSQL HML reais; 119 positivas sem provedor de saída simulado e quatro com Overpass/Evolution simulados. Não comprova operação externa desses provedores. [Recibo HML](ABELHA-EVIDENCIA-HML-031.json) e [relatório](ABELHA-HOMOLOGACAO-INTEGRADA-031.md). Nenhuma migration repetida ou alteração em produção.
+
+403 por papel permanece identificado como restrição de papel. Isolamento por recurso usa titulares igualmente autorizados, inclusive na mesma organização, 404/ausência nas listas e checagem SQL de ausência de mutações. As negativas não são prova genérica de RLS.
+
+| Endpoint | Positivas HML | Negativas HML | Provedor de saída | Gate do contrato |
+|---|---:|---:|---|---|
+| POST /api/v1/account/invites | 8 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/account/invites | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/account/invites/expire | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/account/register/code | 5 | 1 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/account/register | 5 | 1 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/account/password/reset/request | 1 | 1 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/account/password/reset/confirm | 2 | 3 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/catalog | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/catalog | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/catalog/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| DELETE /api/v1/catalog/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/clients | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/clients/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/clients | 2 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/clients/:clientId/contracts | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/clients/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| DELETE /api/v1/clients/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/contracts/:contractId | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/conversations/whatsapp/status | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/conversations/whatsapp/pair | 1 | 6 | simulado | PASS |
+| GET /api/v1/conversations | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/conversations/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/conversations/:id/read | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/crm/contracts | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/crm/overview | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/crm/tasks | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/crm/tasks | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/crm/tasks/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| DELETE /api/v1/crm/tasks/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/crm/opportunities | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/crm/opportunities | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/crm/opportunities/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/crm/opportunities/:id/convert | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/crm/relationships/:clientId | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/crm/relationships/:clientId/notes | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/crm/relationships/:clientId/next-action | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/crm/search | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/crm/notifications | 2 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/crm/notifications | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/crm/reports | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/crm/export | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/events | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/finance/summary | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/finance/clients | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/finance/clients/:clientId | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/finance/expenses | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/finance/expenses | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/finance/expenses/:expenseId | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/finance/receivables | 2 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/finance/receivables/:receivableId | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/integrations/github | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/integrations/codex/projects | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/integrations/codex/report | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/integrations/projects/:id/reports | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/integrations/leads/search | 1 | 2 | simulado | PASS |
+| POST /api/v1/integrations/leads/stage | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/integrations/tick | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/integrations/weekly-review | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/integrations/prices/due | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/integrations/prices/:id/observations | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/integrations/leads/capture | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/member-modules/me | 2 | 4 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/member-modules/me/preferences | 2 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/member-modules/members/:id/status | 3 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/member-modules/members | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/member-modules/members/:id | 5 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/messages | 1 | 7 | simulado | PASS |
+| GET /api/v1/personal/finance | 4 | 4 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/personal/finance/cycles | 2 | 4 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/personal/finance/entries | 1 | 8 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/personal/finance/plans | 1 | 4 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/personal/subscriptions | 4 | 4 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/personal/subscriptions | 2 | 4 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/personal/subscriptions/:id | 1 | 8 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/personal/subscriptions/:id/payments | 1 | 8 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/personal/prices | 4 | 4 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/personal/prices | 3 | 4 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/personal/prices/:id | 1 | 8 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/personal/preferences | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/personal/preferences | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/personal/push-subscriptions | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| DELETE /api/v1/personal/push-subscriptions | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/personal/notifications | 2 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/personal/notifications/:id | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/personal/projects | 4 | 4 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/personal/projects | 4 | 4 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/personal/projects/:id | 1 | 8 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/personal/projects/:id | 1 | 8 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/personal/projects/:id/pipeline | 3 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/personal/projects/:id/links | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| DELETE /api/v1/personal/projects/:id | 1 | 8 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/personal/projects/:id/milestones | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/personal/projects/:id/decisions | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/personal/projects/:id/reports | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/personal/projects/:id/milestones/:milestone/complete | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/personal/reviews | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/personal/reviews | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/prospecting/leads/niches | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/prospecting/leads/search | 1 | 5 | simulado | PASS |
+| GET /api/v1/prospecting/leads/candidates | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/prospecting/leads/import | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/prospecting/leads/candidates/:id/approve | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/prospecting/templates | 2 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/prospecting/drafts | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/prospecting/drafts | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/prospecting/drafts/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/quote-models | 6 | 4 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/quote-models/preview | 1 | 4 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/quote-models | 3 | 4 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/quote-models/proposals | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/quote-models/proposals | 2 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/quote-models/proposals/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/quote-models/proposals/:id/approve | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/quote-models/proposals/:id/refuse | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/quote-models/proposals/:id/prompt | 1 | 7 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/quote-models/:id | 1 | 10 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/reminders | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| POST /api/v1/reminders | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
+| PATCH /api/v1/reminders/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| DELETE /api/v1/reminders/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
+| POST /webhooks/evolution | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
+| GET /health | 1 | 0 | não exigido ou contrato de entrada sintético | PASS |
+| GET /api/v1/health | 1 | 0 | não exigido ou contrato de entrada sintético | PASS |
+
+<!-- HML031-END -->
+
+## Evidência local anterior (PGlite)
+
+
+
+
 121 rotas dos roteadores Express, mais 2 aliases HTTP registrados diretamente no app. O middleware de autenticação da biblioteca é montado em /api/auth e os fluxos usados pela fixture aparecem separadamente. Rotas HEAD implícitas do Express não são entradas independentes.
 
 **Evidência local:** 123/123 rotas com teste direto; 121 com negativa executada, 61 com positiva executada, 635 asserções HTTP nas rotas inventariadas. [Recibo reproduzível](ABELHA-EVIDENCIA-ACESSO.json), hash do escopo-fonte `f773c871509587dc724e373699cd232270e9e5d9a51f1cff6b88489bcdc47b3a`.
 
-**Interpretação:** a negativa comprova o caso anotado, não CRUD, integridade, replays, acesso a objetos de outro tenant ou RLS. Positivas são casos sintéticos executados, sem presumir sucesso remoto. Testes por fluxo e a suíte de PWA são complementares, não foram convertidos em crédito individual. Produção e HML não foram usadas.
+**Interpretação:** a negativa comprova o caso anotado, não CRUD, integridade, replays, acesso a objetos de outro tenant ou RLS. Positivas são casos sintéticos executados, sem presumir sucesso remoto. Testes por fluxo e a suíte de PWA são complementares, não foram convertidos em crédito individual. Na fixture local descrita nesta seção, produção e HML não foram usadas; a rodada real de HML está na seção própria.
 
 **Auth.js, fora do total de rotas da aplicação:** GET /api/auth/csrf · proprietário → 200; POST /api/auth/callback/credentials · proprietário → 200; GET /api/auth/session · proprietário → 200; GET /api/auth/csrf · membro A → 200; POST /api/auth/callback/credentials · membro A → 200; GET /api/auth/session · membro A → 200; GET /api/auth/csrf · membro B → 200; POST /api/auth/callback/credentials · membro B → 200; GET /api/auth/session · membro B → 200; GET /api/auth/csrf · conta desativada após login → 200; POST /api/auth/callback/credentials · conta desativada após login → 200; GET /api/auth/session · conta desativada após login → 200; GET /api/auth/csrf · sessão a revogar → 200; POST /api/auth/callback/credentials · sessão a revogar → 200; GET /api/auth/session · sessão a revogar → 200; POST /api/auth/signout · limpeza do cookie → 200.
 

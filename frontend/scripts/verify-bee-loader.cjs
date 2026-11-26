@@ -132,6 +132,7 @@ async function startScreencast(context, page) {
         const { page, health } = s
         await page.waitForTimeout(10800)
         const frames = await page.evaluate(() => window.loaderFrames)
+        await fs.writeFile(path.join(output, 'flight-frames.json'), JSON.stringify(frames))
         assert.ok(frames.some(frame => frame.cycleTime >= 10400), 'must observe two complete 5.2-second cycles')
         assert.ok(Math.max(...frames.map(f => f.x)) - Math.min(...frames.map(f => f.x)) > 195)
         for (let i = 1; i < frames.length; i++) {

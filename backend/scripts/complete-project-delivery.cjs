@@ -2,7 +2,7 @@
 const fs=require('node:fs/promises')
 const {execFileSync}=require('node:child_process')
 const {setTimeout:delay}=require('node:timers/promises')
-const {formatReceipt,writeReceipt}=require('./obsidian-task-receipt.cjs')
+const {formatReceipt,writeReceipt,writeDeliveryReceipt}=require('./obsidian-task-receipt.cjs')
 const base='/api/v1/integrations/codex'
 
 function canonicalRepo(value){
@@ -59,9 +59,12 @@ async function completeDelivery(input,{cwd=process.cwd(),notesDir,env=process.en
     }
     if(response?.ok){
       const result=await response.json()
-      if(result?.status!=='pending_review'||typeof result?.report_id!=='string'||!result.report_id)
+      if(result?.status!=='pending_review'||!(/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(result?.report_id??'')))
         throw Error('Resposta sem recibo verificável; não confunda com entrega.')
-      return {receipt:result.report_id,status:result.status,note:note.filename,project_id:project.id}
+      let saved
+      try{saved=await writeDeliveryReceipt(notesDir,receipt,{...result,project_id:project.id})}
+      catch{throw Error('O Abelha recebeu o relatório, mas o comprovante local não foi salvo. Repita a mesma entrega para reconciliar; não gere outro evento.')}
+      return {receipt:result.report_id,status:result.status,note:note.filename,delivery_note:saved.filename,project_id:project.id}
     }
     if(response&&(![429,502,503,504].includes(response.status)||attempt===2))
       throw Error('O Abelha não confirmou a entrega (HTTP '+response.status+').')

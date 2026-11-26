@@ -1,6 +1,20 @@
 import test from "node:test"
 import assert from "node:assert/strict"
 import { buildContractSchedule, dueDateInMonth } from "./contracts"
+import { resolveContractInput } from './contract-store'
+
+test('contract edits accept PostgreSQL date objects without changing civil dates', async () => {
+  const input=await resolveContractInput(null,'synthetic-org',{
+    serviceName:'HML',grossAmount:100,paymentMethod:'cash',monthlyFee:0,
+    developmentStartDate:new Date('2020-01-01T00:00:00.000Z'),
+    developmentEndDate:new Date('2020-01-02T00:00:00.000Z'),
+    contractEndDate:new Date('2020-02-02T00:00:00.000Z'),
+  })
+  assert.equal(input.developmentStartDate,'2020-01-01')
+  assert.equal(input.developmentEndDate,'2020-01-02')
+  assert.equal(input.contractEndDate,'2020-02-02')
+  assert.equal(buildContractSchedule(input).grossAmount,100)
+})
 
 const base = {
   serviceName: "Site institucional",

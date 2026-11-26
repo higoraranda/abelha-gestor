@@ -27,3 +27,11 @@ test('immutable proposal formatter retains a selected free item and excludes uns
   assert.match(prompt,/Entregáveis e requisitos técnicos/)
   assert.throws(()=>proposalPrompt({...entry,approved_at:'2026-11-25T15:00:00Z',refused_at:'2026-11-25T15:00:00Z'}),{status:409})
 })
+
+test('approved prompt exposes complete engineering sections without inventing a stack',()=>{
+ const entry=parseProposal({title:'Catálogo sintético',briefing:'Empresa: Oficina Aurora fictícia. Objetivo: exibir serviços. Integrações não definidas.',model:{version:1,name:'Modelo',baseCents:10000,monthlyCents:0,discountBps:0,lines:[]},quantities:{}})
+ const output=proposalPrompt({...entry,client_name:'Contato sintético',approved_at:'2026-11-25'})
+ for(const section of ['Contexto do cliente','Objetivo do projeto','Escopo aprovado','Funcionalidades solicitadas','Requisitos funcionais','Requisitos não funcionais','Integrações necessárias','Restrições técnicas','Entregáveis','Estratégia de implementação','Segurança','Testes','Critérios de aceitação','Documentação','Limites da autorização','Modelo e esforço de raciocínio']) assert.ok(output.includes('## '+section),section)
+ assert.match(output,/lacunas/i)
+ assert.doesNotMatch(output,/Next.js|Supabase|GPT-[0-9]/)
+})

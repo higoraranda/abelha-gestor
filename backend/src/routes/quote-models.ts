@@ -8,7 +8,7 @@ import { endpoint, mutationGuard } from './personal'
 import { parseProposal, proposalText, proposalPrompt } from '../services/quote-proposal'
 import { memberModuleAllowed } from '../services/member-modules'
 
-const proposalRow='id,client_id,client_name,title,briefing,model,quantities,quote,proposal_text,created_at,approved_at,refused_at,terms'
+const proposalRow='id,client_id,client_name,title,briefing,model,quantities,quote,proposal_text,created_at,approved_at,refused_at,terms,status,status_history'
 
 export function createQuoteModelsRouter(database:Database=postgresDatabase(db),authenticate:RequestHandler=authMiddleware) {
   const router=Router()
@@ -44,7 +44,7 @@ export function createQuoteModelsRouter(database:Database=postgresDatabase(db),a
   }))
   router.get('/proposals',requireOwner,endpoint(async(req,res)=>{
     const {organizationId,userId}=req.user!
-    const proposals=await database.query('SELECT id,client_id,client_name,title,created_at,approved_at,refused_at FROM quote_proposals WHERE organization_id=$1 AND user_id=$2 ORDER BY created_at DESC,id LIMIT 100',[organizationId,userId])
+    const proposals=await database.query('SELECT id,client_id,client_name,title,created_at,approved_at,refused_at,status FROM quote_proposals WHERE organization_id=$1 AND user_id=$2 ORDER BY created_at DESC,id LIMIT 100',[organizationId,userId])
     res.json(proposals)
   }))
   router.post('/proposals',requireOwner,endpoint(async(req,res)=>{
@@ -78,9 +78,10 @@ export function createQuoteModelsRouter(database:Database=postgresDatabase(db),a
       const saved=await database.transaction(async tx=>{
         const [current]=await tx.query('SELECT '+proposalRow+' FROM quote_proposals WHERE organization_id=$1 AND user_id=$2 AND id=$3 FOR UPDATE',[organizationId,userId,id])
         if(!current)throw new InputError('Orçamento não encontrado na sua conta.',404)
+        if(current.status==='cancelled')throw new InputError('Este orçamento foi cancelado. Salve uma nova proposta.',409)
         if(current[conflict])throw new InputError('Este orçamento já tem outra decisão. Salve uma nova proposta para negociar outra versão.',409)
         if(current[decision])return current
-        const [row]=await tx.query('UPDATE quote_proposals SET '+decision+'=now() WHERE organization_id=$1 AND user_id=$2 AND id=$3 RETURNING '+proposalRow,[organizationId,userId,id])
+        const [row]=await tx.query('UPDATE quote_proposals SET '+decision+"=now(),status=$4,status_history=status_history||jsonb_build_array(jsonb_build_object('status',$4::text,'at',now())) WHERE organization_id=$1 AND user_id=$2 AND id=$3 RETURNING "+proposalRow,[organizationId,userId,id,action==='approve'?'approved':'refused'])
         return row
       })
       res.json(saved)
@@ -90,6 +91,38 @@ export function createQuoteModelsRouter(database:Database=postgresDatabase(db),a
     const {organizationId,userId}=req.user!
     const entry=await getProposal(organizationId,userId,uuid(req.params.id))
     res.set('Cache-Control','no-store').json({prompt:proposalPrompt({title:entry.title,briefing:entry.briefing,client_name:entry.client_name,quote:entry.quote,quantities:entry.quantities,approved_at:entry.approved_at,refused_at:entry.refused_at})})
+  }))
+  router.post('/proposals/:id/status',requireOwner,endpoint(async(req,res)=>{
+    const target=req.body?.status
+    if(!['draft','sent','awaiting_approval','cancelled'].includes(target)||Object.keys(req.body).length!==1)throw new InputError('Estado comercial inválido.')
+    const {organizationId,userId}=req.user!,id=uuid(req.params.id)
+    const saved=await database.transaction(async tx=>{
+      const [current]=await tx.query('SELECT '+proposalRow+' FROM quote_proposals WHERE organization_id=$1 AND user_id=$2 AND id=$3 FOR UPDATE',[organizationId,userId,id])
+      if(!current)throw new InputError('Orçamento não encontrado na sua conta.',404)
+      if(current.status===target)return current
+      if(['approved','refused','cancelled'].includes(current.status))throw new InputError('Proposta encerrada. Salve uma nova versão para negociar.',409)
+      const transitions:Record<string,string[]>={draft:['sent','awaiting_approval','cancelled'],sent:['awaiting_approval','cancelled'],awaiting_approval:['sent','cancelled']}
+      if(!transitions[current.status]?.includes(target))throw new InputError('Transição comercial inválida.',409)
+      const [row]=await tx.query("UPDATE quote_proposals SET status=$4,status_history=status_history||jsonb_build_array(jsonb_build_object('status',$4::text,'at',now())) WHERE organization_id=$1 AND user_id=$2 AND id=$3 RETURNING "+proposalRow,[organizationId,userId,id,target])
+      return row
+    });res.json(saved)
+  }))
+  router.get('/proposals/:id/prompts',requireOwner,endpoint(async(req,res)=>{
+    const {organizationId,userId}=req.user!,id=uuid(req.params.id)
+    await getProposal(organizationId,userId,id)
+    res.set('Cache-Control','no-store').json(await database.query('SELECT id,content,source,created_at FROM quote_proposal_prompts WHERE organization_id=$1 AND user_id=$2 AND proposal_id=$3 ORDER BY created_at DESC,id LIMIT 100',[organizationId,userId,id]))
+  }))
+  router.post('/proposals/:id/prompts',requireOwner,endpoint(async(req,res)=>{
+    const {organizationId,userId}=req.user!,id=uuid(req.params.id)
+    const edited=req.body?.content
+    if(!req.body||Object.keys(req.body).some(key=>key!=='content')||(edited!==undefined&&(typeof edited!=='string'||!edited.trim()||edited.length>30000||edited.includes(String.fromCharCode(0)))))throw new InputError('O prompt deve ter de 1 a 30.000 caracteres.')
+    const saved=await database.transaction(async tx=>{
+      const [entry]=await tx.query('SELECT '+proposalRow+' FROM quote_proposals WHERE organization_id=$1 AND user_id=$2 AND id=$3 FOR UPDATE',[organizationId,userId,id])
+      if(!entry)throw new InputError('Orçamento não encontrado na sua conta.',404)
+      const generated=proposalPrompt({title:entry.title,briefing:entry.briefing,client_name:entry.client_name,quote:entry.quote,quantities:entry.quantities,approved_at:entry.approved_at,refused_at:entry.refused_at})
+      const [row]=await tx.query('INSERT INTO quote_proposal_prompts(organization_id,user_id,proposal_id,content,source) VALUES($1,$2,$3,$4,$5) RETURNING id,content,source,created_at',[organizationId,userId,id,edited===undefined?generated:edited.trim(),edited===undefined?'generated':'edited'])
+      return row
+    });res.set('Cache-Control','no-store').status(201).json(saved)
   }))
   router.patch('/:id',endpoint(async(req,res)=>{
     const {organizationId,userId}=req.user!

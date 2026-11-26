@@ -17,7 +17,8 @@ test('candidate migration chain preserves legacy owner, projects and commercial 
       client AS (INSERT INTO clients(organization_id,name) SELECT id,'Cliente legado' FROM org RETURNING id)
       SELECT (SELECT id FROM owner) AS owner_id,(SELECT id FROM org) AS org_id,(SELECT id FROM project) AS project_id,(SELECT id FROM client) AS client_id
     `)
-    const files=readdirSync('src/db/migrations').filter(name=>/^202611(?:25|26|27|28)_.*\.sql$/.test(name)).sort()
+    const files=readdirSync('src/db/migrations').filter(name=>/^202611(?:25|26|27|28|29)_.*\.sql$/.test(name)).sort()
+    assert.ok(files.includes('20261129_quote_proposal_workflow.sql'))
     assert.ok(files.includes('20261127_managed_accounts.sql'))
     assert.ok(files.includes('20261127_project_pipeline.sql'))
     assert.ok(files.includes('20261127_quote_proposal_decisions.sql'))

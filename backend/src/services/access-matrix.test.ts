@@ -77,7 +77,7 @@ test('parametric route authorization in production routers over real synthetic A
       WITH org AS (INSERT INTO organizations(name) VALUES('Carteira sintética A') RETURNING id)
       INSERT INTO users(organization_id,name,email,password_hash) SELECT id,'Titular sintético','owner@example.invalid',$1 FROM org RETURNING id,organization_id
     `,[await bcrypt.hash(ownerPassword,4)])).rows
-    for(const name of readdirSync('src/db/migrations').filter(name=>/^202611(?:25|26|27|28)_.*\.sql$/.test(name)).sort())await pg.exec(readFileSync('src/db/migrations/'+name,'utf8'))
+    for(const name of readdirSync('src/db/migrations').filter(name=>/^202611(?:25|26|27|28|29)_.*\.sql$/.test(name)).sort())await pg.exec(readFileSync('src/db/migrations/'+name,'utf8'))
     const [project]=(await pg.query<{id:string}>(`INSERT INTO personal_projects(organization_id,user_id,name,repository)
       VALUES($1,$2,'Projeto sintético permitido','https://github.com/example/authorized') RETURNING id`,[ownerIds.organization_id,ownerIds.id])).rows
     Object.assign(process.env,{
@@ -298,6 +298,13 @@ test('parametric route authorization in production routers over real synthetic A
     await (await exercise(anonymous,'POST /webhooks/evolution','evento sintético autenticado e inerte',200,'positive',
       {headers:{'X-Evolution-Secret':evolutionSecret},data:{event:'ping'}})).body?.cancel()
 
+    const [contact]=(await sql`INSERT INTO clients(organization_id,name) VALUES(${ownerIds.organization_id},'Cliente sintético da proposta') RETURNING id`)
+    const proposalResponse=await exercise(owner,'POST /api/v1/quote-models/proposals','snapshot de proposta própria',201,'positive',{data:{clientId:contact.id,title:'Proposta sintética',briefing:'Escopo sintético',model:defaultModel,quantities:{}}})
+    const proposal=(await proposalResponse.json() as {id:string}).id
+    await (await exercise(owner,'POST /api/v1/quote-models/proposals/:id/status','proposta própria enviada',200,'positive',{params:{id:proposal},data:{status:'sent'}})).body?.cancel()
+    await (await exercise(owner,'POST /api/v1/quote-models/proposals/:id/approve','aprovação explícita da proposta',200,'positive',{params:{id:proposal},data:{confirmed:true}})).body?.cancel()
+    await (await exercise(owner,'POST /api/v1/quote-models/proposals/:id/prompts','prompt versionado da proposta aprovada',201,'positive',{params:{id:proposal}})).body?.cancel()
+    await (await exercise(owner,'GET /api/v1/quote-models/proposals/:id/prompts','histórico próprio de prompts',200,'positive',{params:{id:proposal}})).body?.cancel()
     const csrf=await guestA('/api/auth/csrf');const {csrfToken}=await csrf.json() as {csrfToken:string}
     const signOut=await guestA('/api/auth/signout',{method:'POST',data:new URLSearchParams({csrfToken,redirect:'false'})})
     assert.equal(signOut.status,200)

@@ -113,7 +113,7 @@ const TYPES:ReadonlyArray<readonly [string,string,readonly string[]]>=[
   ['shop','bakery',['padaria','padarias','panificadora']],
   ['shop','pastry',['confeitaria','confeitarias']],
   ['shop','pet',['pet shop','pet shops','petshop']],
-  ['amenity','veterinary',['veterinaria','clinica veterinaria','veterinario','veterinarios']],
+  ['amenity','veterinary',['veterinaria','clinica veterinaria','clinicas veterinarias','veterinario','veterinarios']],
   ['shop','car_repair',['oficina','oficina mecanica','oficinas mecanicas','mecanica automotiva']],
   ['shop','supermarket',['supermercado','supermercados']],
   ['amenity','pharmacy',['farmacia','farmacias','drogaria','drogarias']],

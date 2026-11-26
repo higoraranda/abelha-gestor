@@ -38,8 +38,27 @@ function formatReceipt(receipt){
   return {filename:date+'-'+task_id+'.md', note}
 }
 async function writeReceipt(directory,receipt){
-  const root=await fs.realpath(directory)
   const {filename,note}=formatReceipt(receipt)
+  return writeImmutableNote(directory,filename,note)
+}
+async function writeDeliveryReceipt(directory,receipt,delivery){
+  const {filename}=formatReceipt(receipt)
+  const uuid=/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i
+  if(!uuid.test(delivery?.report_id??'')||!uuid.test(delivery?.project_id??'')||delivery?.status!=='pending_review')
+    throw Error('Comprovante de entrega inválido.')
+  const note=[
+    '# Comprovante de entrega '+receipt.task_id,'',
+    '- Projeto autorizado: '+delivery.project_id.toLowerCase(),
+    '- Relatório recebido: '+delivery.report_id.toLowerCase(),
+    '- Estado retornado: pending_review',
+    '- Commit informado: '+receipt.commit,
+    '- Nota técnica: '+filename,
+    '- O recebimento não representa aceite humano, conclusão de marco ou publicação.','',
+  ].join('\n')
+  return writeImmutableNote(directory,filename.replace(/\.md$/,'-comprovante.md'),note)
+}
+async function writeImmutableNote(directory,filename,note){
+  const root=await fs.realpath(directory)
   const dest=path.join(root,filename)
   try {await fs.writeFile(dest,note,{encoding:'utf8',flag:'wx'})}
   catch(error){
@@ -50,7 +69,7 @@ async function writeReceipt(directory,receipt){
   }
   return {filename}
 }
-module.exports={formatReceipt,writeReceipt}
+module.exports={formatReceipt,writeReceipt,writeDeliveryReceipt}
 if(require.main===module){
   const [, ,input,output]=process.argv
   if(!input){console.error('Uso: node obsidian-task-receipt.cjs recibo.json [pasta-de-notas-existente]');process.exitCode=2}

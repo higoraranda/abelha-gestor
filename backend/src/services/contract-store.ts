@@ -77,9 +77,9 @@ export async function resolveContractInput(sql: any, organizationId: string, raw
     paymentMethod: raw.paymentMethod,
     monthlyFee: Number(raw.monthlyFee ?? 0),
     monthlyDueDay: raw.monthlyDueDay == null || raw.monthlyDueDay === "" ? null : Number(raw.monthlyDueDay),
-    developmentStartDate: raw.developmentStartDate,
-    developmentEndDate: raw.developmentEndDate,
-    contractEndDate: raw.contractEndDate,
+    developmentStartDate: raw.developmentStartDate instanceof Date ? civilKey(raw.developmentStartDate) : raw.developmentStartDate,
+    developmentEndDate: raw.developmentEndDate instanceof Date ? civilKey(raw.developmentEndDate) : raw.developmentEndDate,
+    contractEndDate: raw.contractEndDate instanceof Date ? civilKey(raw.contractEndDate) : raw.contractEndDate,
     notes: raw.notes ?? null,
   }
 }

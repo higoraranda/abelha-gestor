@@ -19,3 +19,5 @@
 .quote-proposal-list li{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.65rem 0;border-bottom:1px solid var(--line)}
 .quote-proposal-list li div{display:grid;gap:.2rem;min-width:0;overflow-wrap:anywhere}
 .quote-proposal-list small{color:var(--ink-soft)}
+
+.quote-proposal-list li>.button{flex-shrink:0;white-space:normal}.quote-proposal-list li>span{min-width:0;overflow-wrap:anywhere}.quote-page textarea{resize:none}

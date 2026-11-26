@@ -1,4 +1,5 @@
 import type { Conversation } from '@/types'
+import { useState } from 'react'
 
 function formatTime(dateStr: string | null): string {
   if (!dateStr) return ''
@@ -19,13 +20,19 @@ interface Props {
 }
 
 export default function ConversationList({ conversations, selectedId, loading, onSelect }: Props) {
+  const [search,setSearch]=useState('')
+  const normalize=(value:string)=>value.normalize('NFD').replace(/\p{Diacritic}/gu,'').replace(/[^\p{L}\p{N}]/gu,'').toLocaleLowerCase('pt-BR')
+  const term=normalize(search)
+  const shown=conversations.filter(conv=>normalize([conv.client?.name,conv.client?.whatsapp,conv.whatsappChatId].filter(Boolean).join(' ')).includes(term))
   return (
     <div className="conversation-list">
       <header className="conversation-list-heading"><h2>Conversas</h2></header>
+      <label className="conversation-search"><span>Pesquisar conversas carregadas</span><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder="Nome ou telefone" /></label>
       <div className="conversation-list-scroll">
         {loading && <p className="conversation-empty">Carregando...</p>}
         {!loading && conversations.length === 0 && <p className="conversation-empty">Nenhuma conversa ainda</p>}
-        {conversations.map((conv) => {
+        {!loading && conversations.length>0 && shown.length===0 && <p className="conversation-empty">Nenhuma conversa corresponde à busca.</p>}
+        {shown.map((conv) => {
           const label = conv.client?.name ?? conv.client?.whatsapp ?? conv.whatsappChatId
           return (
             <button key={conv.id} onClick={() => onSelect(conv.id)} className={'conv-item' + (conv.id === selectedId ? ' active' : '')} aria-pressed={conv.id === selectedId}>

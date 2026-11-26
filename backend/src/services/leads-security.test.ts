@@ -25,7 +25,7 @@ const fallback='https://overpass.private.coffee/api/interpreter'
 const area={type:'area',id:3600000123}
 const validResponse=()=>Response.json({elements:[area,{type:'node',id:123,tags:{name:'Clínica de teste','contact:phone':'+55 19 0000-0000'}}]})
 
-for(const failure of ['network','busy','timeout','invalid-json','incomplete'] as const) {
+for(const failure of ['network','busy','not-acceptable','timeout','invalid-json','incomplete'] as const) {
   test(`Overpass ${failure} on primary recovers through another instance`,async t=>{
     t.mock.method(console,'warn',()=>{})
     const calls:string[]=[]
@@ -39,6 +39,7 @@ for(const failure of ['network','busy','timeout','invalid-json','incomplete'] as
       if(failure==='network')throw new TypeError('fetch failed',{cause:{code:'ECONNRESET'}})
       if(failure==='timeout')throw new DOMException('timeout','TimeoutError')
       if(failure==='busy')return new Response('All query workers are busy',{status:502})
+      if(failure==='not-acceptable')return new Response('Rejected by endpoint gateway',{status:406})
       if(failure==='invalid-json')return new Response('<html>unavailable</html>')
       return Response.json({remark:'runtime error: Query timed out',elements:[]})
     }

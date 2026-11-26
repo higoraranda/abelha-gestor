@@ -68,7 +68,9 @@ export async function searchLeads(org:string,niche:string,city:string,limit:numb
       const response=await fetcher(endpoint,{method:'POST',redirect:'error',headers:{Accept:'application/json','Content-Type':'application/x-www-form-urlencoded','User-Agent':'AbelhaCRM/1.0 (OpenStreetMap business search)'},body:new URLSearchParams({data:query}),signal:signal?AbortSignal.any([signal,AbortSignal.timeout(Math.min(index===0?14000:16000,remaining))]):AbortSignal.timeout(Math.min(index===0?14000:16000,remaining))})
       status=response.status
       if(!response.ok) {
-        retryable=status===429||status>=500
+        // 406 is an endpoint/gateway refusal, not Overpass's 400 query syntax error.
+        // A second instance may accept the same bounded query; never loop on it.
+        retryable=status===406||status===429||status>=500
         void response.body?.cancel().catch(()=>{})
         throw new InputError(status===504?'A fonte pública não respondeu no prazo. Aguarde um minuto antes de tentar novamente.':'A fonte pública está ocupada ou indisponível. Tente novamente mais tarde.',status===504?504:503)
       }

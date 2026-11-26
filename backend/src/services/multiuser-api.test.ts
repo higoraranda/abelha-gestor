@@ -34,6 +34,7 @@ test('real sessions redeem invitations and remain isolated across three workspac
     await pg.exec(load('migrations/20261125_quote_models.sql'))
     await pg.exec(load('migrations/20261126_quote_proposals.sql'))
     await pg.exec(load('migrations/20261127_quote_proposal_decisions.sql'))
+    await pg.exec(load('migrations/20261129_quote_proposal_workflow.sql'))
     wire=new PGLiteSocketServer({db:pg,host:'127.0.0.1',port:0});await wire.start()
     sql=postgres('postgresql://postgres:postgres@'+wire.getServerConn()+'/postgres',{ssl:false,max:3})
     const config=createAuthConfig(sql,false)
@@ -172,6 +173,8 @@ test('real sessions redeem invitations and remain isolated across three workspac
     assert.equal((await owner(one+'/prompt')).status,409)
     assert.equal((await guestA(one+'/approve',{})).status,403)
     assert.equal((await owner(one+'/approve',{})).status,400)
+    assert.equal((await owner(one+'/status',{status:'sent'})).status,200)
+    assert.equal((await owner(one+'/status',{status:'awaiting_approval'})).status,200)
     const approved=await owner(one+'/approve',{confirmed:true});assert.equal(approved.status,200)
     const approvedRow=await approved.json() as {approved_at:string;proposal_text:string;quote:{oneTimeCents:number}}
     assert.ok(approvedRow.approved_at)
@@ -189,6 +192,17 @@ test('real sessions redeem invitations and remain isolated across three workspac
     assert.match(promptText,/Critérios de aceitação/)
     assert.match(promptText,/Criar catálogo acessível/)
     assert.doesNotMatch(promptText,/private@example.invalid|5511999999999/)
+    const generated=await owner(one+'/prompts',{});assert.equal(generated.status,201)
+    const v1=await generated.json() as {id:string;content:string}
+    const edited=await owner(one+'/prompts',{content:v1.content+'\nRevisão sintética.'});assert.equal(edited.status,201)
+    assert.equal((await owner(one+'/prompts',{})).status,201)
+    const history=await (await owner(one+'/prompts')).json() as {id:string;content:string}[]
+    assert.equal(history.length,3);assert.ok(history.some(row=>row.content.endsWith('Revisão sintética.')))
+    assert.equal((await guestA(one+'/prompts')).status,403)
+    assert.equal((await owner(one+'/status',{status:'draft'})).status,409)
+    const cancel=await owner(proposals,brief);const cancelRow=await cancel.json() as {id:string}
+    assert.equal((await owner(proposals+'/'+cancelRow.id+'/status',{status:'cancelled'})).status,200)
+    assert.equal((await owner(proposals+'/'+cancelRow.id+'/approve',{confirmed:true})).status,409)
     await sql`DELETE FROM clients WHERE id=${ownedClient.id}`
     const retained=await (await owner(one)).json() as {client_id:string|null;client_name:string}
     assert.equal(retained.client_id,null);assert.equal(retained.client_name,'Studio Sintético')
