@@ -1,5 +1,17 @@
 # Abelha | Roadmap multiusuário: entrega e gates
 
+## Atualização Prompt 03.4 — 26/11/2026
+
+Estado vigente: [relatório final 03.4 e sequência de produção](ABELHA-HOMOLOGACAO-FINAL-034.md). Candidato confirmado na main remota: `000660b0f01d6dbe16101e1d4d815ee6013786e4`, enviado manualmente pelo proprietário. A referência HML remota está ausente; a branch HML local em `37f9898` contém trabalho divergente e precisa de conciliação manual. Nenhum Git mutável ou deploy nesta missão; Render HML permanece com auto-deploy desativado.
+
+Aplicada somente `20261129_quote_proposal_workflow.sql` no Neon `abelha_homologacao`, após confirmação do destino e ponto de recuperação. Nove anteriores não repetidas. Preservadas as 39 tabelas anteriores; schema final com 40. Teste SQL real com role HML: decisões concorrentes serializadas, histórico comercial/prompts, FK de usuário e constraint de decisão válidos, snapshot preservado; limpeza conferiu fingerprints das 40 tabelas. Isso não substitui os testes HTTP do candidato. Baseline local 93/50, 126 rotas e 267,60 kB reaproveitado sem repetir suítes gerais.
+
+Produção já recebeu automaticamente o push manual da main: Render e Vercel no mesmo SHA `000660b`, mas o catálogo produtivo não contém os marcadores das dez migrations. Risco de incompatibilidade registrado; nenhuma escrita ou recuperação produtiva autorizada/executada nesta missão. Sequência preparada exige nova conferência integral do catálogo, ponto de recuperação fresco, somente migrations ausentes, compatibilidade e aprovação específica.
+
+Gates abertos: transporte HML, HTTPS/cookies/CORS/cold start e regressões do candidato, confirmação Resend/remetente e caixa autorizada, integração automática Codex→Segundo Cérebro→Abelha por evento real. **A integração automática é requisito original obrigatório**, não opcional permanente. WhatsApp desabilitado e indisponibilidade de Busca Lead não bloqueiam áreas independentes seguras. Nenhum hook global alterado, envio real de e-mail ou serviço temporário deixado ativo. Publicação não liberada.
+
+As seções seguintes mantêm o histórico das rodadas; não substituem este estado vigente.
+
 ## Atualização Prompt03.3 — encerramento local26/11/2026
 
 O proprietário revogou expressamente a autorização excepcional de commit/push: todas as alterações permanecem sem stage para revisão e commit manual. Sem publicação, mudança de fonte Render ou migration remota. [Verificação completa dos requisitos](ABELHA-REQUISITOS-033.md).
@@ -214,7 +226,7 @@ Comando opt-in futuro, já testado com dados fictícios: no checkout Git correto
 1. Fechar a separação HML e confirmar recuperação; homologar primeiro banco e depois candidato com usuários sintéticos. Compare a versão, migrações, variáveis por ambiente e comportamentos protegidos.
 2. Fixar os arquivos pelo manifesto (digest distinto de HEAD), confirmar Git e o auto-deploy. Quando a promoção for explicitamente aprovada, e apenas se main local tiver a mesma base e não houver divergência remota, a transição proposta é git switch main, verificar novamente manifestos e diferença, selecionar somente arquivos revisados, git diff --cached --name-status, git commit -m "feat(abelha): consolidar homologação e preparar lançamento", registrar git rev-parse HEAD e só então git push origin main. Se houver divergência, parar e preservar o checkout; não fazer merge automático, rebase, história forçada ou nova branch. Estes comandos não foram executados.
 3. Em produção, só com autorização própria: ponto de recuperação fresco, migrations aditivas antes de uma revisão que dependa delas, backup/restore documentados, HTTPS/credenciais por ambiente, smoke de login existente e dados preservados antes de liberar qualquer convite. Se falhar, impedir avanço e voltar à revisão compatível; restauração destrutiva não é automática.
-4. Essenciais: acesso e privacidade, contas/convites e e-mail, compatibilidade de migrations, smoke do proprietário e concessão apenas dos módulos aprovados. Opcionais desabilitáveis: Evolution, sincronização de execução Codex/Obsidian, prospecção Overpass se não confiável. Bloqueiam liberação: ausência de homologação real, evidência insuficiente de isolamento por recurso, migrações de destino e ausência de confirmação do e-mail. **Prompt 04 ainda não deve ser exclusivamente publicação.**
+4. Essenciais: acesso e privacidade, contas/convites e e-mail, compatibilidade de migrations, smoke do proprietário e concessão apenas dos módulos aprovados. Integração automática Codex/Obsidian/Abelha é requisito original obrigatório, com gate de evento real e revisão humana preservada. Opcionais desabilitáveis: Evolution e prospecção Overpass se não confiável. Bloqueiam aceite integral: ausência de homologação real, evidência insuficiente de isolamento por recurso, migrations de destino, ausência de confirmação do e-mail e integração automática ainda não comprovada. **Prompt 04 ainda não deve ser exclusivamente publicação.**
 
 
 ### Validação final do candidato do Prompt 03
