@@ -1,6 +1,6 @@
 # Design do Abelha — CRM + Personal
 
-Direção atual: Dark Mode padrão, grafite e amarelo Abelha, conforme o redesign de 12/11/2026. Preservar a composição Rapport existente. Esta paleta substitui a aparência clara do briefing anterior; não há alternância de tema nesta etapa.
+O tema escuro em grafite e amarelo Abelha é o padrão. O tema claro usa superfícies quentes e dourado escuro para manter o contraste. O conteúdo mantém sua composição e a navegação volta à lateral esquerda.
 
 ## Produto e identidade
 CRM individual e organização pessoal em ambientes separados, em pt-BR, valores em reais, fuso America/Sao_Paulo. Preservar a marca da abelha e o amarelo. Nada de equipes, metas de vendedores ou decoração empresarial.
@@ -9,6 +9,8 @@ Exclusão de projetos: ação secundária destrutiva no detalhe, com o Modal exi
 
 ## Cores e superfícies
 Fonte de verdade executável: `frontend/src/theme.css`, importado por `index.css`. Modelo de propriedade: o CSS mantém os valores; este documento espelha os papéis e explica o uso. `workspace.css` mantém os componentes compartilhados; `personal.css`, carregado por último, mantém somente a composição Personal, consumindo a mesma paleta.
+
+A tabela abaixo descreve a paleta escura. No tema claro, os mesmos papéis usam fundo `#F7F6EF`, superfície `#FFFDF8`, texto `#242721` e dourado `#795500` para ações e foco. A animação da abelha consome os tokens do tema ativo.
 
 | Papel | Token CSS | Valor | Aplicação |
 |---|---|---|---|
@@ -36,9 +38,9 @@ Fonte de verdade executável: `frontend/src/theme.css`, importado por `index.css
 Urbanist (`--font-body`) com fallback system-ui para títulos e corpo, preservando a identidade existente. Títulos 30–43px, peso 600, tracking discreto negativo. Texto operacional de 13–14px; metadados de 11–12px. CSS histórico com texto de 7–10px foi elevado para 11px; eventos compactos do calendário mobile usam 10px e detalhe completo no painel do dia. Valores financeiros e tabelas usam números tabulares. Números claros e ações com rótulo útil.
 
 ## Navegação e composição
-Navegação superior: Visão geral, Clientes, Entregas, Pipeline, Financeiro, Agenda, Conversas e Relatórios. Rail de ações: busca, novo contato, agenda, exportações e calculadora externa. Notificações no cabeçalho. URL guarda área e registro selecionado para links de busca/notificações.
-O seletor CRM/Personal fica junto à marca. CRM acrescenta Buscar leads e Templates. Personal: Meu dia, Projetos, Faturas e metas, Contas, Preços, Revisão semanal e Preferências. Trocar ambiente limpa o registro anterior e troca menu, ações e central de avisos; links antigos continuam CRM. O gesto característico do Personal é o ritual da fatura no painel verde já usado nos próximos passos do CRM.
-Em celular: navegação rolável no topo, rail inferior, cards empilhados e quadros/tabelas com rolagem própria. O pipeline mantém suas quatro colunas em uma mesma faixa horizontal. O calendário exibe os sete dias na largura disponível e o painel abaixo mantém o texto completo dos compromissos. Não ocultar rolagem de formulários para fazer tabelas caberem.
+A estrutura do commit `68647ab4d92fccfb288080ad59debc57bb639873` é a referência. A sidebar esquerda tem marca, seletor CRM/Personal, grupos com ícone e texto por seção e destaque visível da tela atual. O CRM inclui Entregas, com quadro e checklist, e mantém as ações de busca, contato, exportação e calculadora externa no rodapé. O Personal usa o mesmo shell e suas próprias seções, incluindo Meu dia, Projetos, Revisão semanal, Faturas e metas, Contas, Preços e Preferências.
+A URL guarda o ambiente e o registro. Trocar de ambiente abre a respectiva visão geral e atualiza a central de avisos. A hierarquia dos conteúdos permanece em cada módulo.
+Em larguras inferiores a 1024 px, o menu abre pela esquerda com foco contido. A barra compacta mostra ambiente, seção atual, tema e notificações. Escape e seleção fecham o menu e devolvem o foco ao controle de abertura. Cards se reorganizam e quadros e tabelas conservam rolagem interna. O calendário mantém os sete dias e o painel de detalhes.
 
 ## Autenticação
 O login e a recuperação compartilham o painel direito do mesmo layout. Campos de senha começam ocultos, com botão explícito de mostrar/ocultar e foco visível. A recuperação exibe a mesma instrução de caixa de entrada para todo e-mail válido e não autentica automaticamente após salvar. Nenhuma alteração no formulário em duas etapas do cadastro.
@@ -58,7 +60,7 @@ Feedback de erro em português. Desabilitar ações enquanto salva. Foco visíve
 
 ## Estados e acessibilidade visual
 
-- `color-scheme: dark` no documento, inputs, selects e pickers nativos. Popup e calendário nativo continuam sob propriedade do navegador/sistema; não criar um seletor paralelo.
+- Inputs, selects e pickers herdam o `color-scheme` ativo do documento. O navegador controla o popup e o calendário nativos.
 - Botão principal usa texto escuro e estados amarelos hover/pressed. Secundários usam superfícies e bordas; perigo usa texto dessaturado e contexto explícito.
 - Foco amarelo visível com offset, inclusive em links, campos e botões somente com ícone. Campo tem borda mais forte que separadores decorativos. Placeholder não substitui rótulo.
 - Scrollbars globais visíveis com tokens de trilha/thumb/hover/active e fallback para forced-colors; nenhuma área depende de uma classe opt-in para receber o tema.

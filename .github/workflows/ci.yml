@@ -1,0 +1,52 @@
+name: Abelha validation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["backend/**", "frontend/**", ".github/workflows/ci.yml"]
+  pull_request:
+    paths: ["backend/**", "frontend/**", ".github/workflows/ci.yml"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: abelha-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validation:
+    name: Validate ${{ matrix.directory }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        directory: [backend, frontend]
+    defaults:
+      run:
+        working-directory: ${{ matrix.directory }}
+    env:
+      CI: "true"
+      DATABASE_URL: postgres://synthetic:synthetic@127.0.0.1:1/never_connect
+      ABELHA_HOMOLOGATION_SESSION_FILE: ""
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: ${{ matrix.directory }}/package-lock.json
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Run isolated tests
+        run: npm test
+      - name: Check frontend lint and build
+        if: matrix.directory == 'frontend'
+        run: |
+          npm run lint
+          npx --no-install tsc -b
+          npx --no-install vite build --configLoader runner

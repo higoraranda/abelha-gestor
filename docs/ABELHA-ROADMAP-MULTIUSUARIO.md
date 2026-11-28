@@ -1,5 +1,37 @@
 # Abelha | Roadmap multiusuário: entrega e gates
 
+## Atualização Prompt 05 — 27/11/2026
+
+**PARTIAL.** O candidato local `rc05-0e5fffd8f413` recupera a estrutura lateral do commit `68647ab` para CRM e Personal. Entregas tem acesso pela sidebar, com o quadro e checklist atuais. Tema e tipografia do 04 preservados. As 17 seções foram verificadas no Chromium de 320 a 1920 px e o aceite visual do proprietário segue pendente. [Relatório operacional 05](ABELHA-RELATORIO-05.md).
+
+O 42P01 continua aberto, com 36 tabelas na produção e 40 no HML. Recuperação, CI real, paridade do novo candidato no HML e entrega automática aguardam contenção e as autorizações aplicáveis. Resend gratuito com `resend.dev` está aprovado para o desenvolvimento, com testes reais restritos à caixa autorizada. Domínio próprio é requisito do lançamento público. Publicação manual preservada.
+
+## Atualização Prompt 04 — 27/11/2026
+
+**PARTIAL.** O [relatório operacional 04](ABELHA-RELATORIO-04.md) registra o candidato local `rc04-8d0aef0bfe00`, alternância de tema, 54 testes frontend e 94 backend, 655 asserções HTTP e verificação no Chromium. O HML continua alinhado no SHA `000660b` da rodada anterior. CI e homologação do novo candidato aguardam publicação manual com contenção produtiva comprovada.
+
+Produção segue com 36 tabelas e 42P01 confirmado por incompatibilidade estrutural. O [procedimento de recuperação](ABELHA-INCIDENTE-PRODUCAO-036.md) foi revisto e o pacote passou em ensaio descartável. Faltam autorização, proteção recente verificável e execução produtiva. A rota de entregas do HML retornou HTTP 503 de integração não configurada. Hook local conferido e envelope em rascunho. Resend sem domínio próprio na conta consultada. Aceite, promoção e expansão comercial aguardam os gates aplicáveis.
+
+## Atualização Prompt 03.6 — 26/11/2026
+
+Fonte vigente: [relatório operacional03.6](ABELHA-RELATORIO-036.md) e [incidente produtivo separado](ABELHA-INCIDENTE-PRODUCAO-036.md). Paridade HML encerrada: Render dep-dc470ut9el5s73adq0t0 e Preview dpl_DFU9eP7P2e9LaJuRvX4W8tNJVVg9 em000660b, auto-deploy HML off, reconexão TLS após rotação e identidade abelha_homologacao/abelha_hml_app comprovadas. Smoke dirigido com limpeza/fingerprints40tabelas. Nenhuma migration reaplicada ou suíte completa repetida.
+
+Cold start real aprovado em12.468ms, com início do runtime Render durante a primeira requisição após ociosidade. Artefato existente conferido por25hashes: animação automática da abelha, ausência de botão manual e390px sem overflow nas telas verificadas. PWA instalada/offline/reconexão aprovadas em perfil isolado removido ao final; proteção Preview mantida. Alternância de tema ausente na aplicação atual; dark fixo persiste. E-mail real PASS na caixa autorizada: OTP/cadastro verificado, reset, expiração por timestamps sintéticos, uso único e revogação de duas sessões; limpeza/fingerprints40tabelas. Remetente resend.dev continua de teste; domínio próprio verificado é necessário antes de abrir envio a outros usuários.
+
+Hook local autorizado instalado, confiança no cliente ainda não observada. Vínculo HML único criado e token privado preparado; runtime e CI real ainda pendentes. Workflow sem deploy preparado para revisão/publicação manual, sem commit/push. Nenhum evento real de entrega, UUID ou progresso automático foi comprovado; integração permanece requisito obrigatório aberto.
+
+Produção somente leitura confirmou36tabelas e schema incompatível. Recomendado avanço aditivo das dez migrations ausentes com proteção recuperável, contenção de auto-deploy e autorização produtiva específica. Preflight/pacote transacional preparados, nunca executados. Não enviar main antes de controlar publicação automática produtiva. Lançamento não liberado; Busca Lead preservada e WhatsApp desabilitado não impedem tratamento do incidente.
+
+## Atualização Prompt 03.5 — 26/11/2026
+
+Estado vigente: [relatório consolidado03.5](ABELHA-RELATORIO-035.md). Deploy por SHA dispensa conciliar a branch HML divergente. Preview `dpl_DFU9eP7P2e9LaJuRvX4W8tNJVVg9` READY em000660b; Render HML atual `dep-dc46mil6e07s73eb4eo0` live em844f948 após atualização da credencial. Diferença entre commits apenas documental, mas paridade formal de SHA ainda pendente: proprietário deve fixar Render HML no candidato000660b, preservando variáveis e auto-deploy off. Não exige novo commit/push.
+
+Rotação de abelha_hml_app autorizada e executada exclusivamente no HML, consumidores Render/local atualizados e reconexão posteriormente comprovada. Regressões HTTPS dirigidas: autenticação/sessão/cookies seguros, permissões, isolamento, Kanban, cálculo/snapshot/histórico e decisões concorrentes200/409. UI Preview comprovou orçamento/aprovação, geração/edição/histórico e cópia de prompt, reload e logout. Fixtures removidas, fingerprints40tabelas preservados; nenhuma migration remota reaplicada. Baseline93/50 não repetido. PWA offline bloqueada pela proteção Vercel; cold start por ociosidade, loader e matriz móvel/tema não receberam nova comprovação completa.
+
+Produção somente leitura: catálogo36tabelas e EXPLAIN42P01 para quote_models; plano de contenção/recuperação e ordem das dez migrations no relatório, sem execução produtiva. Rollback b0442f9 não resolve dependência de quote_models; retorno legadoc4e983e exige qualificação e confirmação de artefato/rebuild. Caixa de teste autorizada, mas proprietário pediu instruções Resend e não houve entrega real. Automação continua requisito obrigatório pendente de vínculo/token/Actions real e confiança/evento do cliente; proposta local não ativa, nenhum hook global alterado. Sem stage/commit/push/branches. Publicação não liberada.
+
+As seções seguintes são históricas; orientações anteriores de conciliação obrigatória de branch e reconexão HML não confirmada foram superadas por esta atualização.
+
 ## Atualização Prompt 03.4 — 26/11/2026
 
 Estado vigente: [relatório final 03.4 e sequência de produção](ABELHA-HOMOLOGACAO-FINAL-034.md). Candidato confirmado na main remota: `000660b0f01d6dbe16101e1d4d815ee6013786e4`, enviado manualmente pelo proprietário. A referência HML remota está ausente; a branch HML local em `37f9898` contém trabalho divergente e precisa de conciliação manual. Nenhum Git mutável ou deploy nesta missão; Render HML permanece com auto-deploy desativado.

@@ -9,6 +9,7 @@ import { logout } from '@/lib/auth'
 import { useAuthStore } from '@/store/auth'
 import { useRemote } from '@/hooks/useRemote'
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/DataState'
+import ThemeToggle from '@/components/ui/ThemeToggle'
 
 const PersonalFinance = lazy(() => import('./PersonalFinance'))
 const PersonalSubscriptions = lazy(() => import('./PersonalSubscriptions'))
@@ -63,7 +64,10 @@ export default function MemberHome() {
     catch {setError('Não foi possível sair. Verifique sua conexão e tente novamente.')}
   }
   return <main className="member-shell">
-    <header className="personal-row"><div className="login-brand"><img className="brand-mark" src="/bee-mark.png" alt=""/><strong>abelha</strong></div><button className="button button-secondary" onClick={signOut}><LogOut size={17} aria-hidden="true" /> Sair</button></header>
+    <header className="personal-row">
+      <div className="login-brand"><img className="brand-mark" src="/bee-mark.png" alt=""/><strong>abelha</strong></div>
+      <div className="workspace-account"><ThemeToggle /><button className="button button-secondary" onClick={signOut}><LogOut size={17} aria-hidden="true" /> Sair</button></div>
+    </header>
     <div className="page-heading"><div><p className="eyebrow">Meu espaço · Acesso por convite</p><h1>{user?.name?'Olá, '+user.name.split(' ')[0]+'.':'Seu espaço pessoal'}</h1><p className="page-subtitle">Aqui ficam os módulos disponíveis para a sua conta.</p></div></div>
     {!!visible.length&&<nav className="quote-actions" aria-label="Módulos disponíveis">{visible.map(module=><button key={module.id} className="button button-secondary" aria-current={active===module.id?'page':undefined} onClick={()=>setParams({member:module.slug})}>{module.navigation}</button>)}</nav>}
     {!!authorized.length&&<details className="quote-transfer"><summary>Personalizar meu espaço</summary>

@@ -1,11 +1,15 @@
 import type { ReactNode } from 'react'
 import { CheckCircle2 } from 'lucide-react'
+import ThemeToggle from '@/components/ui/ThemeToggle'
 
 export default function AuthLayout({children}: {children: ReactNode}) {
   return (
     <main className="login-page">
       <section className="login-intro" aria-label="Apresentação do Abelha">
-        <div className="login-brand"><img className="brand-mark" src="/bee-mark.png" alt="" /><strong>abelha</strong></div>
+        <div className="flex items-center justify-between gap-3">
+          <div className="login-brand"><img className="brand-mark" src="/bee-mark.png" alt="" /><strong>abelha</strong></div>
+          <ThemeToggle />
+        </div>
         <div className="login-intro-copy">
           <p className="eyebrow">Seu CRM pessoal</p>
           <h1>Clientes, conversas e financeiro sob o seu controle.</h1>

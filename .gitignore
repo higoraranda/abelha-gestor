@@ -12,3 +12,4 @@ backend/reset-password.mjs
 CLAUDE.md
 .claude/
 .abelha-homologacao/
+.codex/hooks.json

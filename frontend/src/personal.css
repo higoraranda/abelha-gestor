@@ -1,10 +1,4 @@
 /* Shared CRM/Personal additions. Existing tokens remain authoritative. */
-.workspace-header { flex-wrap:wrap; }
-.workspace-nav { order:3; flex-basis:100%; justify-content:flex-start; overflow:auto; padding:3px; }
-.workspace-account { margin-left:auto; }
-.space-switch { display:flex; border:1px solid var(--line); padding:4px; border-radius:999px; background:var(--surface); gap:3px; }
-.space-switch button { border:0; border-radius:999px; padding:9px 16px; min-height:40px; background:transparent; color:var(--ink-soft); font-weight:600; font-size:13px; }
-.space-switch button[aria-pressed=true] { background:var(--accent-yellow); color:var(--on-accent); }
 .personal-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; margin:20px 0; }
 .personal-grid>.crm-panel { margin-bottom:0; min-width:0; }
 .personal-section { display:flex; flex-direction:column; gap:15px; min-width:0; }
@@ -36,8 +30,8 @@
 .lead-search-form { display:grid; grid-template-columns:1fr 1.4fr .6fr auto; gap:15px; align-items:end; }
 .lead-result { border-top:1px solid var(--line); padding:20px 0; display:grid; gap:10px; }.lead-result>div { padding-left:30px; }.lead-result small { color:var(--ink-soft); font-size:12px; }
 .skip-link { position:fixed; top:-100px; left:20px; z-index:100; padding:12px; background:var(--accent-yellow); border-radius:12px; color:var(--on-accent); }.skip-link:focus { top:10px; }
-@media(max-width:800px) { .personal-grid { grid-template-columns:1fr; gap:16px; }.personal-row { align-items:flex-start; }.personal-morning { padding:25px; align-items:flex-start; flex-direction:column; }.personal-morning h2 { font-size:25px; }.personal-banner { flex-wrap:wrap; }.lead-search-form { grid-template-columns:1fr; }.personal-facts { grid-template-columns:1fr 1fr; }.personal-row .crm-toolbar { width:100%; }.quick-rail { margin-bottom:env(safe-area-inset-bottom,0px); }.space-switch { margin-left:auto; }.workspace-account { margin-left:0; }.workspace-account .personal-avatar { display:none; } }
-@media(max-width:430px) { .workspace-brand strong { font-size:22px; }.workspace-brand img { width:33px; height:33px; }.space-switch button { padding:8px 10px; min-height:38px; }.workspace-header { gap:9px; }.personal-metrics { grid-template-columns:1fr; } }
+@media(max-width:800px) { .personal-grid { grid-template-columns:1fr; gap:16px; }.personal-row { align-items:flex-start; }.personal-morning { padding:25px; align-items:flex-start; flex-direction:column; }.personal-morning h2 { font-size:25px; }.personal-banner { flex-wrap:wrap; }.lead-search-form { grid-template-columns:1fr; }.personal-facts { grid-template-columns:1fr 1fr; }.personal-row .crm-toolbar { width:100%; } }
+@media(max-width:430px) { .personal-metrics { grid-template-columns:1fr; } }
 
 .register-fields { display: grid; gap: .9rem; min-width: 0; padding: 0; margin: 1rem 0; border: 0; }
 .register-fields .button { justify-self: start; }

@@ -41,6 +41,7 @@ function inspect() {
   const page=await context.newPage(),errors=[],results=[],checks=[];page.setDefaultTimeout(10000)
   let mode='populated'
   page.on('pageerror',error=>errors.push(error.message))
+  await context.route('**/*', route => new URL(route.request().url()).origin === base ? route.continue() : route.abort())
   await context.route('**/api/**',async route=>{
     const request=route.request(),url=new URL(request.url()),pathname=url.pathname
     if(url.origin!==base)return route.abort()
@@ -57,13 +58,24 @@ function inspect() {
     if(!['GET','HEAD'].includes(request.method())&&!pathname.startsWith('/api/v1/personal/')&&!pathname.startsWith('/api/v1/prospecting/'))return route.fulfill({status:503,json:{error:'Gravações comerciais desativadas nesta prévia visual.'}})
     return route.continue()
   })
-  async function settle() { await page.locator('.workspace-header,.login-form').first().waitFor();await page.locator('[aria-busy=true]').first().waitFor({state:'hidden',timeout:10000}).catch(()=>{});await page.evaluate(()=>document.fonts.ready);await page.waitForTimeout(180) }
+  async function settle() { await page.locator('.workspace-sidebar,.workspace-mobile-bar,.login-form').first().waitFor();await page.locator('[aria-busy=true]').first().waitFor({state:'hidden',timeout:10000}).catch(()=>{});await page.evaluate(()=>document.fonts.ready);await page.waitForTimeout(180) }
   async function open(view,extra='') { await page.goto(base+'/?'+(view.startsWith('personal-')?'space=personal&':'')+'view='+view+extra);await settle() }
   async function capture(name) {
     await page.evaluate(()=>scrollTo(0,0));const audit=await page.evaluate(inspect);results.push({name,...audit});await page.screenshot({path:path.join(output,name+'.png'),fullPage:await page.getByRole('dialog').count()===0});fs.writeFileSync(path.join(output,'progress.json'),JSON.stringify(results,null,2))
   }
   async function closeModal() { await page.keyboard.press('Escape');await page.getByRole('dialog').waitFor({state:'hidden'}) }
-  async function dialog(button,name) { await button.click();await page.getByRole('dialog').waitFor();await capture(name);await page.keyboard.press('Tab');assert.equal(await page.evaluate(()=>document.querySelector('[role=dialog]').contains(document.activeElement)),true);await closeModal();await page.waitForFunction(element=>element===document.activeElement,await button.elementHandle(),{timeout:1500}) }
+  const menuTrigger = page.locator('.workspace-mobile-bar [aria-label="Abrir menu"]')
+  async function openSidebar() { if(await menuTrigger.isVisible())await menuTrigger.click() }
+  async function dialog(button,name,restoreFocus=button) {
+    const opener=await restoreFocus.elementHandle()
+    await button.click()
+    await page.getByRole('dialog').filter({hasNot:page.getByRole('heading',{name:'Menu do Abelha'})}).waitFor()
+    await capture(name)
+    await page.keyboard.press('Tab')
+    assert.equal(await page.evaluate(()=>document.querySelector('[role=dialog]').contains(document.activeElement)),true)
+    await closeModal()
+    await page.waitForFunction(element=>element===document.activeElement,opener,{timeout:1500})
+  }
   try {
     for(const viewport of [{width:1440,height:1000},{width:390,height:844}]) {
       await page.setViewportSize(viewport);const device=viewport.width===390?'mobile':'desktop'
@@ -76,14 +88,16 @@ function inspect() {
       await dialog(page.getByRole('button',{name:'Registrar gasto',exact:true}).first(),'expense-modal-'+device)
       await open('inbox');await page.getByRole('button',{name:new RegExp('Estúdio Aurora')}).click();await page.getByText('Olá! Podemos revisar a proposta do novo site?',{exact:true}).waitFor();await capture('messages-'+device)
       const draft='Mensagem sintética não enviada';await page.getByLabel('Mensagem',{exact:true}).fill(draft);assert.equal(await page.getByLabel('Mensagem',{exact:true}).inputValue(),draft)
-      if(device==='mobile') {const composer=await page.locator('.message-composer').boundingBox(),rail=await page.locator('.quick-rail').boundingBox();assert.ok(composer.y+composer.height<rail.y,'Message composer must remain above quick actions')}
+      if(device==='mobile') {const composer=await page.locator('.message-composer').boundingBox(),header=await page.locator('.workspace-mobile-bar').boundingBox();assert.ok(composer.y>=header.y+header.height&&composer.y+composer.height<=viewport.height,'Message composer must remain inside the visible workspace')}
       await open('agenda');if(device==='mobile')assert.equal(await page.locator('.calendar-panel').evaluate(element=>element.scrollWidth<=element.clientWidth),true,'Full calendar including toolbar fits mobile');await dialog(page.getByRole('button',{name:'Novo compromisso',exact:true}),'appointment-modal-'+device)
       await open('deliveries');await dialog(page.getByRole('button',{name:'Nova tarefa',exact:true}),'task-modal-'+device)
       await open('pipeline');await dialog(page.getByRole('button',{name:'Nova oportunidade',exact:true}),'opportunity-modal-'+device)
       await open('overview');await dialog(page.getByRole('button',{name:'Novo contato',exact:true}).first(),'contact-modal-'+device)
       await dialog(page.getByRole('button',{name:'Abrir notificações'}),'notifications-'+device)
-      await dialog(page.getByRole('button',{name:'Exportar dados'}),'export-'+device)
-      await page.getByRole('button',{name:'Busca global'}).click();await page.getByRole('dialog').getByLabel('Busca global',{exact:true}).fill('Aurora');await page.getByRole('button',{name:new RegExp('Estúdio Aurora')}).waitFor();await capture('search-'+device);await closeModal()
+      await openSidebar()
+      await dialog(page.getByRole('button',{name:'Exportar dados'}),'export-'+device,device==='mobile'?menuTrigger:undefined)
+      await openSidebar()
+      await page.getByRole('button',{name:'Busca global'}).click();await page.getByRole('dialog',{name:'Encontrar no Abelha'}).getByLabel('Busca global',{exact:true}).fill('Aurora');await page.getByRole('button',{name:new RegExp('Estúdio Aurora')}).waitFor();await capture('search-'+device);await closeModal()
       await open('personal-projects');await dialog(page.getByRole('button',{name:'Novo projeto',exact:true}),'project-modal-'+device)
       const projects=await (await page.request.get(base+'/api/v1/personal/projects')).json()
       if(projects.length) { await open('personal-projects','&record='+projects[0].id);await page.getByRole('button',{name:'Adicionar marco'}).waitFor();await capture('project-detail-'+device) }
@@ -97,7 +111,15 @@ function inspect() {
     for(const state of ['loading','empty','error']) {mode=state;await page.goto(base+'/?view=deliveries');if(state==='loading')await page.getByText('Carregando seus dados…',{exact:true}).waitFor();else await settle();await capture('tasks-'+state)}
     mode='populated';await page.getByRole('button',{name:'Tentar novamente'}).click();await page.getByText('Revisar conteúdo e estrutura',{exact:true}).waitFor();checks.push('error retry restores populated board')
     for(const width of [320,768]) { await page.setViewportSize({width,height:900});for(const view of views) {await open(view);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,view+' overflows at '+width)} }checks.push('17 routes reflow at 320px and 768px')
-    await page.setViewportSize({width:1440,height:1000});await open('finance','&record='+fixtures.client.id);await page.getByRole('button',{name:'Extrato / imprimir'}).click();await page.emulateMedia({media:'print'});assert.equal(await page.locator('.statement').evaluate(element=>getComputedStyle(element).backgroundColor),'rgb(255, 255, 255)');assert.deepEqual((await page.evaluate(inspect)).contrast,[],'Printed statement contrast');await page.screenshot({path:path.join(output,'statement-print.png'),fullPage:true});await page.emulateMedia({media:'screen'});await closeModal();checks.push('statement dark on screen, light on paper')
+    await page.setViewportSize({width:1440,height:1000});await open('finance','&record='+fixtures.client.id);await page.getByRole('button',{name:'Extrato / imprimir'}).click()
+    await page.emulateMedia({media:'print'})
+    await page.waitForFunction(() => {
+      const paper = document.querySelector('.statement')
+      return paper && getComputedStyle(paper).backgroundColor === 'rgb(255, 255, 255)'
+    })
+    assert.deepEqual((await page.evaluate(inspect)).contrast,[],'Printed statement contrast')
+    await page.screenshot({path:path.join(output,'statement-print.png'),fullPage:true})
+    await page.emulateMedia({media:'screen'});await closeModal();checks.push('statement dark on screen, light on paper')
     await open('reports');const date=page.getByLabel('Início do período');await date.focus();await page.keyboard.press('ArrowLeft');await page.keyboard.press('Escape');assert.equal(await date.inputValue()!== '',true)
     await open('deliveries');const select=page.getByLabel('Filtrar por contrato');await select.selectOption({index:1});await select.focus();await page.keyboard.press('Alt+ArrowDown');await page.screenshot({path:path.join(output,'native-select-open.png')});await page.keyboard.press('Escape');checks.push('native date and select keyboard; dark color-scheme')
     await open('overview');await page.keyboard.press('Tab');const focusButton=page.getByRole('button',{name:'Visão geral',exact:true});await focusButton.focus();assert.equal(await focusButton.evaluate(element=>getComputedStyle(element).outlineColor),'rgb(244, 210, 47)');await page.screenshot({path:path.join(output,'keyboard-focus.png')});checks.push('reduced motion and yellow keyboard focus')

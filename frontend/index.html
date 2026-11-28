@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/bee-logo.png" />
@@ -10,6 +10,21 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#141719" />
+    <script id="abelha-theme-init">
+      (() => {
+        let theme = 'dark'
+        try {
+          if (localStorage.getItem('abelha-theme') === 'light') theme = 'light'
+        } catch {}
+        document.documentElement.dataset.theme = theme
+        document.querySelector('meta[name="color-scheme"]').setAttribute('content', theme)
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', theme === 'light' ? '#f7f6ef' : '#141719')
+      })()
+    </script>
+    <style>
+      html { background: #141719; }
+      html[data-theme="light"] { background: #f7f6ef; }
+    </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Abelha</title>
   </head>

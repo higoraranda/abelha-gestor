@@ -1,5 +1,11 @@
 # Abelha — Dark Mode
 
+## Alternância entre claro e escuro
+
+No CRM e Personal, o controle de tema fica no rodapé da sidebar em desktop e na barra compacta em celular. Na autenticação e na área de convidados, fica no cabeçalho. A preferência é local ao navegador. Uma nova sessão usa o tema escuro até que a pessoa faça uma escolha. A janela instalada usa a preferência da sua origem. A cor definida no manifesto continua a cor padrão da abertura do PWA.
+
+A validação do tema alternável está no [relatório operacional 04](ABELHA-RELATORIO-04.md). As capturas e verificações abaixo registram a paleta escura original.
+
 Direção visual de 12/11/2026, sobre `main/4f78117`. Tema escuro padrão para CRM, Personal e login; composição e funcionalidades preservadas. [Contrato visual e tokens](../DESIGN.md).
 
 ## Sistema visual

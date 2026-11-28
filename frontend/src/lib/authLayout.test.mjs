@@ -31,6 +31,7 @@ async function pageModule(name, signupState) {
     '@/lib/auth': {},
     '@/store/auth': { useAuthStore: () => () => {} },
     '@/lib/personalAccess': { personalAccess:false },
+    '@/components/ui/ThemeToggle': { default: () => null, __esModule: true },
     './RegisterPage.css': {},
     './PasswordField': name === 'LoginPage' || name === 'ResetPasswordPage' ? await pageModule('PasswordField') : undefined,
     './AuthLayout': name === 'AuthLayout' || name === 'PasswordField' ? undefined : await pageModule('AuthLayout'),

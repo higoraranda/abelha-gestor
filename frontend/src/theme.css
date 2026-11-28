@@ -73,6 +73,45 @@
   --radius: var(--radius-control);
 }
 
+:root[data-theme="light"] {
+  color-scheme: light;
+  --canvas: #f7f6ef;
+  --surface: #fffdf8;
+  --card-surface: #fff;
+  --surface-hover: #edeae0;
+  --field: #fffefa;
+  --line: #dbd8cb;
+  --line-strong: #8b8373;
+  --ink: #242721;
+  --ink-soft: #565a50;
+  --ink-faint: #636459;
+  --accent-yellow: #795500;
+  --accent-hover: #654700;
+  --accent-pressed: #563b00;
+  --on-accent: #fffdf3;
+  --accent-muted: #f6edc9;
+  --accent-border: #9b7622;
+  --context-green: #dcebe1;
+  --context-ink: #244b39;
+  --success: #285b44;
+  --success-muted: #e6f1e7;
+  --success-border: #5e8a70;
+  --danger: #8e342b;
+  --danger-muted: #fae9e4;
+  --danger-border: #b05b50;
+  --info: #285767;
+  --info-muted: #e5eff3;
+  --chart-muted: #716b5f;
+  --overlay: rgb(25 23 15 / 47%);
+  --shadow-sm: 0 4px 14px rgb(61 44 13 / 8%);
+  --shadow-panel: 0 12px 32px -16px rgb(61 44 13 / 24%);
+  --shadow-modal: 0 28px 80px rgb(61 44 13 / 22%);
+  --focus-shadow: 0 0 0 3px rgb(121 85 0 / 22%);
+  --skeleton-shine: rgb(61 44 13 / 6%);
+  --scrollbar-thumb: #a29b8c;
+  --scrollbar-hover: #777163;
+}
+
 @theme inline {
   --font-sans: var(--font-body);
   --font-display: var(--font-body);
