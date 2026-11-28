@@ -52,6 +52,7 @@ export default async function handler(request, response) {
 
   for (const [name, value] of Object.entries(request.headers)) {
     if (REQUEST_HEADERS_TO_SKIP.has(name.toLowerCase()) || value == null) continue
+    if (targetUrl.pathname.startsWith('/api/v1/commercial/public/') && ['authorization', 'cookie'].includes(name.toLowerCase())) continue
     headers.set(name, Array.isArray(value) ? value.join(', ') : value)
   }
 

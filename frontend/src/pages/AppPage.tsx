@@ -17,6 +17,7 @@ import AccountInvites from '@/components/personal/AccountInvites'
 import PersonalReview from './personal/PersonalReview'
 import QuoteModelsPage from './LazyQuoteModelsPage'
 import { api } from '@/lib/api'
+import { commercialPath } from '@/lib/commercial'
 import { SearchPanel, NotificationsPanel, ExportPanel } from '@/components/layout/GlobalPanels'
 import { ErrorState, LoadingState } from '@/components/ui/DataState'
 import NewClientModal from '@/components/clients/NewClientModal'
@@ -33,12 +34,18 @@ const ReportsPage = lazy(() => import('./ReportsPage'))
 const FinancePage = lazy(() => import('./FinancePage'))
 const InboxPage = lazy(() => import('./InboxPage'))
 const AgendaPage = lazy(() => import('./AgendaPage'))
+const CommercialProposalsPage = lazy(() => import('./CommercialProposalsPage'))
+const CommercialProjectPage = lazy(() => import('./CommercialProjectPage'))
 
 export default function AppPage() {
   const navigate=useNavigate();const [params,setParams]=useSearchParams();const clearAuth=useAuthStore(state=>state.clearAuth)
   const {space,view}=resolveNavigation(params.get('space'),params.get('view'));const record=params.get('record')||undefined;const contract=params.get('contract')||undefined
   const pwa=usePwa()
   const isOwner=useAuthStore(state=>state.user?.role==='owner')
+  const commercialAccess=useRemote<{enabled:boolean}>(isOwner?commercialPath+'/access':null)
+  const commercialEnabled=commercialAccess.data?.enabled===true
+  const commercialProject=params.get('commercialProject')
+  const taskProject=params.get('project')||undefined
   const [panel,setPanel]=useState<'search'|'notifications'|'export'|null>(null);const [showClient,setShowClient]=useState(false)
   const clients=useRemote<Client[]>(view==='agenda'?'/api/v1/clients?limit=100':null);const reminders=useRemote<Reminder[]>(view==='agenda'?'/api/v1/reminders':null);const notices=useRemote<Notice[]>(space==='crm'?'/api/v1/crm/notifications':null)
   const personalNotices=useRemote<PersonalNotice[]>(space==='personal'?'/api/v1/personal/notifications':null)
@@ -60,16 +67,25 @@ export default function AppPage() {
   else if(view==='personal-review')content=<PersonalReview onProject={id=>open('personal-projects',id)}/>
   else if(view==='personal-settings')content=<><PersonalSettings pwa={pwa}/>{isOwner&&<AccountInvites/>}</>
   else if(view==='leads')content=<LeadsPage onClient={id=>open('clients',id)}/>
-  else if(view==='quote-models')content=<QuoteModelsPage key={view}/>
+  else if(view==='quote-models')content=commercialAccess.loading&&!commercialAccess.data?<LoadingState/>:
+    <QuoteModelsPage key={record||view} capability={commercialEnabled} draftId={record} onProposal={id=>open('proposals',id)}/>
+  else if(view==='proposals')content=commercialAccess.loading&&!commercialAccess.data?<LoadingState/>:
+    commercialAccess.error?<ErrorState message={commercialAccess.error} retry={commercialAccess.reload}/>:
+    !commercialEnabled?<ErrorState message="O fluxo comercial avançado não está habilitado nesta conta."/>:
+    commercialProject?<CommercialProjectPage key={commercialProject} id={commercialProject}
+      onProposal={id=>open('proposals',id)} onProject={()=>open('personal-projects',commercialProject)}
+      onTasks={()=>setParams({view:'deliveries',project:commercialProject})}/>:
+    <CommercialProposalsPage proposalId={record} onOpen={id=>open('proposals',id)} onQuote={id=>open('quote-models',id)}
+      onProject={id=>setParams({view:'proposals',commercialProject:id})}/>
   else if(view==='overview')content=<DashboardPage onNewClient={()=>setShowClient(true)} onOpenClients={id=>open('clients',id)} onOpenFinance={()=>open('finance')} onOpenReminders={()=>open('agenda')}/>
   else if(view==='clients')content=<ClientsPage key={record} focusId={record} onOpenTasks={id=>open('deliveries',undefined,id)}/>
-  else if(view==='deliveries')content=<TasksPage key={(record||'')+(contract||'')} focusId={record} contractId={contract}/>
+  else if(view==='deliveries')content=<TasksPage key={(record||'')+(contract||'')+(taskProject||'')} focusId={record} contractId={contract} projectId={taskProject}/>
   else if(view==='pipeline')content=<PipelinePage key={record} focusId={record}/>
   else if(view==='reports')content=<ReportsPage/>
   else if(view==='finance')content=<FinancePage key={record} focusId={record}/>
   else if(view==='inbox')content=<div className="inbox-workspace crm-panel"><InboxPage/></div>
   else content=(clients.loading&&!clients.data)||(reminders.loading&&!reminders.data)?<LoadingState/>:clients.error||reminders.error?<ErrorState message={clients.error||reminders.error||''} retry={()=>{clients.reload();reminders.reload()}}/>:<AgendaPage key={record} focusId={record} clients={clients.data||[]} reminders={reminders.data||[]} onRemindersChange={reminders.reload}/>
-  return <div className="app-shell"><a className="skip-link" href="#main">Ir para o conteúdo</a><AppSidebar space={space} onSpace={changeSpace} activeView={view} onChange={next=>open(next)} pendingReminders={space==='crm'?notices.data?.filter(n=>!n.read).length||0:personalNotices.data?.filter(n=>!n.read_at).length||0} onLogout={personalAccess?undefined:signOut} onSearch={()=>setPanel('search')} onNotifications={()=>{setPanel('notifications');if(space==='crm')notices.reload();else personalNotices.reload()}} onExport={()=>setPanel('export')} onCreate={()=>setShowClient(true)}/><main className="app-main" id="main"><div className="app-view">{!pwa.online&&<p className="personal-banner" role="status">Você está offline. Reconecte para consultar ou salvar dados. Nenhuma gravação será enviada em segundo plano.</p>}{pwa.waiting&&<div className="personal-banner" role="status"><span>Uma atualização está disponível. Salve seu trabalho antes de recarregar.</span><button className="button button-secondary" onClick={pwa.update}>Atualizar e recarregar</button></div>}{pwa.failure&&<p className="personal-banner" role="status">{pwa.failure}</p>}<AreaContent key={view}>{content}</AreaContent></div></main>
+  return <div className="app-shell"><a className="skip-link" href="#main">Ir para o conteúdo</a><AppSidebar space={space} onSpace={changeSpace} activeView={view} onChange={next=>open(next)} commercialEnabled={commercialEnabled} pendingReminders={space==='crm'?notices.data?.filter(n=>!n.read).length||0:personalNotices.data?.filter(n=>!n.read_at).length||0} onLogout={personalAccess?undefined:signOut} onSearch={()=>setPanel('search')} onNotifications={()=>{setPanel('notifications');if(space==='crm')notices.reload();else personalNotices.reload()}} onExport={()=>setPanel('export')} onCreate={()=>setShowClient(true)}/><main className="app-main" id="main"><div className="app-view">{!pwa.online&&<p className="personal-banner" role="status">Você está offline. Reconecte para consultar ou salvar dados. Nenhuma gravação será enviada em segundo plano.</p>}{pwa.waiting&&<div className="personal-banner" role="status"><span>Uma atualização está disponível. Salve seu trabalho antes de recarregar.</span><button className="button button-secondary" onClick={pwa.update}>Atualizar e recarregar</button></div>}{pwa.failure&&<p className="personal-banner" role="status">{pwa.failure}</p>}<AreaContent key={view}>{content}</AreaContent></div></main>
     {showClient&&<NewClientModal onClose={()=>setShowClient(false)} onCreate={client=>{setShowClient(false);open('clients',client.id)}}/>}
     {panel==='search'&&<SearchPanel onClose={()=>setPanel(null)} onOpen={open}/>}
     {panel==='notifications'&&(space==='personal'?<PersonalNotifications onClose={()=>setPanel(null)} onOpen={url=>navigate(url)}/>:<NotificationsPanel notices={notices.data||[]} loading={notices.loading} error={notices.error} reload={notices.reload} onClose={()=>setPanel(null)} onOpen={open}/>)}

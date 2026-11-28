@@ -1,11 +1,12 @@
 import { useRef, useState } from 'react'
-import { Calculator, Download, Plus, Upload } from 'lucide-react'
+import { Calculator, Download, Layers, Plus, Upload } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useRemote } from '@/hooks/useRemote'
 import { useAuthStore } from '@/store/auth'
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/DataState'
 import { emptyModel, example, modelingPrompt, scaled, type QuoteModel, type QuoteLine, type SavedModel, type Quote } from '@/lib/quoteModels'
 import QuoteProposals, { type QuoteSimulation } from './QuoteProposals'
+import CommercialCalculator from './CommercialCalculator'
 
 const endpoint='/api/v1/quote-models'
 const money=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'})
@@ -35,7 +36,7 @@ function Summary({quote}:{quote:Quote}){
   </dl></div>
 }
 
-export default function QuoteModelsPage(){
+function QuoteModelLibrary({legacy=true,onCalculator}:{legacy?:boolean;onCalculator?:()=>void}){
   const userId=useAuthStore(state=>state.user?.id)
   const isOwner=useAuthStore(state=>state.user?.role==='owner')
   const remote=useRemote<SavedModel[]>(userId?endpoint:null)
@@ -107,7 +108,7 @@ export default function QuoteModelsPage(){
   }
   if(!userId)return <section className="module-page"><h1>Calculadora de valores</h1><p className="personal-banner">Entre com uma conta para salvar modelos privados. A calculadora antiga continua no atalho do CRM.</p></section>
   return <div className="module-page quote-page">
-    <header className="page-heading"><div><p className="eyebrow">Abelha / Orçamentos</p><h1>Calculadora de valores</h1><p className="page-subtitle">Monte suas regras de preço e reutilize o modelo em novos orçamentos.</p></div><button className="button button-primary" onClick={()=>open(emptyModel)} disabled={!!busy}><Plus size={17} aria-hidden="true"/> Novo modelo</button></header>
+    <header className="page-heading"><div><p className="eyebrow">Abelha / Orçamentos</p><h1>{legacy?'Calculadora de valores':'Modelos de preço'}</h1><p className="page-subtitle">Monte suas regras de preço e reutilize o modelo em novos orçamentos.</p></div><div className="quote-actions">{onCalculator&&<button className="button button-secondary" onClick={onCalculator}>Voltar à calculadora</button>}<button className="button button-primary" onClick={()=>open(emptyModel)} disabled={!!busy}><Plus size={17} aria-hidden="true"/> Novo modelo</button></div></header>
     {status&&<p className="personal-banner" role="status">{status}</p>}
     {error&&<p className="login-error" role="alert">{error}</p>}
     <div className="quote-grid">
@@ -159,6 +160,31 @@ export default function QuoteModelsPage(){
         {simulation&&<Summary quote={simulation.quote}/>}
       </section></div>:<section className="crm-panel personal-section"><EmptyState title="Selecione ou crie um modelo" text="Junte preço fixo, horas, unidades, adicionais e cobranças mensais conforme o seu serviço."/></section>}
     </div>
-    {isOwner&&<QuoteProposals key={userId} simulation={simulation}/>}
+    {legacy&&isOwner&&<QuoteProposals key={userId} simulation={simulation}/>}
   </div>
+}
+
+export type QuoteCalculatorProps={capability?:boolean;draftId?:string|null;onProposal?:(id:string)=>void}
+
+export default function QuoteModelsPage({capability=false,draftId,onProposal}:QuoteCalculatorProps){
+  const [library,setLibrary]=useState(false)
+  const [archive,setArchive]=useState(false)
+  if(!capability)return <QuoteModelLibrary/>
+  return <>
+  {library&&<QuoteModelLibrary legacy={false} onCalculator={()=>setLibrary(false)}/>}
+  {archive&&<div className="module-page quote-page quote-workspace">
+    <div><button type="button" className="button button-secondary" onClick={()=>setArchive(false)}>Voltar à calculadora</button></div>
+    <QuoteProposals simulation={null} archive/>
+  </div>}
+  <div className="module-page quote-page quote-workspace" hidden={library||archive}>
+    <header className="page-heading">
+      <h1>Calculadora de valores</h1>
+      <div className="quote-actions">
+        <button type="button" className="button button-secondary" onClick={()=>setArchive(true)}>Orçamentos anteriores</button>
+        <button type="button" className="button button-secondary" onClick={()=>setLibrary(true)}><Layers size={17} aria-hidden="true"/> Modelos de preço</button>
+      </div>
+    </header>
+    <CommercialCalculator {...{draftId,onProposal}}/>
+  </div>
+  </>
 }

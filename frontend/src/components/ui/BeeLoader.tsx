@@ -54,6 +54,9 @@ export default function BeeLoader({ children, healthUrl = `${API_BASE_URL}/api/v
   const error = imageError ? 'Não foi possível carregar a imagem. Confira sua conexão e tente novamente.' : backend.error
   const recovering = Boolean(error || backend.slow || backend.offline)
   const state = done ? 'done' : backend.ready && imageReady ? 'finishing' : recovering ? 'recovering' : 'loading'
+  const waiting = state === 'loading' || (
+    state === 'recovering' && !backend.offline && !error && backend.failure?.reason !== 'invalid'
+  )
   const beeRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<HTMLDivElement>(null)
   const mainRef = useRef<HTMLElement>(null)
@@ -66,7 +69,7 @@ export default function BeeLoader({ children, healthUrl = `${API_BASE_URL}/api/v
 
   useEffect(() => {
     const bee = beeRef.current, scene = sceneRef.current
-    if (!bee || !scene || state !== 'loading') return
+    if (!bee || !scene || !waiting) return
     const flight = flying ? bee.animate?.(flightFrames(), { duration: FLIGHT_DURATION, iterations: Infinity, easing: 'linear' }) : undefined
     if (flight) flight.currentTime = loopTime.current
     return () => {
@@ -79,7 +82,7 @@ export default function BeeLoader({ children, healthUrl = `${API_BASE_URL}/api/v
         flight.cancel()
       }
     }
-  }, [state, flying])
+  }, [waiting, flying])
 
   useEffect(() => {
     const bee = beeRef.current, main = mainRef.current, scene = sceneRef.current
@@ -138,7 +141,7 @@ export default function BeeLoader({ children, healthUrl = `${API_BASE_URL}/api/v
   const flower = <g transform="translate(312 180)"><g className="bee-loader__petals">{petals}</g><circle className="bee-loader__flower-center" r="16" /></g>
 
   return (
-    <main ref={mainRef} className="bee-loader" data-state={state} data-motion={flying ? 'full' : 'reduced'} aria-label={state === 'recovering' ? 'Recuperação de acesso ao Abelha' : 'Inicializando o Abelha'}>
+    <main ref={mainRef} className="bee-loader" data-state={state} data-waiting={waiting || undefined} data-motion={flying ? 'full' : 'reduced'} aria-label={state === 'recovering' ? 'Recuperação de acesso ao Abelha' : 'Inicializando o Abelha'}>
       <div className="bee-loader__content">
         <p className="bee-loader__brand">abelha<span>seu espaço, no seu ritmo</span></p>
         <div ref={sceneRef} className="bee-loader__scene" aria-hidden="true">

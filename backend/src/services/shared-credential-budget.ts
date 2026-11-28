@@ -1,8 +1,8 @@
 import {createHmac} from 'node:crypto'
 import type {Database} from './platform-db'
 
-type Scope='login'|'reset'
-const config={login:{global:90,identity:12},reset:{global:30,identity:4}}
+type Scope='login'|'reset'|'commercial'
+const config={login:{global:90,identity:12},reset:{global:30,identity:4},commercial:{global:240,identity:60}}
 export function createSharedCredentialBudget(db:Database,secret:string,scope:Scope) {
   if(Buffer.byteLength(secret,'utf8')<32)throw new Error('Configuração do limitador compartilhado inválida.')
   const global=scope+':global'

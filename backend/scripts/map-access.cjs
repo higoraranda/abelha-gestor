@@ -10,6 +10,7 @@ const rules={
  account:['/api/v1/account','Contas e convites','createAccountRouter'],
  catalog:['/api/v1/catalog','Catálogo'],clients:['/api/v1/clients','Clientes e contratos'],
  contracts:['/api/v1/contracts','Contratos'],conversations:['/api/v1/conversations','Conversas e Evolution'],
+ commercial:['/api/v1/commercial','Fluxo comercial','createCommercialRouter'],
  crm:['/api/v1/crm','CRM e legados'],events:['/api/events','Eventos por organização'],
  finance:['/api/v1/finance','Financeiro comercial'],integrations:['/api/v1/integrations','Integrações','createIntegrationsRouter'],
  'member-modules':['/api/v1/member-modules','Administração de membros','createMemberModulesRouter'],messages:['/api/v1/messages','Mensagens'],
@@ -32,6 +33,9 @@ const policyDetails={
  github:['HMAC do corpo bruto','Webhook GitHub','Não aplicável','Configurada no backend','Configurado no backend','Repositório vinculado e chave de idempotência'],
  evolution:['Segredo Evolution','Webhook Evolution','Não aplicável','Instância cadastrada','Serviço','Mensagem atribuída à organização da instância'],
  public:['Público','Nenhum','Não aplicável','Nenhuma','Nenhum','Sem recurso privado'],
+ commercialAccess:['Sessão Auth.js','Conta ativa','Fluxo comercial','Organização da sessão','Usuário da sessão','Consulta de disponibilidade'],
+ commercialOwner:['Sessão Auth.js','Proprietário habilitado','Fluxo comercial','Organização autorizada no backend','Usuário titular','Orçamento, versão, contrato ou projeto da carteira'],
+ commercialLink:['Token comercial ativo','Destinatário do link','Não aplicável','Vinculada à versão','Vinculado à versão','Snapshot publicado, decisão ou contrato disponibilizado'],
 }
 function policy(name,route,method){
  if(name==='app'){
@@ -51,6 +55,7 @@ function policy(name,route,method){
  if(name==='webhooks')return ['evolution']
  if(name==='member-modules')return [route==='/me'||route==='/me/preferences'?'member':'ownerIssuer']
  if(name==='quote-models')return route.startsWith('/proposals')?['personalOwner']:['module','Calculadora']
+ if(name==='commercial')return [route.startsWith('/public/')?'commercialLink':route==='/access'?'commercialAccess':'commercialOwner']
  if(name==='personal-finance')return ['module',route.startsWith('/subscriptions')?'Assinaturas':'Financeiro pessoal']
  if(name==='personal-prices')return ['module','Monitor de preços']
  if(name==='personal')return route==='/projects'&&['get','post'].includes(method)?['module','Projetos']:['personalOwner']
@@ -78,7 +83,7 @@ function inventory(routesDir=root){
            :name==='quote-models'&&arg?.getText(source)==="'/proposals/:id/'+action"&&/\[\s*'approve'\s*,\s*'refuse'\s*\]/.test(source.text)
              ?['/proposals/:id/approve','/proposals/:id/refuse']:null
          if(!routes)throw Error('Rota não literal em '+file)
-         for(const route of routes)add(name,route,method)
+         for(const route of routes)add(name,(target==='publicRouter'?'/public':'')+route,method)
        }
      }
      ts.forEachChild(node,visit)
@@ -89,6 +94,7 @@ function inventory(routesDir=root){
    const name=file.slice(0,-3)
    if(!rules[name])throw Error('Classifique o roteador '+file)
    collect(name,path.join(routesDir,file),'router')
+   if(name==='commercial')collect(name,path.join(routesDir,file),'publicRouter')
  }
  collect('app',path.resolve(routesDir,'../app.ts'),'app')
  const unique=new Set(rows.map(row=>row.endpoint))
@@ -128,7 +134,7 @@ function runtimeMounts(){
 function sourceFingerprint(){
  const hash=createHash('sha256')
  const scope=[path.resolve(backend,'src/routes'),path.resolve(backend,'src/middleware'),path.resolve(backend,'src/db/migrations')]
- const files=['src/db/homologation/bootstrap-empty.sql','src/app.ts','src/auth.config.ts','src/services/member-modules.ts','src/services/invites.ts','src/services/password-reset.ts','src/services/credential-budget.ts','src/services/signup-email.ts','src/services/webhookProcessor.ts','src/services/codex-report-scope.ts','src/services/access-matrix.test.ts','scripts/map-access.cjs']
+ const files=['src/db/homologation/bootstrap-empty.sql','src/app.ts','src/auth.config.ts','src/services/member-modules.ts','src/services/invites.ts','src/services/password-reset.ts','src/services/credential-budget.ts','src/services/signup-email.ts','src/services/webhookProcessor.ts','src/services/codex-report-scope.ts','src/services/commercial.ts','src/services/commercial-store.ts','src/services/shared-credential-budget.ts','src/services/access-matrix.test.ts','scripts/map-access.cjs']
  for(const dir of scope)for(const name of fs.readdirSync(dir).filter(value=>/\.(?:ts|sql)$/.test(value)))files.push(path.relative(backend,path.join(dir,name)).replace(/\\/g,'/'))
  for(const name of files.sort())if(fs.existsSync(path.resolve(backend,name))){
    hash.update(name).update('\0').update(fs.readFileSync(path.resolve(backend,name),'utf8').replaceAll('\r\n','\n')).update('\0')

@@ -58,6 +58,12 @@ O login e a recuperação compartilham o painel direito do mesmo layout. Campos 
 Quadro/checklist alteram o mesmo registro; seletor fornece alternativa ao arraste. Concluir preserva coluna anterior. Cancelar conversão não envia mutação. Confirmação de contrato é o único momento que cria cobranças e marca ganho. Erros de banco nunca viram dados fictícios.
 Feedback de erro em português. Desabilitar ações enquanto salva. Foco visível. Respeitar prefers-reduced-motion. CSV não contém fórmulas executáveis e JSON não contém segredos.
 
+## Fluxo comercial
+
+- Projetos e tarefas usam colunas de largura uniforme, lado a lado. A rolagem horizontal pertence ao quadro e os cartões rolam dentro da coluna. O seletor de situação complementa o arraste e a abertura do cartão dá acesso aos detalhes.
+- A calculadora agrupa cliente e projeto, serviços, investimento e revisão. O resumo com valores em reais acompanha o preenchimento. A biblioteca de modelos e o histórico anterior têm entradas próprias.
+- A proposta publicada tem composição independente com capa personalizada, navegação de seções, progresso e investimento em destaque. Seções de conteúdo aparecem quando preenchidas. O layout usa Urbanist e tokens do Abelha. A folha de impressão é branca, em A4, com os mesmos dados comerciais e sem controles. A formalização é uma etapa distinta no CRM.
+
 ## Estados e acessibilidade visual
 
 - Inputs, selects e pickers herdam o `color-scheme` ativo do documento. O navegador controla o popup e o calendário nativos.

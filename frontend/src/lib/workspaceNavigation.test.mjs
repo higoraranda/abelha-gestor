@@ -23,13 +23,13 @@ const { default: AppSidebar } = load('../components/layout/AppSidebar.tsx', {
   '@/components/ui/ThemeToggle': { __esModule: true, default: () => createElement('button', { type: 'button' }, 'Ativar tema claro') },
 })
 const noop = () => {}
-const render = (space, activeView) => renderToStaticMarkup(createElement(AppSidebar, {
-  space, activeView, pendingReminders: 2, onChange: noop, onSpace: noop,
+const render = (space, activeView, commercialEnabled = false) => renderToStaticMarkup(createElement(AppSidebar, {
+  space, activeView, commercialEnabled, pendingReminders: 2, onChange: noop, onSpace: noop,
   onSearch: noop, onNotifications: noop, onExport: noop, onCreate: noop, onLogout: noop,
 }))
 
 test('CRM puts every section and its active deliveries button in the left sidebar', () => {
-  const html = render('crm', 'deliveries')
+  const html = render('crm', 'deliveries', true)
   assert.match(html, /<aside\b[\s\S]+<\/aside>$/)
   assert.match(html, /<nav[^>]+aria-label="Navegação principal"/)
   for (const { label } of navigation.NAVIGATION) assert.ok(html.includes(`>${label}</span>`), label)
@@ -38,6 +38,11 @@ test('CRM puts every section and its active deliveries button in the left sideba
   for (const label of ['Busca global', 'Novo contato', 'Exportar dados', 'Abrir calculadora de preços em uma nova aba']) {
     assert.ok(html.includes(`aria-label="${label}"`), label)
   }
+})
+
+test('commercial proposal navigation requires the enabled capability', () => {
+  assert.doesNotMatch(render('crm', 'overview'), />Propostas<\/span>/)
+  assert.match(render('crm', 'proposals', true), /aria-current="page"[^>]*>.*?<span>Propostas<\/span>/)
 })
 
 test('Personal reuses the sidebar with its own sections and the shared controls', () => {

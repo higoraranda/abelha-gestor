@@ -20,3 +20,31 @@ export function scaled(value:string,digits:number,label:string):number {
   if(!Number.isSafeInteger(result))throw new Error(label+' excede o limite.')
   return result
 }
+
+// Preview of the server's integer-cent calculation. Persisted totals come from the API.
+export function calculateQuotePreview(model:QuoteModel, quantities:Record<string,number>, optionalItems:readonly string[]=[]){
+  const optional = new Set(optionalItems)
+  const checkedInteger = (value:number,max:number,label:string) => {
+    if(!Number.isInteger(value)||value<0||value>max)throw new Error(`${label} fora do intervalo aceito.`)
+    return value
+  }
+  let subtotalCents=checkedInteger(model.baseCents,100_000_000,'Investimento base')
+  let monthlyCents=checkedInteger(model.monthlyCents,100_000_000,'Mensalidade base')
+  const discountBps=checkedInteger(model.discountBps,10_000,'Desconto')
+  const lines=model.lines.map(line=>{
+    const quantity=checkedInteger(quantities[line.id]??0,10_000_000,'Quantidade de '+line.label)
+    if((line.unit==='fixed'&&quantity!==0&&quantity!==1000)||(line.unit==='unit'&&quantity%1000!==0)){
+      throw new Error(`Quantidade incompatível com ${line.label}.`)
+    }
+    const price=checkedInteger(line.priceCents,100_000_000,'Preço de '+line.label)
+    const amountCents=Number((BigInt(price)*BigInt(quantity)+500n)/1000n)
+    if(!optional.has(line.id)){
+      if(line.period==='monthly')monthlyCents+=amountCents
+      else subtotalCents+=amountCents
+    }
+    return {id:line.id,label:line.label,period:line.period,amountCents}
+  })
+  const discountCents=Number((BigInt(subtotalCents)*BigInt(discountBps)+5000n)/10000n)
+  const quote:Quote={lines,subtotalCents,discountCents,oneTimeCents:subtotalCents-discountCents,monthlyCents}
+  return {quote,options:lines.filter(line=>optional.has(line.id)&&quantities[line.id]>0)}
+}

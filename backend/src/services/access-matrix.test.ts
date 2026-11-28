@@ -77,12 +77,14 @@ test('parametric route authorization in production routers over real synthetic A
       WITH org AS (INSERT INTO organizations(name) VALUES('Carteira sintética A') RETURNING id)
       INSERT INTO users(organization_id,name,email,password_hash) SELECT id,'Titular sintético','owner@example.invalid',$1 FROM org RETURNING id,organization_id
     `,[await bcrypt.hash(ownerPassword,4)])).rows
-    for(const name of readdirSync('src/db/migrations').filter(name=>/^202611(?:25|26|27|28|29)_.*\.sql$/.test(name)).sort())await pg.exec(readFileSync('src/db/migrations/'+name,'utf8'))
+    for(const name of readdirSync('src/db/migrations').filter(name=>/^202611(?:25|26|27|28|29|30)_.*\.sql$/.test(name)).sort())await pg.exec(readFileSync('src/db/migrations/'+name,'utf8'))
     const [project]=(await pg.query<{id:string}>(`INSERT INTO personal_projects(organization_id,user_id,name,repository)
       VALUES($1,$2,'Projeto sintético permitido','https://github.com/example/authorized') RETURNING id`,[ownerIds.organization_id,ownerIds.id])).rows
     Object.assign(process.env,{
       ABELHA_INTEGRATION_ORGANIZATION_ID:ownerIds.organization_id,ABELHA_INTEGRATION_USER_ID:ownerIds.id,
       ABELHA_CODEX_PROJECTS_JSON:JSON.stringify([{id:project.id,repository:'https://github.com/example/authorized'}]),
+      ABELHA_COMMERCIAL_ORGANIZATION_IDS:ownerIds.organization_id,
+      ABELHA_COMMERCIAL_LINK_SECRET:'synthetic-loopback-commercial-link-only',
     })
     wire=new PGLiteSocketServer({db:pg,host:'127.0.0.1',port:0});await wire.start()
     sql=postgres('postgresql://postgres:postgres@'+wire.getServerConn()+'/postgres',{ssl:false,max:1})
@@ -167,6 +169,10 @@ test('parametric route authorization in production routers over real synthetic A
     await (await exercise(owner,'PATCH /api/v1/member-modules/members/:id','módulos desabilitados para B',200,'positive',{data:{projects:false,calculator:false,finance:false,subscriptions:false,prices:false},params:{id:memberB.id}})).body?.cancel()
     for(const row of all){
       if(publicKinds.has(row.kind))continue
+      if(row.kind==='commercialLink'){
+        await (await exercise(anonymous,row.endpoint,'link comercial indisponível',404,'negative')).body?.cancel()
+        continue
+      }
       if(services.has(row.kind)){
         const bad={Authorization:'Bearer synthetic-invalid-credential','X-Hub-Signature-256':'sha256='+'0'.repeat(64),'X-Evolution-Secret':'synthetic-invalid-secret'}
         await (await exercise(anonymous,row.endpoint,'credencial ausente',401,'negative')).body?.cancel()
@@ -178,7 +184,12 @@ test('parametric route authorization in production routers over real synthetic A
       }
       for(const [actor,name] of [[anonymous,'anônimo'],[disabled,'conta desativada'],[revoked,'JWT revogado após reativação']] as const)
         await (await exercise(actor,row.endpoint,name,401,'negative')).body?.cancel()
-      if(row.kind==='owner'||row.kind==='ownerIssuer'||row.kind==='personalOwner'){
+      if(row.kind==='commercialAccess'){
+        const allowed=await exercise(owner,row.endpoint,'proprietário habilitado consulta disponibilidade',200,'positive')
+        assert.deepEqual(await allowed.json(),{enabled:true})
+        const denied=await exercise(guestA,row.endpoint,'membro consulta disponibilidade sem grant',200,'negative')
+        assert.deepEqual(await denied.json(),{enabled:false})
+      }else if(row.kind==='owner'||row.kind==='ownerIssuer'||row.kind==='personalOwner'||row.kind==='commercialOwner'){
         await (await exercise(guestA,row.endpoint,'membro A (outro tenant)',403,'negative')).body?.cancel()
         await (await exercise(guestB,row.endpoint,'membro B (outro tenant)',403,'negative')).body?.cancel()
       }else if(row.kind==='member'){

@@ -8,8 +8,8 @@ const { spawn } = require('node:child_process')
 const { chromium } = require(process.env.ABELHA_PLAYWRIGHT_MODULE || 'playwright')
 const fixtures = require('./dark-mode-fixtures.cjs')
 const root = path.resolve(__dirname, '../dist')
-const output = path.resolve(__dirname, '../../.abelha-homologacao/bee-loader-v2')
-const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.woff2': 'font/woff2' }
+const output = path.resolve(process.env.ABELHA_LOADER_OUTPUT || path.resolve(__dirname, '../../.abelha-homologacao/bee-loader-v2'))
+const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json' }
 const user = { id: 'loader-user', organizationId: 'loader-org', name: 'Demonstração', email: 'loader@example.invalid', role: 'owner' }
 const encoders = new Map()
 
@@ -54,7 +54,7 @@ async function startScreencast(context, page) {
     const pathname = decodeURIComponent(new URL(request.url, 'http://127.0.0.1').pathname)
     const file = path.resolve(root, pathname === '/' ? 'index.html' : pathname.replace(/^\/+/, ''))
     if (!file.startsWith(root + path.sep)) { response.writeHead(403).end(); return }
-    try { response.writeHead(200, { 'content-type': mime[path.extname(file)] || 'application/octet-stream', 'cache-control': 'no-store' }).end(await fs.readFile(file)) }
+    try { response.writeHead(200, { 'content-type': mime[path.extname(file)] || 'application/octet-stream', 'cache-control': 'no-cache' }).end(await fs.readFile(file)) }
     catch { response.writeHead(404).end() }
   })
   let browser, vite
@@ -66,9 +66,9 @@ async function startScreencast(context, page) {
     const base = `http://127.0.0.1:${port}`
     browser = await chromium.launch({ headless: true, ...(process.env.ABELHA_BROWSER_EXECUTABLE ? { executablePath: process.env.ABELHA_BROWSER_EXECUTABLE } : {}) })
 
-    async function scenario({ origin = base, reducedMotion = 'no-preference', width = 1440, height = width === 390 ? 844 : 1000, mode = 'unavailable', session = 'anonymous', clock = false, video = false, brokenImage = false, persistedUser = false } = {}) {
+    async function scenario({ origin = base, reducedMotion = 'no-preference', width = 1440, height = width === 390 ? 844 : 1000, mode = 'unavailable', session = 'anonymous', clock = false, video = false, brokenImage = false, persistedUser = false, serviceWorkers = 'block' } = {}) {
       const nativeVideo = video && process.env.ABELHA_FFMPEG_EXECUTABLE
-      const context = await browser.newContext({ viewport: { width, height }, reducedMotion, serviceWorkers: 'block', ...(video && !nativeVideo ? { recordVideo: { dir: path.join(output, 'video'), size: { width: 960, height: 720 } } } : {}) })
+      const context = await browser.newContext({ viewport: { width, height }, reducedMotion, serviceWorkers, ...(video && !nativeVideo ? { recordVideo: { dir: path.join(output, 'video'), size: { width: 960, height: 720 } } } : {}) })
       const page = await context.newPage()
       page.setDefaultTimeout(12000)
       if (clock) await page.clock.install()
@@ -130,7 +130,7 @@ async function startScreencast(context, page) {
       const s = await scenario({ session: 'hold' })
       try {
         const { page, health } = s
-        await page.waitForTimeout(10800)
+        await page.waitForFunction(() => window.loaderFrames.some(frame => frame.cycleTime >= 10400), undefined, { timeout: 16000 })
         const frames = await page.evaluate(() => window.loaderFrames)
         await fs.writeFile(path.join(output, 'flight-frames.json'), JSON.stringify(frames))
         assert.ok(frames.some(frame => frame.cycleTime >= 10400), 'must observe two complete 5.2-second cycles')
@@ -179,7 +179,7 @@ async function startScreencast(context, page) {
         assert.ok(difference > 10, 'front petals must physically cover the opaque bee')
         await page.locator('.bee-loader__foreground').evaluate(el => { el.style.visibility = '' })
         await page.evaluate(() => document.querySelector('.bee-loader__bee').getAnimations()[0].play())
-        await page.locator('.workspace-header').waitFor()
+        await page.locator('#main').waitFor()
         assert.equal(health.sessionCalls, 1, 'ProtectedRoute must reuse the verified startup session')
         assert.equal(await page.evaluate(() => !!window.unexpectedAuthLoader), false)
         const trace = await page.evaluate(() => window.loaderFrames)
@@ -259,6 +259,49 @@ async function startScreencast(context, page) {
       } finally { await s.context.close() }
     })
 
+    await record('cold start: automatic flight continues after the slow-response message', async () => {
+      const s = await scenario({ width: 390, clock: true })
+      try {
+        const { page, health } = s
+        await page.clock.fastForward(45001)
+        await page.getByRole('heading', { name: 'Mais tempo que o esperado' }).waitFor()
+        assert.equal(await page.getByRole('button', { name: /Ativar voo|Pausar voo/ }).count(), 0)
+        const samples = []
+        for (let index = 0; index < 3; index++) {
+          await page.waitForTimeout(650)
+          samples.push(await page.locator('.bee-loader__bee').evaluate(el => getComputedStyle(el).transform))
+          await page.screenshot({ path: path.join(output, 'voo-cold-start-0' + (index + 1) + '.png') })
+        }
+        assert.equal(new Set(samples).size, 3, 'the bee must change position while the online backend starts')
+        await fs.writeFile(path.join(output, 'voo-cold-start.json'), JSON.stringify(samples, null, 2))
+        health.mode = 'ready'
+        await page.clock.fastForward(10001)
+        await page.locator('.login-form').waitFor()
+        assert.deepEqual(s.errors, [])
+      } finally { await s.context.close() }
+    })
+
+    await record('PWA: online reload animates, offline uses cached shell, then reconnects', async () => {
+      const s = await scenario({ width: 390, mode: 'ready', session: 'authenticated', serviceWorkers: 'allow' })
+      try {
+        const { page, health } = s
+        await page.locator('#main').waitFor()
+        await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller))
+        health.mode = 'unavailable'
+        await page.reload()
+        await page.locator('.bee-loader[data-state=loading]').waitFor()
+        await page.waitForFunction(() => document.querySelector('.bee-loader__bee').getAnimations().some(animation => Number(animation.currentTime) > 100))
+        await s.context.setOffline(true)
+        await page.reload()
+        await page.getByRole('heading', { name: 'Sem conexão' }).waitFor()
+        assert.equal(await page.locator('#main').count(), 0)
+        health.mode = 'ready'
+        await s.context.setOffline(false)
+        await page.locator('#main').waitFor()
+        assert.deepEqual(s.errors, [])
+      } finally { await s.context.close() }
+    })
+
     await record('automatic motion: no flight button, mobile and desktop, gentler reduced-motion variant', async () => {
       const noToggle = page => page.getByRole('button', { name: /Ativar voo|Pausar voo/ }).count()
       for (const width of [390, 1440]) {
@@ -312,7 +355,7 @@ async function startScreencast(context, page) {
         await s.page.getByLabel('Email', { exact: true }).fill(user.email)
         await s.page.getByLabel('Senha', { exact: true }).fill('synthetic-test-only')
         await s.page.getByRole('button', { name: 'Entrar', exact: true }).click()
-        await s.page.locator('.workspace-header').waitFor()
+        await s.page.locator('#main').waitFor()
         assert.equal(await s.page.evaluate(() => JSON.parse(localStorage.getItem('abelha-auth')).state.user.id), user.id)
         assert.deepEqual(s.errors, [])
       } finally { await s.context.close() }
@@ -360,7 +403,7 @@ async function startScreencast(context, page) {
         assert.equal(await s.page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false)
         await s.page.screenshot({ path: path.join(output, 'loading-mobile.png') })
         s.health.mode = 'ready'
-        await s.page.locator('.workspace-header').waitFor()
+        await s.page.locator('#main').waitFor()
         assert.equal(s.health.sessionCalls, 0, 'loopback-only development access remains unchanged')
         assert.deepEqual(s.errors, [])
       } finally { await s.context.close() }

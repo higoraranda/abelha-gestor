@@ -14,13 +14,13 @@ const statusLabels:Record<string,string>={draft:'Rascunho',sent:'Enviado',awaiti
 const decisionLabel=(entry:QuoteIndex)=>statusLabels[entry.status]??(entry.approved_at?'Aprovado':entry.refused_at?'Recusado':'Rascunho')
 type PromptVersion={id:string;content:string;source:string;created_at:string}
 
-export default function QuoteProposals({simulation}:{simulation:QuoteSimulation|null}){
+export default function QuoteProposals({simulation,archive=false}:{simulation:QuoteSimulation|null;archive?:boolean}){
   const items=useRemote<QuoteIndex[]>(endpoint)
   const clientLabel=useId()
   const promptLabel=useId()
   const [clientQuery,setClientQuery]=useState('')
   const [clientFilter,setClientFilter]=useState('')
-  const clients=useRemote<{id:string;name:string|null}[]>(clientsEndpoint + (clientFilter?'&search='+encodeURIComponent(clientFilter):''))
+  const clients=useRemote<{id:string;name:string|null}[]>(archive?null:clientsEndpoint + (clientFilter?'&search='+encodeURIComponent(clientFilter):''))
   const [clientId,setClientId]=useState('')
   const [title,setTitle]=useState('')
   const [briefing,setBriefing]=useState('')
@@ -62,11 +62,11 @@ export default function QuoteProposals({simulation}:{simulation:QuoteSimulation|
   }
 
   return <section className="crm-panel personal-section quote-proposals">
-    <h2>Orçamentos e propostas</h2>
-    <p className="page-subtitle">Salve o briefing e os valores calculados, registre a aprovação do cliente e gere o prompt técnico. Nenhuma etapa envia mensagens ou cria contratos e cobranças.</p>
+    <h2>{archive?'Orçamentos anteriores':'Orçamentos e propostas'}</h2>
+    {!archive&&<p className="page-subtitle">Salve o briefing e os valores calculados, registre a aprovação do cliente e gere o prompt técnico. Nenhuma etapa envia mensagens ou cria contratos e cobranças.</p>}
     {status&&<p className="personal-banner" role="status">{status}</p>}
     {error&&<p className="form-error" role="alert">{error}</p>}
-    {<div className="quote-proposal-compose">
+    {!archive&&<div className="quote-proposal-compose">
       <h3>Briefing do novo orçamento</h3>
       {!simulation&&<p>Preencha o briefing e calcule os valores no modelo acima para habilitar o salvamento.</p>}
       <form className="quote-client-find" onSubmit={event=>{event.preventDefault();setClientId('');setClientFilter(clientQuery.trim())}}>

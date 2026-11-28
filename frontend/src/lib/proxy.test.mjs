@@ -54,6 +54,13 @@ test('production keeps the existing default backend and GET has no body', async 
   assert.equal(calls[0][1].body, undefined)
 })
 
+test('public commercial requests do not forward application cookies', async () => {
+  const { calls, response } = await invoke('preview', 'https://abelha-hml.example', 'POST', 'v1/commercial/public/read')
+  assert.equal(response.statusCode, 200)
+  assert.equal(calls[0][1].headers.has('cookie'), false)
+  assert.equal(calls[0][1].redirect, 'manual')
+})
+
 test('production keeps the error code delivered in a credentials redirect', async () => {
   const upstream = new Response(null, {status:302,headers:{Location:'https://abelha.example/api/auth/error?error=CredentialsSignin'}})
   const { response } = await invoke('production', undefined, 'POST', 'auth/callback/credentials', upstream)

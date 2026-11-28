@@ -37,7 +37,7 @@
 @keyframes bee-loader-in { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
   .bee-loader-app { animation: none; }
-  .bee-loader[data-state="loading"][data-motion="reduced"] .bee-loader__bee img {
+  .bee-loader[data-waiting][data-motion="reduced"] .bee-loader__bee img {
     animation: bee-loader-breathe 2s ease-in-out infinite alternate;
     /* Keep only this non-positional loading signal under the global motion reset. */
     animation-duration: 2s !important;

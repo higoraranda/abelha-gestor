@@ -13,13 +13,14 @@ import { useAuthStore } from './store/auth'
 
 const AppPage = lazy(() => import('./pages/AppPage'))
 const MemberHome = lazy(() => import('./pages/personal/MemberHome'))
+const PublicProposalPage = lazy(() => import('./pages/PublicProposalPage'))
 
 function AccountWorkspace() {
   const user=useAuthStore(state=>state.user)
   return <AreaContent key={user?.role} fullscreen>{user?.role==='member'?<MemberHome/>:<AppPage/>}</AreaContent>
 }
 
-export default function App() {
+function AppStartup() {
   const [initialSession, setInitialSession] = useState<StartupSession | null>(null)
   const setAuth = useAuthStore(state => state.setAuth)
   const clearAuth = useAuthStore(state => state.clearAuth)
@@ -40,15 +41,19 @@ export default function App() {
   }, [])
   return (
     <BeeLoader prepare={prepareAccess}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/cadastro" element={<RegisterPage />} />
-          <Route path="/redefinir-senha" element={personalAccess ? <Navigate to="/" replace /> : <ResetPasswordPage />} />
-          <Route path="/login" element={personalAccess ? <Navigate to="/" replace /> : <LoginPage />} />
-          <Route path="/*" element={personalAccess ? <AreaContent fullscreen><AppPage /></AreaContent> : <ProtectedRoute initialSession={initialSession} onInitialSessionUsed={consumeInitialSession}><AccountWorkspace /></ProtectedRoute>} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
+      <Routes>
+        <Route path="/cadastro" element={<RegisterPage />} />
+        <Route path="/redefinir-senha" element={personalAccess ? <Navigate to="/" replace /> : <ResetPasswordPage />} />
+        <Route path="/login" element={personalAccess ? <Navigate to="/" replace /> : <LoginPage />} />
+        <Route path="/*" element={personalAccess ? <AreaContent fullscreen><AppPage /></AreaContent> : <ProtectedRoute initialSession={initialSession} onInitialSessionUsed={consumeInitialSession}><AccountWorkspace /></ProtectedRoute>} />
+      </Routes>
     </BeeLoader>
   )
+}
+
+export default function App() {
+  return <BrowserRouter><Routes>
+    <Route path="/proposta" element={<AreaContent fullscreen><PublicProposalPage /></AreaContent>} />
+    <Route path="/*" element={<AppStartup />} />
+  </Routes></BrowserRouter>
 }

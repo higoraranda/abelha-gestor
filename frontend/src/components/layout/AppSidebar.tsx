@@ -1,7 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import {
   Bell, CalendarDays, Calculator, ChartColumn, CircleDollarSign, ClipboardList, ContactRound,
-  Download, ExternalLink, FolderKanban, House, LayoutDashboard, ListChecks, LogOut, Menu,
+  Download, ExternalLink, FileText, FolderKanban, House, LayoutDashboard, ListChecks, LogOut, Menu,
   MessageSquareText, Plus, Radar, Receipt, Search, Settings, Tags, Waypoints, X, type LucideIcon,
 } from 'lucide-react'
 import { useRef, useState, useSyncExternalStore } from 'react'
@@ -21,12 +21,13 @@ interface Props {
   onCreate: () => void
   onExport: () => void
   onLogout?: () => void
+  commercialEnabled?: boolean
 }
 
 const icons: Record<AppView, LucideIcon> = {
   overview: LayoutDashboard, clients: ContactRound, inbox: MessageSquareText, leads: Radar,
   deliveries: ClipboardList, pipeline: Waypoints, finance: CircleDollarSign, agenda: CalendarDays,
-  reports: ChartColumn, 'quote-models': Calculator,
+  reports: ChartColumn, 'quote-models': Calculator, proposals: FileText,
   'personal-overview': House, 'personal-projects': FolderKanban, 'personal-review': ListChecks,
   'personal-finance': CircleDollarSign, 'personal-subscriptions': Receipt, 'personal-prices': Tags,
   'personal-settings': Settings,
@@ -66,7 +67,7 @@ function SidebarContents({ props, run = runImmediately, compact = false }: {
   compact?: boolean
 }) {
   const crm = props.space === 'crm'
-  const items = crm ? NAVIGATION : PERSONAL_NAVIGATION
+  const items = crm ? NAVIGATION.filter(item => item.id !== 'proposals' || props.commercialEnabled) : PERSONAL_NAVIGATION
   const firstGroup = crm ? crmMain : personalMain
   const groups = [
     { label: crm ? 'CRM' : 'Personal', items: items.filter(item => firstGroup.has(item.id)) },

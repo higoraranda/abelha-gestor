@@ -1,6 +1,20 @@
 # Abelha | Roadmap multiusuário: entrega e gates
 
-## Atualização Prompt 05 — 27/11/2026
+## Atualização Prompt 07 — 28/11/2026
+
+O fluxo comercial integrado está implementado no checkout e foi exercitado com dados sintéticos. A opção Propostas depende da autorização da organização e do proprietário no backend. A decisão externa referencia uma versão publicada. A formalização administrativa com evidência gera o projeto canônico e seu planejamento. Quadros horizontais, calculadora e carregamento integram o mesmo candidato local.
+
+O CI e a homologação remota deste candidato aguardam comprovação atual da contenção produtiva no Vercel. A versão do Prompt 06 permanece em homologação. O [relatório do Prompt 07](ABELHA-RELATORIO-07.md) reúne as evidências locais, a migration incremental e as pendências de aceite e publicação.
+
+## Atualização Prompt 06 — 28/11/2026
+
+**Homologado tecnicamente, aguardando aceite.** O 42P01 produtivo foi resolvido em janela controlada. O Neon passou de 36 para 40 tabelas, com conferência do catálogo e dos dados legados após o commit. O ponto de proteção ficou em uma branch de recuperação no plano gratuito, com o compute suspenso.
+
+O candidato `7b1e4953ce3277c68f0ebf6aad7db56c7dd90d61` está na `main`, aprovado no GitHub Actions e implantado no Render HML e no Vercel Preview protegido. A sidebar recuperada no 05 foi preservada. O extrato tem impressão branca e legível a partir dos dois temas. As versões públicas continuam contidas enquanto aguardam aceite visual e operacional do proprietário.
+
+A integração de entregas responde somente para o projeto canônico no HML. O envelope foi preparado para o evento real `Stop`. O UUID, o registro no histórico e a idempotência dependem da observação posterior do evento. Resend mantém o plano gratuito e `resend.dev`. Domínio próprio e envio para terceiros ficam para o lançamento público. [Relatório operacional 06](ABELHA-RELATORIO-06.md).
+
+## Histórico do Prompt 05 — 27/11/2026
 
 **PARTIAL.** O candidato local `rc05-0e5fffd8f413` recupera a estrutura lateral do commit `68647ab` para CRM e Personal. Entregas tem acesso pela sidebar, com o quadro e checklist atuais. Tema e tipografia do 04 preservados. As 17 seções foram verificadas no Chromium de 320 a 1920 px e o aceite visual do proprietário segue pendente. [Relatório operacional 05](ABELHA-RELATORIO-05.md).
 

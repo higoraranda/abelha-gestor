@@ -3,7 +3,23 @@ export const TASK_LABELS: Record<TaskStatus,string> = {todo:'A fazer',in_progres
 export type Stage = 'qualification' | 'proposal' | 'negotiation' | 'closing' | 'won' | 'lost'
 export const STAGE_LABELS: Record<Stage,string> = {qualification:'Qualificação',proposal:'Proposta',negotiation:'Negociação',closing:'Fechamento',won:'Ganho',lost:'Perdido'}
 export const OPEN_STAGES: Stage[] = ['qualification','proposal','negotiation','closing']
-export interface DeliveryTask {id:string;contract_id:string;client_id:string;title:string;description:string;due_date:string|null;status:TaskStatus;previous_status:TaskStatus|null;service_name:string;client_name:string|null}
+export interface DeliveryTask {
+  id: string
+  contract_id: string | null
+  project_id?: string | null
+  parent_id?: string | null
+  dependency_id?: string | null
+  client_id: string
+  title: string
+  description: string
+  due_date: string | null
+  status: TaskStatus
+  previous_status: TaskStatus | null
+  service_name: string
+  client_name: string | null
+  priority?: 'high' | 'normal' | 'low' | null
+  blocked?: boolean
+}
 export interface ContractOption {id:string;client_id:string;service_name:string;client_name:string|null;status:string}
 export interface Opportunity {id:string;client_id:string;client_name:string|null;title:string;description:string;amount:number;expected_close:string;stage:Stage;probability:number;weighted_value:number;contract_id:string|null}
 export interface OpportunityPage {items:Opportunity[];total:number;summary:{open_count:number;open_value:number;weighted_value:number}}

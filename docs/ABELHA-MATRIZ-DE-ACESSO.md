@@ -1,152 +1,10 @@
 # Abelha | Inventário de autorização por rota
 
-**Atualização03.3:** o conteúdo HML03.1 abaixo é histórico do candidato anterior. O workflow novo acrescenta três rotas e uma migration ainda não aplicados ao HML. Consulte a [matriz local03.3](ABELHA-MATRIZ-ACESSO-033.md):126rotas/124negativas/66positivas/655asserções; não presumir que o recibo HML anterior cobre o código novo.
+144 rotas dos roteadores Express, mais 2 aliases HTTP registrados diretamente no app. O middleware de autenticação da biblioteca é montado em /api/auth e os fluxos usados pela fixture aparecem separadamente. Rotas HEAD implícitas do Express não são entradas independentes.
 
-<!-- HML031-BEGIN -->
-## Homologação integrada — 25/11/2026
+**Evidência local:** 146/146 rotas com teste direto; 144 com negativa executada, 67 com positiva executada, 743 asserções HTTP nas rotas inventariadas. [Recibo reproduzível](ABELHA-EVIDENCIA-ACESSO.json), hash do escopo-fonte `a2988ace7bb7e4a7de1366212cdb6de168c5b861a7d9f8d12f2b422d1c6624fb`.
 
-**123/123 rotas com positiva, 121 com negativa; 785 asserções da matriz, mais 23 verificações complementares por recurso.** Auth.js/backend/PostgreSQL HML reais; 119 positivas sem provedor de saída simulado e quatro com Overpass/Evolution simulados. Não comprova operação externa desses provedores. [Recibo HML](ABELHA-EVIDENCIA-HML-031.json) e [relatório](ABELHA-HOMOLOGACAO-INTEGRADA-031.md). Nenhuma migration repetida ou alteração em produção.
-
-403 por papel permanece identificado como restrição de papel. Isolamento por recurso usa titulares igualmente autorizados, inclusive na mesma organização, 404/ausência nas listas e checagem SQL de ausência de mutações. As negativas não são prova genérica de RLS.
-
-| Endpoint | Positivas HML | Negativas HML | Provedor de saída | Gate do contrato |
-|---|---:|---:|---|---|
-| POST /api/v1/account/invites | 8 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/account/invites | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/account/invites/expire | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/account/register/code | 5 | 1 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/account/register | 5 | 1 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/account/password/reset/request | 1 | 1 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/account/password/reset/confirm | 2 | 3 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/catalog | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/catalog | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/catalog/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| DELETE /api/v1/catalog/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/clients | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/clients/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/clients | 2 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/clients/:clientId/contracts | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/clients/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| DELETE /api/v1/clients/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/contracts/:contractId | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/conversations/whatsapp/status | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/conversations/whatsapp/pair | 1 | 6 | simulado | PASS |
-| GET /api/v1/conversations | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/conversations/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/conversations/:id/read | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/crm/contracts | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/crm/overview | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/crm/tasks | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/crm/tasks | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/crm/tasks/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| DELETE /api/v1/crm/tasks/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/crm/opportunities | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/crm/opportunities | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/crm/opportunities/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/crm/opportunities/:id/convert | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/crm/relationships/:clientId | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/crm/relationships/:clientId/notes | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/crm/relationships/:clientId/next-action | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/crm/search | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/crm/notifications | 2 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/crm/notifications | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/crm/reports | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/crm/export | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/events | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/finance/summary | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/finance/clients | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/finance/clients/:clientId | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/finance/expenses | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/finance/expenses | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/finance/expenses/:expenseId | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/finance/receivables | 2 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/finance/receivables/:receivableId | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/integrations/github | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/integrations/codex/projects | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/integrations/codex/report | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/integrations/projects/:id/reports | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/integrations/leads/search | 1 | 2 | simulado | PASS |
-| POST /api/v1/integrations/leads/stage | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/integrations/tick | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/integrations/weekly-review | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/integrations/prices/due | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/integrations/prices/:id/observations | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/integrations/leads/capture | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/member-modules/me | 2 | 4 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/member-modules/me/preferences | 2 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/member-modules/members/:id/status | 3 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/member-modules/members | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/member-modules/members/:id | 5 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/messages | 1 | 7 | simulado | PASS |
-| GET /api/v1/personal/finance | 4 | 4 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/personal/finance/cycles | 2 | 4 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/personal/finance/entries | 1 | 8 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/personal/finance/plans | 1 | 4 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/personal/subscriptions | 4 | 4 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/personal/subscriptions | 2 | 4 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/personal/subscriptions/:id | 1 | 8 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/personal/subscriptions/:id/payments | 1 | 8 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/personal/prices | 4 | 4 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/personal/prices | 3 | 4 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/personal/prices/:id | 1 | 8 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/personal/preferences | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/personal/preferences | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/personal/push-subscriptions | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| DELETE /api/v1/personal/push-subscriptions | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/personal/notifications | 2 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/personal/notifications/:id | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/personal/projects | 4 | 4 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/personal/projects | 4 | 4 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/personal/projects/:id | 1 | 8 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/personal/projects/:id | 1 | 8 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/personal/projects/:id/pipeline | 3 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/personal/projects/:id/links | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| DELETE /api/v1/personal/projects/:id | 1 | 8 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/personal/projects/:id/milestones | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/personal/projects/:id/decisions | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/personal/projects/:id/reports | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/personal/projects/:id/milestones/:milestone/complete | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/personal/reviews | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/personal/reviews | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/prospecting/leads/niches | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/prospecting/leads/search | 1 | 5 | simulado | PASS |
-| GET /api/v1/prospecting/leads/candidates | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/prospecting/leads/import | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/prospecting/leads/candidates/:id/approve | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/prospecting/templates | 2 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/prospecting/drafts | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/prospecting/drafts | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/prospecting/drafts/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/quote-models | 6 | 4 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/quote-models/preview | 1 | 4 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/quote-models | 3 | 4 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/quote-models/proposals | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/quote-models/proposals | 2 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/quote-models/proposals/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/quote-models/proposals/:id/approve | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/quote-models/proposals/:id/refuse | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/quote-models/proposals/:id/prompt | 1 | 7 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/quote-models/:id | 1 | 10 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/reminders | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| POST /api/v1/reminders | 1 | 5 | não exigido ou contrato de entrada sintético | PASS |
-| PATCH /api/v1/reminders/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| DELETE /api/v1/reminders/:id | 1 | 6 | não exigido ou contrato de entrada sintético | PASS |
-| POST /webhooks/evolution | 1 | 2 | não exigido ou contrato de entrada sintético | PASS |
-| GET /health | 1 | 0 | não exigido ou contrato de entrada sintético | PASS |
-| GET /api/v1/health | 1 | 0 | não exigido ou contrato de entrada sintético | PASS |
-
-<!-- HML031-END -->
-
-## Evidência local anterior (PGlite)
-
-
-
-
-121 rotas dos roteadores Express, mais 2 aliases HTTP registrados diretamente no app. O middleware de autenticação da biblioteca é montado em /api/auth e os fluxos usados pela fixture aparecem separadamente. Rotas HEAD implícitas do Express não são entradas independentes.
-
-**Evidência local:** 123/123 rotas com teste direto; 121 com negativa executada, 61 com positiva executada, 635 asserções HTTP nas rotas inventariadas. [Recibo reproduzível](ABELHA-EVIDENCIA-ACESSO.json), hash do escopo-fonte `f773c871509587dc724e373699cd232270e9e5d9a51f1cff6b88489bcdc47b3a`.
-
-**Interpretação:** a negativa comprova o caso anotado, não CRUD, integridade, replays, acesso a objetos de outro tenant ou RLS. Positivas são casos sintéticos executados, sem presumir sucesso remoto. Testes por fluxo e a suíte de PWA são complementares, não foram convertidos em crédito individual. Na fixture local descrita nesta seção, produção e HML não foram usadas; a rodada real de HML está na seção própria.
+**Interpretação:** a negativa comprova o caso anotado, não CRUD, integridade, replays, acesso a objetos de outro tenant ou RLS. Positivas são casos sintéticos executados, sem presumir sucesso remoto. Testes por fluxo e a suíte de PWA são complementares, não foram convertidos em crédito individual. Produção e HML não foram usadas.
 
 **Auth.js, fora do total de rotas da aplicação:** GET /api/auth/csrf · proprietário → 200; POST /api/auth/callback/credentials · proprietário → 200; GET /api/auth/session · proprietário → 200; GET /api/auth/csrf · membro A → 200; POST /api/auth/callback/credentials · membro A → 200; GET /api/auth/session · membro A → 200; GET /api/auth/csrf · membro B → 200; POST /api/auth/callback/credentials · membro B → 200; GET /api/auth/session · membro B → 200; GET /api/auth/csrf · conta desativada após login → 200; POST /api/auth/callback/credentials · conta desativada após login → 200; GET /api/auth/session · conta desativada após login → 200; GET /api/auth/csrf · sessão a revogar → 200; POST /api/auth/callback/credentials · sessão a revogar → 200; GET /api/auth/session · sessão a revogar → 200; POST /api/auth/signout · limpeza do cookie → 200.
 
@@ -169,6 +27,26 @@
 | Clientes e contratos | POST /api/v1/clients/:clientId/contracts | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Não é carteira de membro | Entidade da organização | Mutação | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
 | Clientes e contratos | PATCH /api/v1/clients/:id | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Não é carteira de membro | Entidade da organização | Mutação | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
 | Clientes e contratos | DELETE /api/v1/clients/:id | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Não é carteira de membro | Entidade da organização | Mutação | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Fluxo comercial | GET /api/v1/commercial/access | Sessão Auth.js | Conta ativa | Fluxo comercial | Organização da sessão | Usuário da sessão | Consulta de disponibilidade | Leitura | proprietário habilitado consulta disponibilidade → 200 | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro consulta disponibilidade sem grant → 200 | Casos locais aprovados |
+| Fluxo comercial | GET /api/v1/commercial/proposals | Sessão Auth.js | Proprietário habilitado | Fluxo comercial | Organização autorizada no backend | Usuário titular | Orçamento, versão, contrato ou projeto da carteira | Leitura | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Fluxo comercial | POST /api/v1/commercial/proposals | Sessão Auth.js | Proprietário habilitado | Fluxo comercial | Organização autorizada no backend | Usuário titular | Orçamento, versão, contrato ou projeto da carteira | Mutação | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Fluxo comercial | GET /api/v1/commercial/proposals/:id | Sessão Auth.js | Proprietário habilitado | Fluxo comercial | Organização autorizada no backend | Usuário titular | Orçamento, versão, contrato ou projeto da carteira | Leitura | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Fluxo comercial | PATCH /api/v1/commercial/proposals/:id | Sessão Auth.js | Proprietário habilitado | Fluxo comercial | Organização autorizada no backend | Usuário titular | Orçamento, versão, contrato ou projeto da carteira | Mutação | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Fluxo comercial | POST /api/v1/commercial/proposals/:id/publish | Sessão Auth.js | Proprietário habilitado | Fluxo comercial | Organização autorizada no backend | Usuário titular | Orçamento, versão, contrato ou projeto da carteira | Mutação | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Fluxo comercial | GET /api/v1/commercial/proposals/:id/versions/:versionId | Sessão Auth.js | Proprietário habilitado | Fluxo comercial | Organização autorizada no backend | Usuário titular | Orçamento, versão, contrato ou projeto da carteira | Leitura | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Fluxo comercial | GET /api/v1/commercial/proposals/:id/versions/:versionId/link | Sessão Auth.js | Proprietário habilitado | Fluxo comercial | Organização autorizada no backend | Usuário titular | Orçamento, versão, contrato ou projeto da carteira | Leitura | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Fluxo comercial | POST /api/v1/commercial/proposals/:id/versions/:versionId/revoke | Sessão Auth.js | Proprietário habilitado | Fluxo comercial | Organização autorizada no backend | Usuário titular | Orçamento, versão, contrato ou projeto da carteira | Mutação | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Fluxo comercial | POST /api/v1/commercial/proposals/:id/versions/:versionId/sent | Sessão Auth.js | Proprietário habilitado | Fluxo comercial | Organização autorizada no backend | Usuário titular | Orçamento, versão, contrato ou projeto da carteira | Mutação | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Fluxo comercial | PATCH /api/v1/commercial/proposals/:id/contract | Sessão Auth.js | Proprietário habilitado | Fluxo comercial | Organização autorizada no backend | Usuário titular | Orçamento, versão, contrato ou projeto da carteira | Mutação | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Fluxo comercial | POST /api/v1/commercial/proposals/:id/contract/publish | Sessão Auth.js | Proprietário habilitado | Fluxo comercial | Organização autorizada no backend | Usuário titular | Orçamento, versão, contrato ou projeto da carteira | Mutação | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Fluxo comercial | POST /api/v1/commercial/proposals/:id/contract/formalize | Sessão Auth.js | Proprietário habilitado | Fluxo comercial | Organização autorizada no backend | Usuário titular | Orçamento, versão, contrato ou projeto da carteira | Mutação | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Fluxo comercial | GET /api/v1/commercial/proposals/:id/contract/evidence | Sessão Auth.js | Proprietário habilitado | Fluxo comercial | Organização autorizada no backend | Usuário titular | Orçamento, versão, contrato ou projeto da carteira | Leitura | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Fluxo comercial | GET /api/v1/commercial/projects/:id | Sessão Auth.js | Proprietário habilitado | Fluxo comercial | Organização autorizada no backend | Usuário titular | Orçamento, versão, contrato ou projeto da carteira | Leitura | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Fluxo comercial | GET /api/v1/commercial/projects/:id/prompts | Sessão Auth.js | Proprietário habilitado | Fluxo comercial | Organização autorizada no backend | Usuário titular | Orçamento, versão, contrato ou projeto da carteira | Leitura | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Fluxo comercial | POST /api/v1/commercial/projects/:id/prompts | Sessão Auth.js | Proprietário habilitado | Fluxo comercial | Organização autorizada no backend | Usuário titular | Orçamento, versão, contrato ou projeto da carteira | Mutação | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Fluxo comercial | POST /api/v1/commercial/public/read | Token comercial ativo | Destinatário do link | Não aplicável | Vinculada à versão | Vinculado à versão | Snapshot publicado, decisão ou contrato disponibilizado | Mutação | Não exercitado | link comercial indisponível → 404 | PARCIAL |
+| Fluxo comercial | POST /api/v1/commercial/public/decision | Token comercial ativo | Destinatário do link | Não aplicável | Vinculada à versão | Vinculado à versão | Snapshot publicado, decisão ou contrato disponibilizado | Mutação | Não exercitado | link comercial indisponível → 404 | PARCIAL |
+| Fluxo comercial | POST /api/v1/commercial/public/contract/acknowledge | Token comercial ativo | Destinatário do link | Não aplicável | Vinculada à versão | Vinculado à versão | Snapshot publicado, decisão ou contrato disponibilizado | Mutação | Não exercitado | link comercial indisponível → 404 | PARCIAL |
 | Contratos | PATCH /api/v1/contracts/:contractId | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Não é carteira de membro | Entidade da organização | Mutação | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
 | Conversas e Evolution | GET /api/v1/conversations/whatsapp/status | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Não é carteira de membro | Entidade da organização | Leitura | consulta autenticada do proprietário → 200 | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | Casos locais aprovados |
 | Conversas e Evolution | POST /api/v1/conversations/whatsapp/pair | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Não é carteira de membro | Entidade da organização | Mutação | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
@@ -262,11 +140,14 @@
 | Calculadora e propostas | POST /api/v1/quote-models/preview | Sessão Auth.js | Proprietário ou membro com grant | Calculadora | Organização da sessão | Usuário da sessão | Registro privado do usuário e organização | Mutação | cálculo de modelo próprio → 200 | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; módulo desabilitado → 403 | Casos locais aprovados |
 | Calculadora e propostas | POST /api/v1/quote-models | Sessão Auth.js | Proprietário ou membro com grant | Calculadora | Organização da sessão | Usuário da sessão | Registro privado do usuário e organização | Mutação | persistência do modelo próprio → 201 | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; módulo desabilitado → 403 | Casos locais aprovados |
 | Calculadora e propostas | GET /api/v1/quote-models/proposals | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Usuário da sessão | Titular da carteira; proprietário não herda recursos de convidados | Leitura | consulta autenticada do proprietário → 200 | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | Casos locais aprovados |
-| Calculadora e propostas | POST /api/v1/quote-models/proposals | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Usuário da sessão | Titular da carteira; proprietário não herda recursos de convidados | Mutação | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Calculadora e propostas | POST /api/v1/quote-models/proposals | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Usuário da sessão | Titular da carteira; proprietário não herda recursos de convidados | Mutação | snapshot de proposta própria → 201 | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | Casos locais aprovados |
 | Calculadora e propostas | GET /api/v1/quote-models/proposals/:id | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Usuário da sessão | Titular da carteira; proprietário não herda recursos de convidados | Leitura | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
-| Calculadora e propostas | POST /api/v1/quote-models/proposals/:id/approve | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Usuário da sessão | Titular da carteira; proprietário não herda recursos de convidados | Mutação | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Calculadora e propostas | POST /api/v1/quote-models/proposals/:id/approve | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Usuário da sessão | Titular da carteira; proprietário não herda recursos de convidados | Mutação | aprovação explícita da proposta → 200 | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | Casos locais aprovados |
 | Calculadora e propostas | POST /api/v1/quote-models/proposals/:id/refuse | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Usuário da sessão | Titular da carteira; proprietário não herda recursos de convidados | Mutação | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
 | Calculadora e propostas | GET /api/v1/quote-models/proposals/:id/prompt | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Usuário da sessão | Titular da carteira; proprietário não herda recursos de convidados | Leitura | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |
+| Calculadora e propostas | POST /api/v1/quote-models/proposals/:id/status | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Usuário da sessão | Titular da carteira; proprietário não herda recursos de convidados | Mutação | proposta própria enviada → 200 | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | Casos locais aprovados |
+| Calculadora e propostas | GET /api/v1/quote-models/proposals/:id/prompts | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Usuário da sessão | Titular da carteira; proprietário não herda recursos de convidados | Leitura | histórico próprio de prompts → 200 | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | Casos locais aprovados |
+| Calculadora e propostas | POST /api/v1/quote-models/proposals/:id/prompts | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Usuário da sessão | Titular da carteira; proprietário não herda recursos de convidados | Mutação | prompt versionado da proposta aprovada → 201 | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | Casos locais aprovados |
 | Calculadora e propostas | PATCH /api/v1/quote-models/:id | Sessão Auth.js | Proprietário ou membro com grant | Calculadora | Organização da sessão | Usuário da sessão | Registro privado do usuário e organização | Mutação | edição do modelo privado → 200 | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; módulo desabilitado → 403; proprietário não altera modelo de convidado → 404 | Casos locais aprovados |
 | Agenda e lembretes | GET /api/v1/reminders | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Não é carteira de membro | Entidade da organização | Leitura | consulta autenticada do proprietário → 200 | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | Casos locais aprovados |
 | Agenda e lembretes | POST /api/v1/reminders | Sessão Auth.js | Proprietário | Nenhum para membros | Organização da sessão | Não é carteira de membro | Entidade da organização | Mutação | Não exercitado | anônimo → 401; conta desativada → 401; JWT revogado após reativação → 401; membro A (outro tenant) → 403; membro B (outro tenant) → 403 | PARCIAL |

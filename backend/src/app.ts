@@ -19,6 +19,7 @@ import { createQuoteModelsRouter } from "./routes/quote-models"
 import { createMemberModulesRouter } from "./routes/member-modules"
 import { createProspectingRouter } from "./routes/prospecting"
 import { createIntegrationsRouter, githubJsonParser } from "./routes/integrations"
+import { createCommercialRouter } from "./routes/commercial"
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -31,6 +32,7 @@ app.use(
 )
 
 app.use('/api/v1/integrations/github',githubJsonParser)
+app.use('/api/v1/commercial', createCommercialRouter())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use("/api/v1", (_req, res, next) => { res.set("Cache-Control", "no-store"); next() })

@@ -1,8 +1,7 @@
 import { useRef, useState, type DragEvent } from 'react'
-import { ArrowRight, ArrowUpRight, GitBranch, ListTodo } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, GitBranch, ListTodo, TriangleAlert, X } from 'lucide-react'
 import { api } from '@/lib/api'
-import { pipelineLabels, pipelineStages, projectStageLabel, projectUpdateSource, type ProjectStage } from '@/lib/personalProjectStatus'
-import { civilDate } from '@/types/crm'
+import { pipelineLabels, pipelineStages, projectStageLabel, type ProjectStage } from '@/lib/personalProjectStatus'
 import type { PersonalProject } from '@/types/personal'
 import './ProjectBoard.css'
 
@@ -27,6 +26,7 @@ export default function ProjectBoard({ projects, onOpen }: {
   const writable = projects.some(project => project.pipeline_stage!==undefined)
   const [error, setError] = useState('')
   const feedback = useRef<HTMLParagraphElement>(null)
+  const searchInput = useRef<HTMLInputElement>(null)
 
   async function move(project: PersonalProject, destination: ProjectStage) {
     if (inFlight.current || destination === project.pipeline_stage) return
@@ -56,18 +56,21 @@ export default function ProjectBoard({ projects, onOpen }: {
 
   return <section className="project-board" aria-labelledby="project-board-title">
     <div className="project-board-heading">
-      <div><h2 id="project-board-title">Quadro de projetos</h2><p className="page-subtitle">Arraste os cartões ou use «Mover para». O quadro não altera os marcos do projeto.</p></div>
+      <div><h2 id="project-board-title">Quadro de projetos</h2><p className="page-subtitle">Deslize para ver mais etapas. Arraste um cartão ou use «Mover para».</p></div>
       <span className="status-pill">{shown.length} {shown.length === 1 ? 'projeto' : 'projetos'}</span>
     </div>
     <div className="project-board-filters">
-      <label>Buscar projeto<input type="search" value={query} onChange={event=>setQuery(event.target.value)} placeholder="Nome ou descrição"/></label>
+      <div className="project-board-search">
+        <label>Buscar projeto<input ref={searchInput} type="search" value={query} onChange={event=>setQuery(event.target.value)} placeholder="Nome ou descrição"/></label>
+        {query && <button className="icon-button" type="button" aria-label="Limpar busca de projetos" onClick={()=>{setQuery('');searchInput.current?.focus()}}><X size={16} aria-hidden="true"/></button>}
+      </div>
       <label>Condição<select value={attention} onChange={event=>setAttention(event.target.value)}><option value="all">Todos</option><option value="paused">Pausados</option><option value="blocked">Bloqueados</option></select></label>
     </div>
     {!writable&&<p className="page-subtitle">O quadro está em leitura até a atualização do banco. Os projetos e seus estados anteriores foram preservados.</p>}
     {!shown.length&&<p role="status">Nenhum projeto corresponde aos filtros.</p>}
     <p className="project-board-feedback" tabIndex={-1} ref={feedback} role="status">{busyId ? 'Salvando movimentação…' : message}</p>
     {error && <p className="form-error" role="alert">{error}</p>}
-    <div className="project-board-columns">
+    <div className="project-board-columns kanban-columns" role="group" aria-label="Etapas dos projetos" tabIndex={0}>
       {stages.map(({ id, label }) => {
         const cards = shown.filter(project => (project.pipeline_stage ?? null) === id)
         const sectionId = id ?? 'unassigned'
@@ -87,9 +90,9 @@ export default function ProjectBoard({ projects, onOpen }: {
             <h3 id={'project-stage-'+sectionId}>{label}</h3>
             <span className="project-board-count" aria-label={cards.length+' projetos'}>{cards.length}</span>
           </header>
-          {cards.length > 0 ? <ul className="project-board-cards">{cards.map(project => <li key={project.id}>
+          {cards.length > 0 ? <ul className="project-board-cards kanban-cards" aria-label={'Projetos em '+label} tabIndex={0}>{cards.map(project => <li key={project.id}>
             <article className="project-board-card"
-              draggable={writable&&!busyId}
+              draggable={project.pipeline_stage!==undefined&&!busyId}
               onDragStart={event => {
                 dragging.current = project
                 event.dataTransfer.effectAllowed = 'move'
@@ -99,17 +102,11 @@ export default function ProjectBoard({ projects, onOpen }: {
               <button className="project-board-open" type="button" onClick={() => onOpen(project.id)}>
                 <span>{project.name}</span><ArrowUpRight aria-hidden="true" size={16}/>
               </button>
-              {project.description && <p className="project-board-description">{project.description}</p>}
-              <dl className="project-board-facts">
-                <dt>Situação</dt><dd>{projectStageLabel(project.status)}</dd>
-                <dt>Registro mais recente</dt><dd>{projectUpdateSource(project.latest_update_kind)}</dd>
-                <dt>Próxima ação</dt><dd>{project.next_step || 'Ainda não definida'}</dd>
-                {project.current_milestone && <><dt>Marco em aberto</dt><dd>{project.current_milestone}</dd></>}
-                {project.blockers && <><dt>Bloqueio</dt><dd>{project.blockers}</dd></>}
-              </dl>
+              {project.status === 'paused' && <p className="project-board-status">{projectStageLabel(project.status)}</p>}
+              {project.next_step && <p className="project-board-next"><span>Próxima ação</span>{project.next_step}</p>}
+              {project.blockers && <p className="project-board-blocker"><TriangleAlert size={14} aria-label="Bloqueio"/><span>{project.blockers}</span></p>}
               <ProjectProgress project={project}/>
-              <p className="project-board-date">Atualização: {civilDate(project.updated_at)}</p>
-              {writable&&<MoveControl project={project} disabled={Boolean(busyId)} onMove={destination => void move(project, destination)}/>}
+              {project.pipeline_stage!==undefined&&<MoveControl project={project} disabled={Boolean(busyId)} onMove={destination => void move(project, destination)}/>}
             </article>
           </li>)}</ul> : <p className="project-board-empty">Nenhum projeto nesta etapa.</p>}
         </section>
@@ -138,7 +135,7 @@ function MoveControl({ project, disabled, onMove }: {
 
 function ProjectProgress({ project }: { project: PersonalProject }) {
   const { milestone_count: total, completed_count: complete } = project
-  if (!total) return <p className="project-board-progress-label">Sem marcos definidos</p>
+  if (!total) return null
   const value = Math.round(complete / total * 100)
   return <div className="personal-progress project-board-progress">
     <progress value={value} max={100} aria-label={'Progresso de '+project.name}/>
